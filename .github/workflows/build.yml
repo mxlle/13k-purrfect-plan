@@ -8,7 +8,10 @@ on:
         description: "Deploy?"
         required: false
         type: boolean
-
+        
+permissions:
+  deployments: write
+  
 jobs:
   build:
     name: Build
