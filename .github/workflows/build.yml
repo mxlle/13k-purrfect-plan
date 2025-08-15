@@ -38,6 +38,9 @@ jobs:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' || inputs.deploy
     needs: build
+    permissions:
+      contents: read
+      deployments: write
     steps:
       - name: Create Deployment
         id: deploy
