@@ -61,7 +61,13 @@ $border-style: outset;
   }
 
   .#{$IS_MOM} {
-    text-shadow: 0.1rem -0.1rem 0.2rem rgba($main-color, 0.5);
+    $shadowSize: 0.1rem;
+    $shadowBlur: 0.1rem;
+    text-shadow:
+      $shadowSize -1 * $shadowSize $shadowBlur rgba($main-color, 0.5),
+      -1 * $shadowSize $shadowSize $shadowBlur rgba($main-color, 0.5),
+      $shadowSize $shadowSize $shadowBlur rgba($main-color, 0.5),
+      -1 * $shadowSize -1 * $shadowSize $shadowBlur rgba($main-color, 0.5);
   }
 
   .#{$CAT_SIZE} {
