@@ -1,0 +1,35 @@
+{
+  "name": "purrfect-plan",
+  "version": "1.0.0",
+  "main": "index",
+  "type": "module",
+  "scripts": {
+    "build": "npm rum clean && rollup -c",
+    "build-js13k": "npm rum clean && rollup -c --environment NODE_ENV:js13k && npm rum package",
+    "build-poki": "npm rum clean && rollup -c --environment NODE_ENV:poki && npm rum package",
+    "package": "node scripts/package.js",
+    "clean": "rimraf dist && mkdirp dist",
+    "start": "mkdirp out && rollup -c -w"
+  },
+  "devDependencies": {
+    "@rollup/plugin-html": "^1.0.3",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-terser": "^0.4.4",
+    "@rollup/plugin-typescript": "^11.1.6",
+    "archiver": "^7.0.1",
+    "html-minifier": "^4.0.0",
+    "mkdirp": "^3.0.1",
+    "prettier": "^3.3.3",
+    "rimraf": "^6.0.1",
+    "rollup": "^4.21.0",
+    "rollup-plugin-clear": "^2.0.7",
+    "rollup-plugin-dotenv": "^0.5.1",
+    "rollup-plugin-livereload": "^2.0.5",
+    "rollup-plugin-manifest-json": "^1.7.0",
+    "rollup-plugin-serve": "^2.0.2",
+    "rollup-plugin-svg-import": "^3.0.0",
+    "rollup-styles": "^1.5.0",
+    "sass": "^1.77.8",
+    "type-fest": "^4.25.0"
+  }
+}

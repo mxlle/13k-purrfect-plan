@@ -1,0 +1,150 @@
+@import "theme";
+
+html,
+body {
+  height: 100%;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+.score {
+  font-family: monospace;
+
+  @media (max-width: 640px) {
+    font-size: 0.8rem;
+  }
+}
+
+html {
+  font-size: 16px;
+
+  @media (min-width: 600px) {
+    font-size: 24px;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  background: $bg-primary;
+  color: $text-primary;
+  font-family: $font-family;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  hyphens: auto;
+  display: grid;
+  grid-template-rows: min-content 1fr;
+  overflow: hidden; // to hide dialogs
+
+  @media (prefers-color-scheme: light) {
+    @include light-theme;
+  }
+}
+
+main {
+  // height: 100%;
+  // width: 100%;
+  overflow: auto;
+  display: grid;
+  padding: 1rem;
+  gap: 1rem;
+  grid-template-columns: minmax(min-content, 1fr) minmax(min-content, 600px);
+
+  @media (orientation: portrait) {
+    grid-template-columns: 1fr;
+    grid-template-rows: min-content auto auto;
+  }
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 1rem;
+  align-items: center;
+  gap: 1rem;
+
+  .h-btns {
+    display: flex;
+    gap: 0.5rem;
+  }
+}
+
+button {
+  font-family: $font-family;
+  font-size: 1em;
+  cursor: pointer;
+  color: $text-primary;
+  border: 1px solid $bg-alpha-10;
+  background-color: $bg-secondary;
+  padding: 1rem 1.5rem;
+  border-radius: $border-radius;
+
+  @include hover {
+    background-color: $bg-alpha-10;
+  }
+
+  &.prm {
+    border-color: $main-color;
+    background-color: $main-color;
+
+    @include hover {
+      background-color: rgba($main-color, 0.7);
+    }
+  }
+
+  &[disabled] {
+    opacity: 0.3;
+    pointer-events: none;
+  }
+}
+
+button.icon-btn {
+  width: 2rem;
+  height: 2rem;
+  display: grid;
+  place-items: center;
+  border: none;
+  border-radius: 50%;
+  padding: 0.5rem;
+  font-size: 0.9em;
+  line-height: 1;
+  color: $text-secondary;
+  transform: scale(1);
+  transition: transform 0.3s;
+
+  @include hover {
+    transform: scale(1.2);
+  }
+}
+
+h3 {
+  margin: 0;
+}
+
+p {
+  margin: 0;
+  margin-bottom: 0.5rem;
+}
+
+.hidden {
+  display: none !important;
+}
+
+ul {
+  margin: 0.25rem 0;
+  padding-inline-start: 1rem;
+}

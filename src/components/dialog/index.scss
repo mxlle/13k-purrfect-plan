@@ -1,0 +1,52 @@
+@use "../../theme";
+
+.dialog {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background: theme.$dialog-bg;
+  color: theme.$text-primary;
+  display: grid;
+  grid-template-rows: 1fr min-content;
+  text-align: center;
+  transform: translateY(0);
+  opacity: 1;
+  transition:
+    transform 0.5s,
+    opacity 0.5s;
+
+  &:not(.open) {
+    transform: translateY(100%);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .content {
+    display: grid;
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    &.ovrflw {
+      align-content: start;
+    }
+  }
+
+  .icon-btn {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+  }
+}
+
+.btns {
+  display: grid;
+  gap: 1rem;
+  padding: 1rem;
+  grid-template-columns: repeat(2, minmax(auto, 1fr));
+
+  > * {
+    white-space: nowrap;
+  }
+}

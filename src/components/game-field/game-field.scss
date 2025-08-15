@@ -1,0 +1,82 @@
+@use "../../grid-mixins";
+
+@import "../../theme";
+@import "../../names";
+
+$border-style: outset;
+
+.#{$FIELD} {
+  --t: #{$tile-color-1};
+  position: relative;
+  margin: 0 auto;
+  justify-content: center;
+  height: fit-content;
+  border: calc(var(--s-size) / 4) solid $tile-color-alpha;
+
+  @include grid-mixins.board-tile-grid;
+  @include grid-mixins.board-tile-grid-variables;
+
+  .row {
+    display: contents;
+
+    &:nth-child(even) {
+      .#{$CELL} {
+        &:nth-child(odd) {
+          --t: #{$tile-color-2};
+        }
+      }
+    }
+
+    &:nth-child(odd) {
+      .#{$CELL}:not(:nth-child(odd)) {
+        --t: #{$tile-color-2};
+      }
+    }
+  }
+
+  .#{$START_BUTTON} {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 6;
+  }
+}
+
+.#{$CELL} {
+  background-color: var(--t);
+  display: grid;
+  place-items: center;
+  position: relative;
+  // width: 100%;
+  // height: 100%;
+
+  .#{$CAT} {
+    border: 0.125rem dotted transparent;
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 100%;
+    height: 100%;
+  }
+
+  > .#{$CAT} {
+    grid-area: 1 / 1;
+  }
+
+  span,
+  .#{$CAT} {
+    pointer-events: none;
+  }
+}
+
+
+.#{$WON} {
+  .#{$CELL} {
+    pointer-events: none;
+  }
+
+  .#{$START_BUTTON} {
+    font-size: 0.8rem;
+  }
+}
