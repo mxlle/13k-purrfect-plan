@@ -1,3 +1,5 @@
+import { createCatElement } from "./components/game-field/cell-component";
+
 export interface GameMetaData {
   minMoves: number;
   maxMoves: number;
@@ -24,18 +26,28 @@ export interface Cell extends CellPosition {
 }
 
 export interface BaseCat {
+  id: number;
   name: string; // todo tagged type
   size: number;
   awake: boolean;
+  isMother?: boolean;
 }
 
 export interface Cat extends BaseCat {
-  catElement: HTMLElement; // Optional reference to the HTML element representing the cat
+  catElement: HTMLElement;
+  inventory: Inventory;
 }
 
 export interface PlacedCat extends Cat, CellPosition {}
 
 export interface CatWithPosition extends BaseCat, CellPosition {}
+
+export type InventoryItem = PlacedCat;
+
+export interface Inventory {
+  size: number;
+  items: InventoryItem[];
+}
 
 export type GameFieldData = Cell[][];
 
@@ -46,7 +58,37 @@ export interface GameData {
   metaData?: GameMetaData;
 }
 
+export enum Direction {
+  UP,
+  DOWN,
+  LEFT,
+  RIGHT,
+}
+
 // type helpers
+
+const BASE_MOTHER_CAT: BaseCat = {
+  id: 0,
+  name: "🐈‍⬛",
+  size: 3,
+  awake: true,
+  isMother: true,
+};
+
+export const INITIAL_MOTHER_CAT: PlacedCat = {
+  ...BASE_MOTHER_CAT,
+  row: 0,
+  column: 0,
+  catElement: createCatElement(BASE_MOTHER_CAT),
+  inventory: getInventory(13),
+};
+
+export function getInventory(size: number): Inventory {
+  return {
+    size,
+    items: [],
+  };
+}
 
 const getType = (typeOrObject: string | Cell) => (typeof typeOrObject === "string" ? typeOrObject : typeOrObject.type);
 

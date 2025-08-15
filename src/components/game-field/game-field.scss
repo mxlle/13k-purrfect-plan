@@ -60,6 +60,26 @@ $border-style: outset;
     height: 100%;
   }
 
+  .#{$IS_MOM} {
+    text-shadow: 0.1rem -0.1rem 0.2rem rgba($main-color, 0.5);
+  }
+
+  .#{$CAT_SIZE} {
+    &1 {
+      font-size: 0.5em;
+      z-index: 3;
+    }
+
+    &2 {
+      font-size: 0.8em;
+      z-index: 2;
+    }
+
+    &3 {
+      font-size: 1.2em;
+    }
+  }
+
   > .#{$CAT} {
     grid-area: 1 / 1;
   }
@@ -69,7 +89,6 @@ $border-style: outset;
     pointer-events: none;
   }
 }
-
 
 .#{$WON} {
   .#{$CELL} {

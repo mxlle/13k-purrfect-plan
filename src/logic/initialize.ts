@@ -1,4 +1,4 @@
-import { BaseCat, Cat, Cell, CellType, GameFieldData, PlacedCat } from "../types";
+import { BaseCat, Cat, Cell, CellType, GameFieldData, getInventory, PlacedCat } from "../types";
 import { getOnboardingData, OnboardingData } from "./onboarding";
 import { globals } from "../globals";
 import { getRandomIntFromInterval, shuffleArray } from "../utils/random-utils";
@@ -14,7 +14,7 @@ export function placeCatsInitially(gameFieldData: GameFieldData): PlacedCat[] {
   if (onboardingData) {
     placedCats = applyPredefinedPositionsOfCharacters(onboardingData);
   } else {
-    const charactersForGame = generateCharactersForGame(gameFieldData);
+    const charactersForGame = generateCatsForGame(gameFieldData);
     placedCats = randomlyApplyCharactersOnBoard(gameFieldData, charactersForGame);
 
     //const time = performance.now();
@@ -74,19 +74,21 @@ function getGameFieldObject(type: CellType, row: number, column: number): Cell {
   return obj;
 }
 
-function generateCharactersForGame(gameField: GameFieldData): Cat[] {
-  const placedCats: PlacedCat[] = [];
+function generateCatsForGame(gameField: GameFieldData): Cat[] {
+  const motherCat = globals.motherCat;
+  const placedCats: PlacedCat[] = [motherCat];
   const { minAmount, maxAmount } = globals.settings;
   const amount = getRandomIntFromInterval(minAmount, maxAmount);
-  const characters: Cat[] = [];
+  const characters: Cat[] = [motherCat];
 
   while (characters.length < amount) {
-    const newCat = generateCat();
-    const chair = findValidField(gameField, placedCats, newCat);
+    const wasMotherCreated = characters.some((cat) => cat.isMother);
+    const newCat = generateCat(characters.length, !wasMotherCreated);
+    const field = findValidField(gameField, placedCats, newCat);
 
-    if (chair) {
+    if (field) {
       characters.push(newCat);
-      const { row, column } = chair;
+      const { row, column } = field;
       placedCats.push({ ...newCat, row, column });
     }
   }
@@ -100,17 +102,21 @@ export function findValidField(gameFieldData: GameFieldData, placedCats: PlacedC
   return emptyChairs[0];
 }
 
-function generateCat(): Cat {
+function generateCat(id: number, isMother: boolean): Cat {
   const name = "🐈‍⬛";
 
   const baseCat: BaseCat = {
+    id,
     name,
-    size: getRandomIntFromInterval(1, 3),
+    size: isMother ? 3 : getRandomIntFromInterval(1, 2),
     awake: true,
+    isMother,
   };
 
   return {
     ...baseCat,
+    catElement: createCatElement(baseCat),
+    inventory: getInventory(isMother ? 13 : baseCat.size),
   };
 }
 
@@ -148,6 +154,7 @@ function applyPredefinedPositionsOfCharacters(onboardingData: OnboardingData): P
     return {
       ...cat,
       catElement: createCatElement(cat),
+      inventory: getInventory(cat.size),
     };
   });
 }

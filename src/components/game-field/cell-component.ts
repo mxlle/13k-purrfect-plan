@@ -12,7 +12,7 @@ export function createCellElement(_cell: Cell): HTMLElement {
 
 export function createCatElement(cat: BaseCat): HTMLElement {
   const catElem = createElement({
-    cssClass: CssClass.CAT,
+    cssClass: `${CssClass.CAT} ${CssClass.CAT_SIZE}${cat.size} ${cat.isMother ? CssClass.IS_MOM : ""}`,
   });
 
   const catTextElem = createElement({

@@ -1,4 +1,4 @@
-import { GameFieldData, GameMetaData, PlacedCat, Settings } from "./types";
+import { GameFieldData, GameMetaData, INITIAL_MOTHER_CAT, PlacedCat, Settings } from "./types";
 import { getLocalStorageItem, LocalStorageKey } from "./utils/local-storage";
 import { Difficulty, difficultySettings } from "./logic/difficulty";
 
@@ -6,6 +6,7 @@ interface GameGlobals {
   previousOnboardingStep: number | undefined;
   onboardingStep: number;
   gameFieldData: GameFieldData;
+  motherCat: PlacedCat;
   placedCats: PlacedCat[];
   language: string;
   difficulty: Difficulty;
@@ -25,6 +26,7 @@ const defaultGlobals: GameGlobals = {
   onboardingStep: onboardingStepSetting ? Number(onboardingStepSetting) : 0,
   gameFieldData: [],
   placedCats: [],
+  motherCat: INITIAL_MOTHER_CAT,
   language: "en",
   difficulty: initialDifficulty,
   settings: initialSettings,

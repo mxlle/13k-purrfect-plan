@@ -2,7 +2,7 @@ import "./game-field.scss";
 
 import { createButton, createElement } from "../../utils/html-utils";
 import { newGame } from "../../logic/game-logic";
-import { Cell, CellPosition, findCat, GameFieldData } from "../../types";
+import { Cell, CellPosition, GameFieldData, PlacedCat } from "../../types";
 import { createCellElement } from "./cell-component";
 import { getTranslation, TranslationKey } from "../../translations/i18n";
 import { globals } from "../../globals";
@@ -13,9 +13,11 @@ import { handlePokiCommercial } from "../../poki-integration";
 import { getOnboardingData, increaseOnboardingStepIfApplicable, isOnboarding, wasOnboarding } from "../../logic/onboarding";
 import { getOnboardingArrow } from "../onboarding/onboarding-components";
 import { CssClass } from "../../utils/css-class";
+import { getControlsComponent } from "../controls/controls-component";
 
 let mainContainer: HTMLElement | undefined;
 let gameFieldElem: HTMLElement | undefined;
+let controlsElem: HTMLElement | undefined;
 let startButton: HTMLElement | undefined;
 let onboardingArrow: HTMLElement | undefined;
 const cellElements: HTMLElement[][] = [];
@@ -58,6 +60,7 @@ function addStartButton(buttonLabelKey: TranslationKey) {
 export async function startNewGame() {
   document.body.classList.remove(CssClass.SELECTING, CssClass.WON);
   globals.isWon = false;
+  globals.motherCat.inventory.items = [];
   startButton?.remove();
 
   if (globals.gameFieldData.length && gameFieldElem) {
@@ -71,6 +74,8 @@ export async function startNewGame() {
       console.debug("Was onboarding, removing game field");
       gameFieldElem.remove();
       gameFieldElem = undefined;
+      controlsElem?.remove();
+      controlsElem = undefined;
       globals.gameFieldData = [];
     }
   }
@@ -82,12 +87,15 @@ export async function startNewGame() {
   }
 
   globals.placedCats = placeCatsInitially(globals.gameFieldData);
+  globals.motherCat = globals.placedCats.find((cat) => cat.isMother);
 
   if (!gameFieldElem) {
     gameFieldElem = generateGameFieldElement(globals.gameFieldData);
     appendGameField();
     await requestAnimationFrameWithTimeout(TIMEOUT_BETWEEN_GAMES);
   }
+
+  await initializeCatsOnGameField(globals.placedCats);
 
   addOnboardingArrowIfApplicable();
 }
@@ -106,6 +114,10 @@ function appendGameField() {
   }
 
   mainContainer.append(gameFieldElem);
+
+  controlsElem = getControlsComponent();
+
+  mainContainer.append(controlsElem);
 }
 
 export function getCellElement(cell: CellPosition): HTMLElement {
@@ -128,12 +140,6 @@ export function generateGameFieldElement(gameFieldData: GameFieldData) {
     row.forEach((cell, _columnIndex) => {
       const cellElement = createCellElement(cell);
 
-      const cat = findCat(globals.placedCats, cell);
-
-      if (cat) {
-        cellElement.append(cat.catElement);
-      }
-
       rowElem.append(cellElement);
       rowElements.push(cellElement);
     });
@@ -152,6 +158,16 @@ function addOnboardingArrowIfApplicable() {
     const cell = globals.gameFieldData[onboardingData.arrow.row][onboardingData.arrow.column];
     const cellElement = getCellElement(cell);
     cellElement.append(onboardingArrow);
+  }
+}
+
+export async function initializeCatsOnGameField(cats: PlacedCat[]) {
+  for (let i = 0; i < cats.length; i++) {
+    const cat = cats[i];
+    const cellElement = getCellElement(cat);
+    cellElement.innerHTML = "";
+    cellElement.append(cat.catElement);
+    await requestAnimationFrameWithTimeout(TIMEOUT_CELL_APPEAR);
   }
 }
 

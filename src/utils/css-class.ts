@@ -20,10 +20,10 @@ export const enum CssClass {
   RIGHT = "q",
   ARROW = "r",
 
-  // help
-  HELP = "s",
-  HI = "t",
-  STATS = "u",
+  // controls
+  CONTROLS = "s",
+  MOVEMENT_CONTROLS = "t",
+  ACTION_CONTROLS = "u",
   STATS_GRID = "v",
   STAT = "w",
   GOOD = "x",
@@ -31,9 +31,9 @@ export const enum CssClass {
 
   TABLE = "z",
   MIDDLE = "A",
-  PLATE = "B",
-  CHAIR = "C",
-  CAT = "D",
+  IS_MOM = "B",
+  CAT = "C",
+  CAT_SIZE = "D",
   EMOJI = "E",
   FIELD = "F",
   WON = "G",

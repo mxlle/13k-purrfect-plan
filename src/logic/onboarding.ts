@@ -81,18 +81,17 @@ export function increaseOnboardingStepIfApplicable() {
 function getOnboardingDataForIntro(): OnboardingData {
   const short: ShortCharacterDefinition[] = [
     [0, 3, 1, 1, 0],
-    [0, 1, 1, 0, 3],
     [0, 1, 1, 3, 3],
   ];
 
   return {
     field: onboardingField,
     characters: getCatsWithPositionFromShortDescription(short),
-    arrow: {
-      row: 1,
-      column: 0,
-      direction: Direction.UP,
-    },
+    // arrow: {
+    //   row: 1,
+    //   column: 0,
+    //   direction: Direction.UP,
+    // },
   };
 }
 
@@ -103,12 +102,14 @@ function getCatsWithPositionFromShortDescription(short: ShortCharacterDefinition
     return ONBOARDING_CAT_EMOJIS[newIndex];
   };
 
-  return short.map(([nameIndex, size, awake, rowIndex, columnIndex]) => {
+  return short.map(([nameIndex, size, awake, rowIndex, columnIndex], index: number) => {
     const name = getOEmoji(nameIndex);
 
     return {
+      id: index,
       name,
       size,
+      isMother: index === 0, // The first cat is the mother
       awake: Boolean(awake),
       row: rowIndex,
       column: columnIndex,
