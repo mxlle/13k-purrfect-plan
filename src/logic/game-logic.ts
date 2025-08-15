@@ -30,10 +30,11 @@ export function moveCatToCell(cat: PlacedCat, cell: CellPosition) {
     newCellElement.appendChild(cat.catElement);
   }
 
-  moveInventory(cat, cell);
-  updateInventory(cat);
-
-  checkWinCondition();
+  if (cat.isMother) {
+    moveInventory(cat, cell);
+    updateInventory(cat);
+    checkWinCondition();
+  }
 }
 
 function moveInventory(cat: PlacedCat, cell: CellPosition) {
@@ -52,14 +53,14 @@ function updateInventory(cat: PlacedCat) {
 
   const currentInventory = cat.inventory;
   const otherCatsOnCell = globals.placedCats.filter((c) => c.id !== cat.id && c.row === cat.row && c.column === cat.column);
-  const smallerCats = otherCatsOnCell.filter((c) => c.size < cat.size);
-  const catsToPickUp = smallerCats.filter((c) => !currentInventory.items.some((item) => item.id === c.id));
+  // const smallerCats = otherCatsOnCell.filter((c) => c.size < cat.size);
+  const kittensToPickUp = otherCatsOnCell.filter((c) => currentInventory.items.every((item) => item.id !== c.id));
 
-  catsToPickUp.forEach((smallerCat) => {
+  kittensToPickUp.forEach((kitten) => {
     if (currentInventory.items.length < currentInventory.size) {
-      currentInventory.items.push(smallerCat);
+      currentInventory.items.push(kitten);
     } else {
-      console.warn("Inventory is full, cannot add smaller cat", smallerCat);
+      console.warn("Inventory is full, cannot add smaller cat", kitten);
     }
   });
 }
