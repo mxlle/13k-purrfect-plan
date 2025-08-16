@@ -17,7 +17,8 @@ body {
   }
 }
 
-.score {
+.title {
+  color: $main-color;
   font-family: monospace;
 
   @media (max-width: 640px) {

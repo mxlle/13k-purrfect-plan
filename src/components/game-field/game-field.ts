@@ -7,7 +7,6 @@ import { getTranslation, TranslationKey } from "../../translations/i18n";
 import { globals } from "../../globals";
 import { requestAnimationFrameWithTimeout } from "../../utils/promise-utils";
 import { getGameFieldData, placeCatsInitially } from "../../logic/initialize";
-import { PubSubEvent, pubSubService } from "../../utils/pub-sub-service";
 import { handlePokiCommercial } from "../../poki-integration";
 import { getOnboardingData, increaseOnboardingStepIfApplicable, isOnboarding, wasOnboarding } from "../../logic/onboarding";
 import { getArrowComponent } from "../arrow-component/arrow-component";
@@ -65,7 +64,6 @@ export async function startNewGame() {
 
   if (globals.gameFieldData.length && gameFieldElem) {
     // reset old game field
-    pubSubService.publish(PubSubEvent.UPDATE_SCORE, { score: 0, moves: 0, par: 0 });
     await cleanGameField(globals.gameFieldData);
     if (process.env.POKI_ENABLED === "true") await handlePokiCommercial();
     await requestAnimationFrameWithTimeout(TIMEOUT_BETWEEN_GAMES);

@@ -7,11 +7,10 @@ import { initAudio, togglePlayer } from "./audio/music-control";
 import { getLocalStorageItem, LocalStorageKey } from "./utils/local-storage";
 import { initPoki } from "./poki-integration";
 import { isOnboarding } from "./logic/onboarding";
-import { globals, isGameInProgress } from "./globals";
-import { getTranslation, TranslationKey } from "./translations/i18n";
+import { isGameInProgress } from "./globals";
 import { createWinScreen } from "./components/win-screen/win-screen";
 
-let scoreElement: HTMLElement;
+let titleElement: HTMLElement;
 let currentScore = 0;
 
 const initializeMuted = getLocalStorageItem(LocalStorageKey.MUTED) === "true";
@@ -21,11 +20,12 @@ function init() {
     tag: "header",
   });
 
-  scoreElement = createElement({
-    cssClass: "score",
+  titleElement = createElement({
+    cssClass: "title",
+    text: "Kittens united - a purrfect plan",
   });
 
-  header.append(scoreElement);
+  header.append(titleElement);
 
   const btnContainer = createElement({
     cssClass: "h-btns",
@@ -69,21 +69,6 @@ function init() {
   pubSubService.subscribe(PubSubEvent.NEW_GAME, () => {
     void startNewGame();
   });
-
-  pubSubService.subscribe(PubSubEvent.UPDATE_SCORE, ({ score, moves, par }) => {
-    if (isOnboarding() || !globals.metaData) {
-      scoreElement.textContent = "";
-      return;
-    }
-
-    currentScore = score;
-    const scoreText = `${getTranslation(TranslationKey.MOVES)}: ${moves} | Par: ${par} | ${formatNumber(score)}⭐️`;
-    scoreElement.textContent = scoreText;
-  });
-}
-
-function formatNumber(num: number): string {
-  return ("" + (10000 + num)).substring(1);
 }
 
 // INIT
