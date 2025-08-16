@@ -1,4 +1,5 @@
 @import "../../names";
+@import "../../theme";
 
 .#{$CONTROLS} {
   display: flex;
@@ -46,5 +47,11 @@
       grid-column: 1;
       grid-row: 2;
     }
+  }
+}
+
+.#{$TOOL_CONTROLS} {
+  button {
+    color: $main-color;
   }
 }

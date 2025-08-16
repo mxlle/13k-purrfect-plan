@@ -24,7 +24,7 @@ export const enum CssClass {
   CONTROLS = "controls",
   MOVEMENT_CONTROLS = "movement-controls",
   ACTION_CONTROLS = "u",
-  STATS_GRID = "v",
+  TOOL_CONTROLS = "tool-controls",
   STAT = "w",
   GOOD = "x",
   BAD = "y",

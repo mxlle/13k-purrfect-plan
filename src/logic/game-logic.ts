@@ -1,4 +1,4 @@
-import { Direction } from "../types";
+import { Direction, isTool, Tool, TurnMove } from "../types";
 import { PubSubEvent, pubSubService } from "../utils/pub-sub-service";
 import { getCellElement } from "../components/game-field/game-field";
 import { getKittensElsewhere, getKittensOnCell, isValidCellPosition } from "./checks";
@@ -8,24 +8,43 @@ import { requestAnimationFrameWithTimeout } from "../utils/promise-utils";
 import { CatId, isMother, PlacedCat } from "./data/cats";
 import { CellPosition, CellType } from "./data/cell";
 
-const KITTEN_DELAY_TIME = 0;
+const KITTEN_DELAY_TIME = 100;
+const FREE_KITTEN_DELAY_TIME = 500; // Time to wait before free kittens start moving
+
+let isPerformingMove = false;
 
 export function newGame() {
   pubSubService.publish(PubSubEvent.NEW_GAME);
 }
 
-export async function performMove(direction: Direction) {
+export async function performMove(turnMove: TurnMove) {
+  console.debug(`Make move: ${turnMove}`);
+
+  if (isPerformingMove) {
+    console.warn("Already performing a move, ignoring this one.");
+    return;
+  }
+
+  isPerformingMove = true;
+
   const kittensOnCell = getKittensOnCell(globals.placedCats, globals.motherCat);
 
-  console.debug(`Moving ${direction}`);
-  moveCat(globals.motherCat, direction);
+  if (isTool(turnMove)) {
+    await executeTool(turnMove);
+  } else {
+    moveCat(globals.motherCat, turnMove);
 
-  for (const kitten of kittensOnCell) {
-    await requestAnimationFrameWithTimeout(KITTEN_DELAY_TIME);
-    moveCat(kitten, direction);
+    for (const kitten of kittensOnCell) {
+      await requestAnimationFrameWithTimeout(KITTEN_DELAY_TIME);
+      moveCat(kitten, turnMove);
+    }
   }
 
   const freeKittens = getKittensElsewhere(globals.placedCats, globals.motherCat);
+
+  if (freeKittens.length > 0) {
+    await requestAnimationFrameWithTimeout(FREE_KITTEN_DELAY_TIME);
+  }
 
   for (const kitten of freeKittens) {
     await requestAnimationFrameWithTimeout(KITTEN_DELAY_TIME);
@@ -33,6 +52,21 @@ export async function performMove(direction: Direction) {
   }
 
   checkWinCondition();
+
+  isPerformingMove = false;
+}
+
+async function executeTool(tool: Tool) {
+  switch (tool) {
+    case Tool.MEOW:
+      // all kittens move one cell in the direction of the mother cat
+      const freeKittens = getKittensElsewhere(globals.placedCats, globals.motherCat);
+
+      for (const kitten of freeKittens) {
+        await requestAnimationFrameWithTimeout(KITTEN_DELAY_TIME);
+        moveCatTowardsCell(kitten, globals.motherCat);
+      }
+  }
 }
 
 function handleKittenBehavior(cat: PlacedCat) {
@@ -51,29 +85,10 @@ function handleKittenBehavior(cat: PlacedCat) {
 
 function doMoonyMove(cat: PlacedCat) {
   // Moony moves towards the moon
-  const { row, column } = cat;
-
   const moonPosition = globals.gameFieldData.flat().find((cell) => cell.type === CellType.MOON);
+
   if (moonPosition) {
-    if (moonPosition.row !== row) {
-      // one row closer to the moon
-      const newRow = row < moonPosition.row ? row + 1 : row - 1;
-
-      if (isValidCellPosition(globals.gameFieldData, { row: newRow, column })) {
-        moveCatToCell(cat, { row: newRow, column });
-        return;
-      }
-    }
-
-    if (moonPosition.column !== column) {
-      // one column closer to the moon
-      const newColumn = column < moonPosition.column ? column + 1 : column - 1;
-
-      if (isValidCellPosition(globals.gameFieldData, { row, column: newColumn })) {
-        moveCatToCell(cat, { row, column: newColumn });
-        return;
-      }
-    }
+    moveCatTowardsCell(cat, moonPosition);
   }
 }
 
@@ -127,35 +142,45 @@ function doIvyMove(cat: PlacedCat) {
         moveCatToCell(cat, { row: newRow, column });
         return;
       }
+    } else {
+      // If not next to a tree, just move towards the tree
+      moveCatTowardsCell(cat, treePosition);
     }
   }
 }
 
 function doSplashyMove(cat: PlacedCat) {
   // Splashy moves towards the puddle
-  const { row, column } = cat;
   const waterPosition = globals.gameFieldData.flat().find((cell) => cell.type === CellType.PUDDLE);
 
   if (waterPosition) {
-    if (waterPosition.column !== column) {
-      // one column closer to the puddle
-      const newColumn = column < waterPosition.column ? column + 1 : column - 1;
+    moveCatTowardsCell(cat, waterPosition);
+  }
+}
 
-      if (isValidCellPosition(globals.gameFieldData, { row, column: newColumn })) {
-        moveCatToCell(cat, { row, column: newColumn });
-        return;
-      }
+function moveCatTowardsCell(cat: PlacedCat, targetCell: CellPosition) {
+  const rowDiff = targetCell.row - cat.row;
+  const columnDiff = targetCell.column - cat.column;
+
+  if (rowDiff === 0 && columnDiff === 0) {
+    return;
+  }
+
+  if (Math.abs(rowDiff) >= Math.abs(columnDiff)) {
+    // Move vertically firsts
+    const newRow = cat.row + (rowDiff > 0 ? 1 : -1);
+
+    if (isValidCellPosition(globals.gameFieldData, { row: newRow, column: cat.column })) {
+      moveCatToCell(cat, { row: newRow, column: cat.column });
+      return;
     }
+  }
 
-    if (waterPosition.row !== row) {
-      // one row closer to the puddle
-      const newRow = row < waterPosition.row ? row + 1 : row - 1;
+  const newColumn = cat.column + (columnDiff > 0 ? 1 : -1);
 
-      if (isValidCellPosition(globals.gameFieldData, { row: newRow, column })) {
-        moveCatToCell(cat, { row: newRow, column });
-        return;
-      }
-    }
+  if (isValidCellPosition(globals.gameFieldData, { row: cat.row, column: newColumn })) {
+    moveCatToCell(cat, { row: cat.row, column: newColumn });
+    return;
   }
 }
 
@@ -168,7 +193,8 @@ export function moveCatToCell(cat: PlacedCat, cell: CellPosition) {
   const isValidMove = isValidCellPosition(globals.gameFieldData, cell);
 
   if (!isValidMove) {
-    throw new Error("invalid");
+    console.warn(`Invalid move for cat ${cat.name} to cell (${cell.row}, ${cell.column})`);
+    return;
   }
 
   cat.row = cell.row;

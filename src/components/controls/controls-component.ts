@@ -1,6 +1,6 @@
 import { createButton, createElement } from "../../utils/html-utils";
 import { CssClass } from "../../utils/css-class";
-import { Direction } from "../../types";
+import { Direction, Tool, TurnMove } from "../../types";
 
 import "./controls-component.scss";
 import { performMove } from "../../logic/game-logic";
@@ -25,17 +25,17 @@ export function getControlsComponent(): HTMLElement {
 
   controlsComponent.appendChild(movementContainer);
 
-  // const actionContainer = createElement({
-  //   cssClass: CssClass.ACTION_CONTROLS,
-  // });
-  //
-  // const startButton = createButton({
-  //   text: "Start",
-  //   onClick: () => console.log("Start button clicked"),
-  // });
+  const toolContainer = createElement({
+    cssClass: CssClass.TOOL_CONTROLS,
+  });
 
-  // actionContainer.appendChild(startButton);
-  // controlsComponent.appendChild(actionContainer);
+  const startButton = createButton({
+    text: "Meow",
+    onClick: () => performMove(Tool.MEOW),
+  });
+
+  toolContainer.appendChild(startButton);
+  controlsComponent.appendChild(toolContainer);
 
   return controlsComponent;
 }
@@ -61,26 +61,29 @@ function setupEventListeners() {
   if (hasSetupEventListeners) return;
 
   document.addEventListener("keydown", (event) => {
-    let direction: Direction | undefined;
+    let turnMove: TurnMove | undefined;
 
     switch (event.key) {
       case "ArrowUp":
-        direction = Direction.UP;
+        turnMove = Direction.UP;
         break;
       case "ArrowDown":
-        direction = Direction.DOWN;
+        turnMove = Direction.DOWN;
         break;
       case "ArrowLeft":
-        direction = Direction.LEFT;
+        turnMove = Direction.LEFT;
         break;
       case "ArrowRight":
-        direction = Direction.RIGHT;
+        turnMove = Direction.RIGHT;
+        break;
+      case "m": // 'm' for meow
+        turnMove = Tool.MEOW;
         break;
     }
 
-    if (direction) {
+    if (turnMove) {
       event.preventDefault(); // Prevent default scrolling behavior
-      handleMoveButtonClick(direction);
+      void performMove(turnMove);
     }
   });
 
@@ -88,7 +91,5 @@ function setupEventListeners() {
 }
 
 async function handleMoveButtonClick(direction: Direction) {
-  controlsComponent?.classList.add(CssClass.DISABLED);
   await performMove(direction);
-  controlsComponent?.classList.remove(CssClass.DISABLED);
 }

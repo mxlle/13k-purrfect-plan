@@ -16,3 +16,13 @@ export enum Direction {
   LEFT = CssClass.LEFT,
   RIGHT = CssClass.RIGHT,
 }
+
+export enum Tool {
+  MEOW = "meow",
+}
+
+export type TurnMove = Direction | Tool;
+
+export function isTool(move: TurnMove): move is Tool {
+  return Object.values(Tool).includes(move as Tool);
+}
