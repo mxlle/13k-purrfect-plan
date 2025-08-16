@@ -96,11 +96,11 @@ type InitialSetup = (CellType | CatId)[][];
 const lastSetup: InitialSetup = (() => {
   const { _, M, t, o, c, T, O, C } = getCellTypePlaceholders();
   return [
-    [_, o, C, _, _],
+    [C, o, _, _, _],
     [_, _, _, _, O],
-    [M, _, t, _, _],
-    [_, T, _, _, _],
-    [_, _, _, c, _],
+    [M, _, _, _, _],
+    [_, T, _, c, _],
+    [_, _, t, _, c],
   ];
 })();
 
