@@ -7,6 +7,10 @@ export function waitForPromiseAndTime(promise: Promise<unknown>, ms: number) {
 }
 
 export async function requestAnimationFrameWithTimeout(ms: number): Promise<void> {
+  if (ms < 0) {
+    return;
+  }
+
   await sleep(ms);
   return new Promise((resolve) => requestAnimationFrame(() => resolve()));
 }

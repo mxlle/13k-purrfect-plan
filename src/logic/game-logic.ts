@@ -8,8 +8,8 @@ import { requestAnimationFrameWithTimeout } from "../utils/promise-utils";
 import { CatId, isMother, PlacedCat } from "./data/cats";
 import { CellPosition, CellType } from "./data/cell";
 
-const KITTEN_DELAY_TIME = 100;
-const FREE_KITTEN_DELAY_TIME = 500; // Time to wait before free kittens start moving
+const KITTEN_DELAY_TIME = -1;
+const FREE_KITTEN_DELAY_TIME = -1; // Time to wait before free kittens start moving
 
 let isPerformingMove = false;
 
