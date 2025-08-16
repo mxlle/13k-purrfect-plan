@@ -52,6 +52,51 @@ $border-style: outset;
   // width: 100%;
   // height: 100%;
 
+  &.#{$TREE},
+  &.#{$PUDDLE},
+  &.#{$MOON} {
+    &::before {
+      content: "";
+      position: absolute;
+      display: grid;
+      place-items: center;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+  }
+
+  &.#{$TREE} {
+    &::before {
+      content: "🌳";
+    }
+  }
+
+  &.#{$PUDDLE} {
+    &::before {
+      --water: #105a99;
+
+      // css to create a puddle/pond effect
+      content: "";
+      border-radius: 55% 45% 62% 38% / 48% 60% 40% 52%;
+      width: 80%;
+      height: 80%;
+      top: 10%;
+      left: 10%;
+
+      background: radial-gradient(120px 90px at 62% 38%, rgba(170, 210, 255, 0.25), rgba(170, 210, 255, 0) 60%),
+        radial-gradient(80px 60px at 34% 68%, rgba(140, 190, 255, 0.2), rgba(140, 190, 255, 0) 60%), var(--water);
+    }
+  }
+
+  &.#{$MOON} {
+    &::before {
+      content: "🌙";
+      transform: scale(0.5) translateY(-50%);
+    }
+  }
+
   .#{$CAT} {
     position: relative;
     display: grid;

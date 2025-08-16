@@ -1,7 +1,7 @@
-import { getCellTypesWithoutPrefix } from "./data/cell";
+import { getCellTypePlaceholders } from "./data/cell";
 
 export const baseField = (() => {
-  const { _ } = getCellTypesWithoutPrefix();
+  const { _ } = getCellTypePlaceholders();
   return [
     [_, _, _, _, _],
     [_, _, _, _, _],
@@ -12,7 +12,7 @@ export const baseField = (() => {
 })();
 
 export const baseField7 = (() => {
-  const { _ } = getCellTypesWithoutPrefix();
+  const { _ } = getCellTypePlaceholders();
   return [
     [_, _, _, _, _, _, _],
     [_, _, _, _, _, _, _],

@@ -3,11 +3,17 @@ import { CssClass } from "../../utils/css-class";
 
 import catSvg from "./black-cat-pink-eyes.svg";
 import { BaseCat, isMother } from "../../logic/data/cats";
-import { Cell } from "../../logic/data/cell";
+import { Cell, CellType } from "../../logic/data/cell";
 
-export function createCellElement(_cell: Cell): HTMLElement {
+const cellTypeToCssClass: Record<Exclude<CellType, CellType.EMPTY>, CssClass> = {
+  [CellType.TREE]: CssClass.TREE,
+  [CellType.PUDDLE]: CssClass.PUDDLE,
+  [CellType.MOON]: CssClass.MOON,
+};
+
+export function createCellElement(cell: Cell): HTMLElement {
   const cellElem = createElement({
-    cssClass: CssClass.CELL,
+    cssClass: CssClass.CELL + " " + (cellTypeToCssClass[cell.type] || ""),
   });
 
   return cellElem;

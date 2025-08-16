@@ -1,9 +1,10 @@
-import { PlacedCat } from "./cats";
+import { CatId, PlacedCat } from "./cats";
 
 export const enum CellType {
   EMPTY = "",
-  TABLE = "🟫",
-  CHAIR = "🪑",
+  TREE = "🌳",
+  PUDDLE = "💧",
+  MOON = "🌙",
 }
 
 export interface CellPosition {
@@ -17,7 +18,6 @@ export interface Cell extends CellPosition {
 
 export type GameFieldData = Cell[][];
 const getType = (typeOrObject: string | Cell) => (typeof typeOrObject === "string" ? typeOrObject : typeOrObject.type);
-export const isChair = (typeOrObject: string | Cell) => getType(typeOrObject) === CellType.CHAIR;
 
 export function isEmptyField(placedCats: PlacedCat[], cell: Cell): boolean {
   return !hasCat(placedCats, cell);
@@ -35,10 +35,15 @@ export function isSameCell(cell1: CellPosition, cell2: CellPosition) {
   return cell1.row === cell2.row && cell1.column === cell2.column;
 }
 
-export function getCellTypesWithoutPrefix() {
+export function getCellTypePlaceholders() {
   return {
     _: CellType.EMPTY,
-    T: CellType.TABLE,
-    c: CellType.CHAIR,
+    T: CellType.TREE,
+    O: CellType.PUDDLE,
+    C: CellType.MOON,
+    M: CatId.MOTHER,
+    t: CatId.IVY,
+    o: CatId.SPLASHY,
+    c: CatId.MOONY,
   };
 }

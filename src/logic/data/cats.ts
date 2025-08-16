@@ -6,7 +6,7 @@ export enum CatId {
   MOTHER,
   MOONY,
   IVY,
-  TRIXY,
+  SPLASHY,
 }
 
 export const ALL_CAT_IDS = Object.values(CatId).filter((id) => typeof id === "number") as CatId[];
@@ -15,14 +15,14 @@ export const CAT_NAMES: Record<CatId, string> = {
   [CatId.MOTHER]: "Amara",
   [CatId.MOONY]: "Moony",
   [CatId.IVY]: "Ivy",
-  [CatId.TRIXY]: "Trixy",
+  [CatId.SPLASHY]: "Splashy",
 };
 
 const cachedCats: Record<CatId, Cat> = {
   [CatId.MOTHER]: createCat(CatId.MOTHER),
   [CatId.MOONY]: createCat(CatId.MOONY),
   [CatId.IVY]: createCat(CatId.IVY),
-  [CatId.TRIXY]: createCat(CatId.TRIXY),
+  [CatId.SPLASHY]: createCat(CatId.SPLASHY),
 };
 
 type CatName = (typeof CAT_NAMES)[CatId];

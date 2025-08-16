@@ -1,6 +1,6 @@
 export const enum CssClass {
   SELECTING = "a",
-  SELECTED = "b",
+  DISABLED = "disabled",
   PANIC = "c",
   SCARED = "d",
   SCARY = "e",
@@ -34,6 +34,9 @@ export const enum CssClass {
   CAT = "cat",
   CAT_SIZE = "cat-size",
   CAT_COLOR = "cat-color",
+  TREE = "tree",
+  PUDDLE = "puddle",
+  MOON = "moon",
   EMOJI = "emoji",
   FIELD = "field",
   WON = "won",
