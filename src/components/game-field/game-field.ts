@@ -2,7 +2,6 @@ import "./game-field.scss";
 
 import { createButton, createElement } from "../../utils/html-utils";
 import { newGame } from "../../logic/game-logic";
-import { Cell, CellPosition, GameFieldData, PlacedCat } from "../../types";
 import { createCellElement } from "./cell-component";
 import { getTranslation, TranslationKey } from "../../translations/i18n";
 import { globals } from "../../globals";
@@ -14,6 +13,8 @@ import { getOnboardingData, increaseOnboardingStepIfApplicable, isOnboarding, wa
 import { getArrowComponent } from "../arrow-component/arrow-component";
 import { CssClass } from "../../utils/css-class";
 import { getControlsComponent } from "../controls/controls-component";
+import { PlacedCat } from "../../logic/data/cats";
+import { Cell, CellPosition, GameFieldData } from "../../logic/data/cell";
 
 let mainContainer: HTMLElement | undefined;
 let gameFieldElem: HTMLElement | undefined;

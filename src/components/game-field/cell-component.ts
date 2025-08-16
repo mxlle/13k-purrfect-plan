@@ -1,8 +1,9 @@
-import { BaseCat, Cell } from "../../types";
 import { createElement } from "../../utils/html-utils";
 import { CssClass } from "../../utils/css-class";
 
 import catSvg from "./black-cat-pink-eyes.svg";
+import { BaseCat } from "../../logic/data/cats";
+import { Cell } from "../../logic/data/cell";
 
 export function createCellElement(_cell: Cell): HTMLElement {
   const cellElem = createElement({

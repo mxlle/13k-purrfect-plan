@@ -1,10 +1,12 @@
-import { CellPosition, Direction, PlacedCat } from "../types";
+import { Direction } from "../types";
 import { PubSubEvent, pubSubService } from "../utils/pub-sub-service";
 import { getCellElement } from "../components/game-field/game-field";
 import { getKittensOnCell, isValidCellPosition } from "./checks";
 import { globals } from "../globals";
 import { createWinScreen } from "../components/win-screen/win-screen";
 import { requestAnimationFrameWithTimeout } from "../utils/promise-utils";
+import { PlacedCat } from "./data/cats";
+import { CellPosition } from "./data/cell";
 
 const KITTEN_DELAY_TIME = 100;
 

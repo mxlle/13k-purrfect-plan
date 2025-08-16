@@ -1,4 +1,5 @@
-import { Cell, CellPosition, GameFieldData, isEmptyField, PlacedCat } from "../types";
+import { PlacedCat } from "./data/cats";
+import { Cell, CellPosition, GameFieldData, isEmptyField } from "./data/cell";
 
 // get all 8 neighbors of a cell
 export function getNeighbors(placedCats: PlacedCat[], self: PlacedCat): PlacedCat[] {

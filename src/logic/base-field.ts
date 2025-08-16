@@ -1,4 +1,4 @@
-import { getCellTypesWithoutPrefix } from "../types";
+import { getCellTypesWithoutPrefix } from "./data/cell";
 
 export const baseField = (() => {
   const { _ } = getCellTypesWithoutPrefix();

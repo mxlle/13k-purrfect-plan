@@ -1,6 +1,8 @@
-import { GameFieldData, GameMetaData, INITIAL_MOTHER_CAT, PlacedCat, Settings } from "./types";
+import { GameMetaData, Settings } from "./types";
 import { getLocalStorageItem, LocalStorageKey } from "./utils/local-storage";
 import { Difficulty, difficultySettings } from "./logic/difficulty";
+import { INITIAL_MOTHER_CAT, PlacedCat } from "./logic/data/cats";
+import { GameFieldData } from "./logic/data/cell";
 
 interface GameGlobals {
   previousOnboardingStep: number | undefined;

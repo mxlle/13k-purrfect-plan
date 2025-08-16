@@ -1,10 +1,11 @@
-import { BaseCat, Cat, Cell, CellType, GameFieldData, getInventory, PlacedCat } from "../types";
 import { getOnboardingData, OnboardingData } from "./onboarding";
 import { globals } from "../globals";
 import { getRandomIntFromInterval, shuffleArray } from "../utils/random-utils";
 import { getEmptyFields } from "./checks";
 import { baseField } from "./base-field";
 import { createCatElement } from "../components/game-field/cell-component";
+import { BaseCat, Cat, getInventory, PlacedCat } from "./data/cats";
+import { Cell, CellType, GameFieldData } from "./data/cell";
 
 export function placeCatsInitially(gameFieldData: GameFieldData): PlacedCat[] {
   let onboardingData: OnboardingData | undefined = getOnboardingData();

@@ -1,9 +1,11 @@
 import { ONBOARDING_CAT_EMOJIS, OnboardingEmojiIndex } from "../cat_emojis";
-import { CatWithPosition, CellType, Direction, getCellTypesWithoutPrefix } from "../types";
+import { Direction } from "../types";
 import { globals } from "../globals";
 import { LocalStorageKey, setLocalStorageItem } from "../utils/local-storage";
 import type { IntRange } from "type-fest";
 import { getRandomIntFromInterval } from "../utils/random-utils";
+import { CatWithPosition } from "./data/cats";
+import { CellType, getCellTypesWithoutPrefix } from "./data/cell";
 
 export const enum OnboardingStep {
   INTRO = 0,
