@@ -23,7 +23,7 @@ let onboardingArrow: HTMLElement | undefined;
 const cellElements: HTMLElement[][] = [];
 
 const TIMEOUT_BETWEEN_GAMES = 300;
-const TIMEOUT_CELL_APPEAR = 20;
+const TIMEOUT_CELL_APPEAR = -1;
 
 export async function initializeEmptyGameField() {
   document.body.classList.remove(CssClass.SELECTING);
