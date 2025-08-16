@@ -13,7 +13,7 @@ import { getOnboardingData, increaseOnboardingStepIfApplicable, isOnboarding, wa
 import { getArrowComponent } from "../arrow-component/arrow-component";
 import { CssClass } from "../../utils/css-class";
 import { getControlsComponent } from "../controls/controls-component";
-import { PlacedCat } from "../../logic/data/cats";
+import { isMother, PlacedCat } from "../../logic/data/cats";
 import { Cell, CellPosition, GameFieldData } from "../../logic/data/cell";
 
 let mainContainer: HTMLElement | undefined;
@@ -87,7 +87,7 @@ export async function startNewGame() {
   }
 
   globals.placedCats = placeCatsInitially(globals.gameFieldData);
-  globals.motherCat = globals.placedCats.find((cat) => cat.isMother);
+  globals.motherCat = globals.placedCats.find(isMother);
 
   if (!gameFieldElem) {
     gameFieldElem = generateGameFieldElement(globals.gameFieldData);

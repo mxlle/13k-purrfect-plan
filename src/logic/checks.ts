@@ -1,4 +1,4 @@
-import { PlacedCat } from "./data/cats";
+import { isMother, PlacedCat } from "./data/cats";
 import { Cell, CellPosition, GameFieldData, isEmptyField } from "./data/cell";
 
 // get all 8 neighbors of a cell
@@ -14,7 +14,7 @@ export function getNeighbors(placedCats: PlacedCat[], self: PlacedCat): PlacedCa
 }
 
 export function getKittensOnCell(placedCats: PlacedCat[], cell: CellPosition): PlacedCat[] {
-  return placedCats.filter((cat) => !cat.isMother && cat.row === cell.row && cat.column === cell.column);
+  return placedCats.filter((cat) => !isMother(cat) && cat.row === cell.row && cat.column === cell.column);
 }
 
 export function getEmptyFields(gameFieldData: GameFieldData, placedCats: PlacedCat[]) {
@@ -30,5 +30,5 @@ export function isValidCellPosition(gameFieldData: GameFieldData, position: Cell
 }
 
 export function getMotherCat(placedCats: PlacedCat[]): PlacedCat | undefined {
-  return placedCats.find((cat) => cat.isMother);
+  return placedCats.find(isMother);
 }

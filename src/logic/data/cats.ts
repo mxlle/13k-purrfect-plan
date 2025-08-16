@@ -2,12 +2,35 @@ import { createCatElement } from "../../components/game-field/cell-component";
 
 import { CellPosition } from "./cell";
 
+export enum CatId {
+  MOTHER,
+  MOONY,
+  IVY,
+  TRIXY,
+}
+
+export const ALL_CAT_IDS = Object.values(CatId).filter((id) => typeof id === "number") as CatId[];
+
+export const CAT_NAMES: Record<CatId, string> = {
+  [CatId.MOTHER]: "Amara",
+  [CatId.MOONY]: "Moony",
+  [CatId.IVY]: "Ivy",
+  [CatId.TRIXY]: "Trixy",
+};
+
+const cachedCats: Record<CatId, Cat> = {
+  [CatId.MOTHER]: createCat(CatId.MOTHER),
+  [CatId.MOONY]: createCat(CatId.MOONY),
+  [CatId.IVY]: createCat(CatId.IVY),
+  [CatId.TRIXY]: createCat(CatId.TRIXY),
+};
+
+type CatName = (typeof CAT_NAMES)[CatId];
+
 export interface BaseCat {
-  id: number;
-  name: string; // todo tagged type
-  size: number;
+  readonly id: CatId;
+  readonly name: CatName;
   awake: boolean;
-  isMother?: boolean;
 }
 
 export interface Cat extends BaseCat {
@@ -17,21 +40,33 @@ export interface Cat extends BaseCat {
 
 export interface PlacedCat extends Cat, CellPosition {}
 
-export interface CatWithPosition extends BaseCat, CellPosition {}
-
 export type InventoryItem = PlacedCat;
 
-const BASE_MOTHER_CAT: BaseCat = {
-  id: 0,
-  name: "🐈‍⬛",
-  size: 3,
-  awake: true,
-  isMother: true,
-};
-
 export const INITIAL_MOTHER_CAT: PlacedCat = {
-  ...BASE_MOTHER_CAT,
+  ...getCat(CatId.MOTHER),
   row: 0,
   column: 0,
-  catElement: createCatElement(BASE_MOTHER_CAT),
 };
+
+function createCat(id: CatId): Cat {
+  const name = CAT_NAMES[id];
+
+  const baseCat: BaseCat = {
+    id,
+    name,
+    awake: true,
+  };
+
+  return {
+    ...baseCat,
+    catElement: createCatElement(baseCat),
+  };
+}
+
+export function getCat(id: CatId): Cat {
+  return cachedCats[id];
+}
+
+export function isMother(cat: BaseCat): boolean {
+  return cat.id === CatId.MOTHER;
+}

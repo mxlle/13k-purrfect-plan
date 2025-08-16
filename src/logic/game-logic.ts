@@ -5,7 +5,7 @@ import { getKittensOnCell, isValidCellPosition } from "./checks";
 import { globals } from "../globals";
 import { createWinScreen } from "../components/win-screen/win-screen";
 import { requestAnimationFrameWithTimeout } from "../utils/promise-utils";
-import { PlacedCat } from "./data/cats";
+import { isMother, PlacedCat } from "./data/cats";
 import { CellPosition } from "./data/cell";
 
 const KITTEN_DELAY_TIME = 100;
@@ -51,7 +51,7 @@ export function moveCatToCell(cat: PlacedCat, cell: CellPosition) {
 }
 
 function updateInventory(cat: PlacedCat) {
-  if (!cat.isMother) {
+  if (!isMother(cat)) {
     return; // Only mother cat can pick up smaller cats
   }
 

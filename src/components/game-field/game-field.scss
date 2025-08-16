@@ -58,35 +58,15 @@ $border-style: outset;
     place-items: center;
     width: 100%;
     height: 100%;
+
+    &:not(.#{$IS_MOM}) {
+      z-index: 2;
+      transform: scale(1.3) translate(var(--t-x, 0), 15%);
+    }
   }
 
   .#{$IS_MOM} {
-    $shadowSize: 0.1rem;
-    $shadowBlur: 0.1rem;
-    text-shadow:
-      $shadowSize -1 * $shadowSize $shadowBlur rgba($main-color, 0.5),
-      -1 * $shadowSize $shadowSize $shadowBlur rgba($main-color, 0.5),
-      $shadowSize $shadowSize $shadowBlur rgba($main-color, 0.5),
-      -1 * $shadowSize -1 * $shadowSize $shadowBlur rgba($main-color, 0.5);
-  }
-
-  .#{$CAT_SIZE} {
-    &1 {
-      font-size: 0.7em;
-      z-index: 3;
-      transform: scale(1.3) translate(var(--t-x, 0), 15%);
-    }
-
-    &2 {
-      font-size: 0.9em;
-      z-index: 2;
-      transform: scale(1.6);
-    }
-
-    &3 {
-      font-size: 1.2em;
-      transform: scale(2);
-    }
+    transform: scale(2);
   }
 
   .#{$CAT_COLOR} {

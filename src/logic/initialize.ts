@@ -3,8 +3,7 @@ import { globals } from "../globals";
 import { getRandomIntFromInterval, shuffleArray } from "../utils/random-utils";
 import { getEmptyFields } from "./checks";
 import { baseField } from "./base-field";
-import { createCatElement } from "../components/game-field/cell-component";
-import { BaseCat, Cat, PlacedCat } from "./data/cats";
+import { ALL_CAT_IDS, Cat, getCat, PlacedCat } from "./data/cats";
 import { Cell, CellType, GameFieldData } from "./data/cell";
 
 export function placeCatsInitially(gameFieldData: GameFieldData): PlacedCat[] {
@@ -76,15 +75,13 @@ function getGameFieldObject(type: CellType, row: number, column: number): Cell {
 }
 
 function generateCatsForGame(gameField: GameFieldData): Cat[] {
-  const motherCat = globals.motherCat;
-  const placedCats: PlacedCat[] = [motherCat];
+  const placedCats: PlacedCat[] = [];
   const { minAmount, maxAmount } = globals.settings;
   const amount = getRandomIntFromInterval(minAmount, maxAmount);
-  const characters: Cat[] = [motherCat];
+  const characters: Cat[] = [];
 
-  while (characters.length < amount) {
-    const wasMotherCreated = characters.some((cat) => cat.isMother);
-    const newCat = generateCat(characters.length, !wasMotherCreated);
+  for (let catId of ALL_CAT_IDS) {
+    const newCat = getCat(catId);
     const field = findValidField(gameField, placedCats, newCat);
 
     if (field) {
@@ -92,32 +89,19 @@ function generateCatsForGame(gameField: GameFieldData): Cat[] {
       const { row, column } = field;
       placedCats.push({ ...newCat, row, column });
     }
+
+    if (characters.length >= amount) {
+      break;
+    }
   }
 
   return characters;
 }
 
 export function findValidField(gameFieldData: GameFieldData, placedCats: PlacedCat[], _cat: Cat): Cell | undefined {
-  const emptyChairs = getEmptyFields(gameFieldData, placedCats);
+  const emptyFields = getEmptyFields(gameFieldData, placedCats);
 
-  return emptyChairs[0];
-}
-
-function generateCat(id: number, isMother: boolean): Cat {
-  const name = "🐈‍⬛";
-
-  const baseCat: BaseCat = {
-    id,
-    name,
-    size: isMother ? 3 : 1,
-    awake: true,
-    isMother,
-  };
-
-  return {
-    ...baseCat,
-    catElement: createCatElement(baseCat),
-  };
+  return emptyFields[0];
 }
 
 function randomlyApplyCharactersOnBoard(gameFieldData: GameFieldData, characters: Cat[], iteration: number = 0): PlacedCat[] {
@@ -153,7 +137,6 @@ function applyPredefinedPositionsOfCharacters(onboardingData: OnboardingData): P
   return characters.map((cat): PlacedCat => {
     return {
       ...cat,
-      catElement: createCatElement(cat),
     };
   });
 }

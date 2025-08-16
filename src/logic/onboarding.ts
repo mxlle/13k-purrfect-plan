@@ -1,10 +1,8 @@
-import { ONBOARDING_CAT_EMOJIS, OnboardingEmojiIndex } from "../cat_emojis";
 import { Direction } from "../types";
 import { globals } from "../globals";
 import { LocalStorageKey, setLocalStorageItem } from "../utils/local-storage";
 import type { IntRange } from "type-fest";
-import { getRandomIntFromInterval } from "../utils/random-utils";
-import { CatWithPosition } from "./data/cats";
+import { getCat, PlacedCat } from "./data/cats";
 import { CellType, getCellTypesWithoutPrefix } from "./data/cell";
 
 export const enum OnboardingStep {
@@ -21,7 +19,7 @@ export function wasOnboarding() {
 
 export interface OnboardingData {
   field: CellType[][];
-  characters: CatWithPosition[];
+  characters: PlacedCat[];
   arrow?: {
     row: number;
     column: number;
@@ -31,13 +29,7 @@ export interface OnboardingData {
 
 type BaseFieldIndex = IntRange<0, 9>;
 
-type ShortCharacterDefinition = [
-  nameIndex: OnboardingEmojiIndex,
-  size: number,
-  awake: 0 | 1,
-  rowIndex: BaseFieldIndex,
-  columnIndex: BaseFieldIndex,
-];
+type ShortCharacterDefinition = [awake: 0 | 1, rowIndex: BaseFieldIndex, columnIndex: BaseFieldIndex];
 
 // a 4 by 4 grid
 const onboardingField = (() => {
@@ -81,8 +73,8 @@ export function increaseOnboardingStepIfApplicable() {
 
 function getOnboardingDataForIntro(): OnboardingData {
   const short: ShortCharacterDefinition[] = [
-    [0, 3, 1, 1, 0],
-    [0, 1, 1, 3, 3],
+    [1, 1, 0],
+    [1, 3, 3],
   ];
 
   return {
@@ -96,21 +88,10 @@ function getOnboardingDataForIntro(): OnboardingData {
   };
 }
 
-function getCatsWithPositionFromShortDescription(short: ShortCharacterDefinition[]): CatWithPosition[] {
-  const cesar = getRandomIntFromInterval(0, ONBOARDING_CAT_EMOJIS.length - 1);
-  const getOEmoji = (index) => {
-    const newIndex = (cesar + index) % ONBOARDING_CAT_EMOJIS.length;
-    return ONBOARDING_CAT_EMOJIS[newIndex];
-  };
-
-  return short.map(([nameIndex, size, awake, rowIndex, columnIndex], index: number) => {
-    const name = getOEmoji(nameIndex);
-
+function getCatsWithPositionFromShortDescription(short: ShortCharacterDefinition[]): PlacedCat[] {
+  return short.map(([awake, rowIndex, columnIndex], index: number) => {
     return {
-      id: index,
-      name,
-      size,
-      isMother: index === 0, // The first cat is the mother
+      ...getCat(index),
       awake: Boolean(awake),
       row: rowIndex,
       column: columnIndex,
