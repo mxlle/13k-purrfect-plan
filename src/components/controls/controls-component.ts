@@ -3,8 +3,7 @@ import { CssClass } from "../../utils/css-class";
 import { Direction } from "../../types";
 
 import "./controls-component.scss";
-import { globals } from "../../globals";
-import { moveCat } from "../../logic/game-logic";
+import { performMove } from "../../logic/game-logic";
 
 export function getControlsComponent(): HTMLElement {
   const controlsComponent = createElement({
@@ -65,6 +64,5 @@ export function getDirectionButtonText(direction: Direction): string {
 }
 
 function handleMoveButtonClick(direction: Direction) {
-  console.debug(`Moving ${direction}`);
-  moveCat(globals.motherCat, direction);
+  performMove(direction);
 }

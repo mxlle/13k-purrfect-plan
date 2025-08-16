@@ -1,15 +1,19 @@
 import { Cell, CellPosition, GameFieldData, isEmptyField, PlacedCat } from "../types";
 
-// get all 8 neighbors of a cell, plus the three cells on the other side of the table
-export function getNeighbors(placedCats: PlacedCat[], self: CellPosition): PlacedCat[] {
+// get all 8 neighbors of a cell
+export function getNeighbors(placedCats: PlacedCat[], self: PlacedCat): PlacedCat[] {
   const { row, column } = self;
 
   const neighbors: PlacedCat[] = placedCats.filter((cat) => {
-    const isSelf = cat.row === row && cat.column === column;
+    const isSelf = cat.id === self.id;
     return !isSelf && Math.abs(cat.row - row) <= 1 && Math.abs(cat.column - column) <= 1;
   });
 
   return neighbors;
+}
+
+export function getKittensOnCell(placedCats: PlacedCat[], cell: CellPosition): PlacedCat[] {
+  return placedCats.filter((cat) => !cat.isMother && cat.row === cell.row && cat.column === cell.column);
 }
 
 export function getEmptyFields(gameFieldData: GameFieldData, placedCats: PlacedCat[]) {

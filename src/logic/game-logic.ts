@@ -1,12 +1,29 @@
 import { CellPosition, Direction, PlacedCat } from "../types";
 import { PubSubEvent, pubSubService } from "../utils/pub-sub-service";
 import { getCellElement } from "../components/game-field/game-field";
-import { isValidCellPosition } from "./checks";
+import { getKittensOnCell, isValidCellPosition } from "./checks";
 import { globals } from "../globals";
 import { createWinScreen } from "../components/win-screen/win-screen";
+import { requestAnimationFrameWithTimeout } from "../utils/promise-utils";
+
+const KITTEN_DELAY_TIME = 100;
 
 export function newGame() {
   pubSubService.publish(PubSubEvent.NEW_GAME);
+}
+
+export async function performMove(direction: Direction) {
+  const kittensOnCell = getKittensOnCell(globals.placedCats, globals.motherCat);
+
+  console.debug(`Moving ${direction}`);
+  moveCat(globals.motherCat, direction);
+
+  for (const kitten of kittensOnCell) {
+    await requestAnimationFrameWithTimeout(KITTEN_DELAY_TIME);
+    moveCat(kitten, direction);
+  }
+
+  checkWinCondition();
 }
 
 export function moveCat(cat: PlacedCat, direction: Direction) {
@@ -29,21 +46,6 @@ export function moveCatToCell(cat: PlacedCat, cell: CellPosition) {
   if (newCellElement) {
     newCellElement.appendChild(cat.catElement);
   }
-
-  if (cat.isMother) {
-    moveInventory(cat, cell);
-    updateInventory(cat);
-    checkWinCondition();
-  }
-}
-
-function moveInventory(cat: PlacedCat, cell: CellPosition) {
-  const currentInventory = cat.inventory;
-
-  // Place each item in the inventory into the cell
-  currentInventory.items.forEach((item) => {
-    moveCatToCell(item, cell);
-  });
 }
 
 function updateInventory(cat: PlacedCat) {
