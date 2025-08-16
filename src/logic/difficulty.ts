@@ -27,19 +27,19 @@ export const difficulties = [Difficulty.EASY, Difficulty.MEDIUM, Difficulty.HARD
 export const difficultySettings: Record<Difficulty, Settings> = {
   [Difficulty.EASY]: {
     minAmount: 2,
-    maxAmount: 5,
+    maxAmount: 2,
   },
   [Difficulty.MEDIUM]: {
-    minAmount: 4,
-    maxAmount: 7,
+    minAmount: 3,
+    maxAmount: 3,
   },
   [Difficulty.HARD]: {
-    minAmount: 7,
-    maxAmount: 10,
+    minAmount: 4,
+    maxAmount: 4,
   },
   [Difficulty.EXTREME]: {
-    minAmount: 13,
-    maxAmount: 13,
+    minAmount: 5,
+    maxAmount: 5,
   },
 };
 
