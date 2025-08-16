@@ -11,7 +11,7 @@ import { getGameFieldData, placeCatsInitially } from "../../logic/initialize";
 import { PubSubEvent, pubSubService } from "../../utils/pub-sub-service";
 import { handlePokiCommercial } from "../../poki-integration";
 import { getOnboardingData, increaseOnboardingStepIfApplicable, isOnboarding, wasOnboarding } from "../../logic/onboarding";
-import { getOnboardingArrow } from "../onboarding/onboarding-components";
+import { getArrowComponent } from "../arrow-component/arrow-component";
 import { CssClass } from "../../utils/css-class";
 import { getControlsComponent } from "../controls/controls-component";
 
@@ -71,7 +71,7 @@ export async function startNewGame() {
     await requestAnimationFrameWithTimeout(TIMEOUT_BETWEEN_GAMES);
 
     if (wasOnboarding()) {
-      console.debug("Was onboarding, removing game field");
+      console.debug("Was arrow-component, removing game field");
       gameFieldElem.remove();
       gameFieldElem = undefined;
       controlsElem?.remove();
@@ -80,7 +80,7 @@ export async function startNewGame() {
     }
   }
 
-  console.debug("Starting new game, onboarding step", globals.onboardingStep);
+  console.debug("Starting new game, arrow-component step", globals.onboardingStep);
 
   if (!globals.gameFieldData.length) {
     globals.gameFieldData = getGameFieldData();
@@ -154,7 +154,7 @@ function addOnboardingArrowIfApplicable() {
   const onboardingData = getOnboardingData();
 
   if (onboardingData?.arrow) {
-    onboardingArrow = getOnboardingArrow(onboardingData.arrow.direction);
+    onboardingArrow = getArrowComponent(onboardingData.arrow.direction, true);
     const cell = globals.gameFieldData[onboardingData.arrow.row][onboardingData.arrow.column];
     const cellElement = getCellElement(cell);
     cellElement.append(onboardingArrow);

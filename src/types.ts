@@ -1,4 +1,5 @@
 import { createCatElement } from "./components/game-field/cell-component";
+import { CssClass } from "./utils/css-class";
 
 export interface GameMetaData {
   minMoves: number;
@@ -59,10 +60,10 @@ export interface GameData {
 }
 
 export enum Direction {
-  UP,
-  DOWN,
-  LEFT,
-  RIGHT,
+  UP = CssClass.UP,
+  DOWN = CssClass.DOWN,
+  LEFT = CssClass.LEFT,
+  RIGHT = CssClass.RIGHT,
 }
 
 // type helpers

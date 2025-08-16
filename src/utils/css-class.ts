@@ -11,7 +11,7 @@ export const enum CssClass {
   HAS_RIGHT = "j",
   CELL = "k",
   IS_DRAGGING = "l",
-  IS_DRAGGED = "m",
+  ANIMATED = "m",
 
   // arrows
   UP = "n",

@@ -4,6 +4,7 @@ import { Direction } from "../../types";
 
 import "./controls-component.scss";
 import { performMove } from "../../logic/game-logic";
+import { getArrowComponent } from "../arrow-component/arrow-component";
 
 let hasSetupEventListeners = false;
 
@@ -44,27 +45,15 @@ function getAllMoveButtons(): HTMLElement[] {
 
 function getMoveButton(direction: Direction): HTMLElement {
   const button = createButton({
-    text: getDirectionButtonText(direction),
+    text: "",
     onClick: () => handleMoveButtonClick(direction),
     iconBtn: true,
   });
 
-  return button;
-}
+  const arrow = getArrowComponent(direction, false);
+  button.append(arrow);
 
-export function getDirectionButtonText(direction: Direction): string {
-  switch (direction) {
-    case Direction.UP:
-      return "⬆️";
-    case Direction.DOWN:
-      return "⬇️";
-    case Direction.LEFT:
-      return "⬅️";
-    case Direction.RIGHT:
-      return "➡️";
-    default:
-      return "";
-  }
+  return button;
 }
 
 function setupEventListeners() {
