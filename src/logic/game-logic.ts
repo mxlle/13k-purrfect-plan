@@ -55,14 +55,11 @@ function updateInventory(cat: PlacedCat) {
     return; // Only mother cat can pick up smaller cats
   }
 
-  const currentInventory = cat.inventory;
-  const otherCatsOnCell = globals.placedCats.filter((c) => c.id !== cat.id && c.row === cat.row && c.column === cat.column);
-  // const smallerCats = otherCatsOnCell.filter((c) => c.size < cat.size);
-  const kittensToPickUp = otherCatsOnCell.filter((c) => currentInventory.items.every((item) => item.id !== c.id));
+  const kittensToPickUp = globals.placedCats.filter((c) => c.id !== cat.id && c.row === cat.row && c.column === cat.column);
 
   kittensToPickUp.forEach((kitten) => {
-    if (currentInventory.items.length < currentInventory.size) {
-      currentInventory.items.push(kitten);
+    if (!cat.inventory) {
+      cat.inventory = kitten;
     } else {
       console.warn("Inventory is full, cannot add smaller cat", kitten);
     }

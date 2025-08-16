@@ -61,7 +61,6 @@ function addStartButton(buttonLabelKey: TranslationKey) {
 export async function startNewGame() {
   document.body.classList.remove(CssClass.SELECTING, CssClass.WON);
   globals.isWon = false;
-  globals.motherCat.inventory.items = [];
   startButton?.remove();
 
   if (globals.gameFieldData.length && gameFieldElem) {

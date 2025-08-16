@@ -4,7 +4,7 @@ import { getRandomIntFromInterval, shuffleArray } from "../utils/random-utils";
 import { getEmptyFields } from "./checks";
 import { baseField } from "./base-field";
 import { createCatElement } from "../components/game-field/cell-component";
-import { BaseCat, Cat, getInventory, PlacedCat } from "./data/cats";
+import { BaseCat, Cat, PlacedCat } from "./data/cats";
 import { Cell, CellType, GameFieldData } from "./data/cell";
 
 export function placeCatsInitially(gameFieldData: GameFieldData): PlacedCat[] {
@@ -117,7 +117,6 @@ function generateCat(id: number, isMother: boolean): Cat {
   return {
     ...baseCat,
     catElement: createCatElement(baseCat),
-    inventory: getInventory(isMother ? 13 : baseCat.size),
   };
 }
 
@@ -155,7 +154,6 @@ function applyPredefinedPositionsOfCharacters(onboardingData: OnboardingData): P
     return {
       ...cat,
       catElement: createCatElement(cat),
-      inventory: getInventory(cat.size),
     };
   });
 }
