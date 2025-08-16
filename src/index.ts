@@ -7,7 +7,7 @@ import { initAudio, togglePlayer } from "./audio/music-control";
 import { getLocalStorageItem, LocalStorageKey } from "./utils/local-storage";
 import { initPoki } from "./poki-integration";
 import { isOnboarding } from "./logic/onboarding";
-import { globals } from "./globals";
+import { globals, isGameInProgress } from "./globals";
 import { getTranslation, TranslationKey } from "./translations/i18n";
 import { createWinScreen } from "./components/win-screen/win-screen";
 
@@ -53,6 +53,18 @@ function init() {
   } else {
     void initializeEmptyGameField();
   }
+
+  document.addEventListener("keydown", (event) => {
+    console.debug("Key pressed:", event);
+
+    if (event.code === "Space") {
+      console.debug("Space key pressed");
+
+      if (!isGameInProgress() && !isOnboarding()) {
+        void startNewGame();
+      }
+    }
+  });
 
   pubSubService.subscribe(PubSubEvent.NEW_GAME, () => {
     void startNewGame();

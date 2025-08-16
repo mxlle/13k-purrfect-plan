@@ -48,3 +48,7 @@ function getNumFromParam(param: string, fallback: number) {
 
   return num;
 }
+
+export function isGameInProgress(): boolean {
+  return !globals.isWon && globals.gameFieldData.length > 0 && globals.placedCats.length > 0;
+}

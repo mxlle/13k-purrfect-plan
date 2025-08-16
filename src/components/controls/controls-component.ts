@@ -5,7 +5,11 @@ import { Direction } from "../../types";
 import "./controls-component.scss";
 import { performMove } from "../../logic/game-logic";
 
+let hasSetupEventListeners = false;
+
 export function getControlsComponent(): HTMLElement {
+  setupEventListeners();
+
   const controlsComponent = createElement({
     cssClass: CssClass.CONTROLS,
   });
@@ -61,6 +65,29 @@ export function getDirectionButtonText(direction: Direction): string {
     default:
       return "";
   }
+}
+
+function setupEventListeners() {
+  if (hasSetupEventListeners) return;
+
+  document.addEventListener("keydown", (event) => {
+    switch (event.key) {
+      case "ArrowUp":
+        performMove(Direction.UP);
+        break;
+      case "ArrowDown":
+        performMove(Direction.DOWN);
+        break;
+      case "ArrowLeft":
+        performMove(Direction.LEFT);
+        break;
+      case "ArrowRight":
+        performMove(Direction.RIGHT);
+        break;
+    }
+  });
+
+  hasSetupEventListeners = true;
 }
 
 function handleMoveButtonClick(direction: Direction) {
