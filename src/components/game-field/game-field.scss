@@ -48,7 +48,6 @@ $border-style: outset;
   display: grid;
   place-items: center;
   position: relative;
-  overflow: hidden;
   // width: 100%;
   // height: 100%;
 
@@ -129,6 +128,15 @@ $border-style: outset;
     }
   }
 
+  .#{$CAT_BOX} {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    z-index: 3;
+
+    transition: transform 0.3s ease-in-out;
+  }
+
   .#{$CAT} {
     position: relative;
     display: grid;
@@ -179,13 +187,8 @@ $border-style: outset;
     }
   }
 
-  > .#{$CAT} {
+  > .#{$CAT_BOX} {
     grid-area: 1 / 1;
-  }
-
-  span,
-  .#{$CAT} {
-    pointer-events: none;
   }
 }
 

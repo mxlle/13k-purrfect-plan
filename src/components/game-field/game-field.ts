@@ -165,6 +165,8 @@ export async function initializeCatsOnGameField(cats: PlacedCat[]) {
     const cellElement = getCellElement(cat);
     cellElement.innerHTML = "";
     cellElement.append(cat.catElement);
+    cat.catElement.style.transform = "translate(0, 0)"; // reset position
+    cat.initialPosition = { row: cat.row, column: cat.column };
     await requestAnimationFrameWithTimeout(TIMEOUT_CELL_APPEAR);
   }
 }

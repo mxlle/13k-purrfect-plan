@@ -35,6 +35,13 @@ export function isSameCell(cell1: CellPosition, cell2: CellPosition) {
   return cell1.row === cell2.row && cell1.column === cell2.column;
 }
 
+export function getCellDifference(cell1: CellPosition, cell2: CellPosition): CellPosition {
+  return {
+    row: cell1.row - cell2.row,
+    column: cell1.column - cell2.column,
+  };
+}
+
 export function getCellTypePlaceholders() {
   return {
     _: CellType.EMPTY,

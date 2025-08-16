@@ -20,11 +20,17 @@ export function createCellElement(cell: Cell): HTMLElement {
 }
 
 export function createCatElement(cat: BaseCat): HTMLElement {
+  const catBox = createElement({
+    cssClass: CssClass.CAT_BOX,
+  });
+
   const catElem = createElement({
     cssClass: `${CssClass.CAT} ${CssClass.CAT_COLOR}${cat.id} ${isMother(cat) ? CssClass.IS_MOM : ""}`,
   });
 
   catElem.append(catSvg());
 
-  return catElem;
+  catBox.append(catElem);
+
+  return catBox;
 }

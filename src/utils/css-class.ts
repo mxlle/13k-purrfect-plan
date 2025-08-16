@@ -32,7 +32,7 @@ export const enum CssClass {
   TABLE = "z",
   IS_MOM = "is-mom",
   CAT = "cat",
-  CAT_SIZE = "cat-size",
+  CAT_BOX = "cat-box",
   CAT_COLOR = "cat-color",
   TREE = "tree",
   PUDDLE = "puddle",

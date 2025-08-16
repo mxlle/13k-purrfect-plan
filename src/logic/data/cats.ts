@@ -38,7 +38,9 @@ export interface Cat extends BaseCat {
   inventory?: InventoryItem;
 }
 
-export interface PlacedCat extends Cat, CellPosition {}
+export interface PlacedCat extends Cat, CellPosition {
+  initialPosition?: CellPosition;
+}
 
 export type InventoryItem = PlacedCat;
 

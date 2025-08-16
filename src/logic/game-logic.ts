@@ -1,12 +1,11 @@
 import { Direction, isTool, Tool, TurnMove } from "../types";
 import { PubSubEvent, pubSubService } from "../utils/pub-sub-service";
-import { getCellElement } from "../components/game-field/game-field";
 import { getKittensElsewhere, getKittensOnCell, isValidCellPosition } from "./checks";
 import { globals } from "../globals";
 import { createWinScreen } from "../components/win-screen/win-screen";
 import { requestAnimationFrameWithTimeout } from "../utils/promise-utils";
 import { CatId, isMother, PlacedCat } from "./data/cats";
-import { CellPosition, CellType } from "./data/cell";
+import { CellPosition, CellType, getCellDifference } from "./data/cell";
 import { playSoundForAction } from "../audio/sound-control/sound-control";
 
 const KITTEN_DELAY_TIME = -1;
@@ -203,11 +202,9 @@ export function moveCatToCell(cat: PlacedCat, cell: CellPosition) {
   cat.row = cell.row;
   cat.column = cell.column;
 
-  const newCellElement = getCellElement(cat);
+  const diff = getCellDifference(cat, cat.initialPosition);
 
-  if (newCellElement) {
-    newCellElement.appendChild(cat.catElement);
-  }
+  cat.catElement.style.transform = `translate(${diff.column * 100}%, ${diff.row * 100}%)`;
 }
 
 function updateInventory(cat: PlacedCat) {
