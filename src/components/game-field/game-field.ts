@@ -71,7 +71,7 @@ export async function startNewGame() {
     await requestAnimationFrameWithTimeout(TIMEOUT_BETWEEN_GAMES);
 
     if (wasOnboarding()) {
-      console.debug("Was arrow-component, removing game field");
+      console.debug("Was onboard, removing game field");
       gameFieldElem.remove();
       gameFieldElem = undefined;
       controlsElem?.remove();
@@ -80,7 +80,7 @@ export async function startNewGame() {
     }
   }
 
-  console.debug("Starting new game, arrow-component step", globals.onboardingStep);
+  console.debug("Starting new game, onboarding step", globals.onboardingStep);
 
   if (!globals.gameFieldData.length) {
     globals.gameFieldData = getGameFieldData();
