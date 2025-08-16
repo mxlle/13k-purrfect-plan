@@ -141,6 +141,14 @@ $border-style: outset;
       z-index: 4;
       transform: scale(0.7) translate(var(--t-x, 0), 22%);
     }
+
+    svg {
+      ellipse {
+        transform-box: fill-box;
+        transform-origin: center;
+        animation: eye-blink 8s 8s infinite;
+      }
+    }
   }
 
   .#{$IS_MOM} {
@@ -188,5 +196,24 @@ $border-style: outset;
 
   .#{$START_BUTTON} {
     font-size: 0.8rem;
+  }
+}
+
+// scale y
+@keyframes eye-blink {
+  0% {
+    transform: scaleY(1);
+  }
+  3% {
+    transform: scaleY(0);
+  }
+  6% {
+    transform: scaleY(1);
+  }
+  9% {
+    transform: scaleY(0);
+  }
+  12% {
+    transform: scaleY(1);
   }
 }
