@@ -7,6 +7,12 @@
   display: grid;
   place-items: center;
 
+  svg {
+    color: theme.$main-color;
+    width: 75%;
+    height: 75%;
+  }
+
   &.#{$LEFT} {
     transform: rotate(180deg);
   }
@@ -43,12 +49,6 @@
       animation: point 1.2s infinite;
     }
   }
-}
-
-svg {
-  color: theme.$main-color;
-  width: 75%;
-  height: 75%;
 }
 
 @keyframes point {

@@ -139,27 +139,35 @@ $border-style: outset;
 
     &:not(.#{$IS_MOM}) {
       z-index: 4;
-      transform: scale(1.3) translate(var(--t-x, 0), 15%);
+      transform: scale(0.7) translate(var(--t-x, 0), 22%);
     }
   }
 
   .#{$IS_MOM} {
-    transform: scale(2);
+    transform: scale(0.95);
   }
 
   .#{$CAT_COLOR} {
     &1 {
-      filter: hue-rotate(90deg);
+      svg {
+        color: #c09402;
+      }
     }
 
     &2 {
-      filter: hue-rotate(180deg);
-      --t-x: -10%;
+      --t-x: -25%;
+
+      svg {
+        color: #009e28;
+      }
     }
 
     &3 {
-      filter: hue-rotate(270deg);
-      --t-x: 10%;
+      --t-x: 25%;
+
+      svg {
+        color: #106dff;
+      }
     }
   }
 
