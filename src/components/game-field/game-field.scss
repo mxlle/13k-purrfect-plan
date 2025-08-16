@@ -58,8 +58,6 @@ $border-style: outset;
     &::before {
       content: "";
       position: absolute;
-      display: grid;
-      place-items: center;
       top: 0;
       left: 0;
       width: 100%;
@@ -69,7 +67,27 @@ $border-style: outset;
 
   &.#{$TREE} {
     &::before {
-      content: "🌳";
+      top: auto;
+      bottom: 10%; /* sits on bottom */
+      left: 40%;
+      width: 20%; /* trunk width = 10% of cell */
+      height: 35%; /* trunk height = 35% of cell */
+      background: #3d2209;
+      border-radius: 15% / 10%; /* subtle round edges */
+    }
+
+    /* crown */
+    &::after {
+      content: "";
+      position: absolute;
+      top: auto;
+      bottom: 35%; /* starts above trunk */
+      left: 20%;
+      width: 60%;
+      height: 60%;
+      border-radius: 50%;
+      background: radial-gradient(circle at 40% 35%, #33cc55 0%, #009e28 60%, /* kitten’s eye color */ #00751e 100%);
+      filter: brightness(0.6);
     }
   }
 
@@ -78,7 +96,6 @@ $border-style: outset;
       --water: #105a99;
 
       // css to create a puddle/pond effect
-      content: "";
       border-radius: 55% 45% 62% 38% / 48% 60% 40% 52%;
       width: 80%;
       height: 80%;
@@ -92,8 +109,23 @@ $border-style: outset;
 
   &.#{$MOON} {
     &::before {
-      content: "🌙";
-      transform: scale(0.5) translateY(-50%);
+      transform: scale(0.5) translateY(-40%);
+
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #ffc878 0%, #ffb450 40%, #a96800 85%);
+      z-index: 1;
+      box-shadow: 0 0 4px rgba(0, 0, 0, 0.25) inset;
+    }
+
+    &::after {
+      content: "";
+      width: 110%;
+      height: 110%;
+      transform: scale(0.5) translateY(-45%) translateX(35%); /* x shift = crescent thickness */
+      position: absolute;
+      border-radius: 50%;
+      background: var(--t); /* same as grass/sky background color */
+      z-index: 2;
     }
   }
 
@@ -103,9 +135,10 @@ $border-style: outset;
     place-items: center;
     width: 100%;
     height: 100%;
+    z-index: 3;
 
     &:not(.#{$IS_MOM}) {
-      z-index: 2;
+      z-index: 4;
       transform: scale(1.3) translate(var(--t-x, 0), 15%);
     }
   }
