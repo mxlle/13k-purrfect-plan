@@ -7,11 +7,12 @@ import { performMove } from "../../logic/game-logic";
 import { getArrowComponent } from "../arrow-component/arrow-component";
 
 let hasSetupEventListeners = false;
+let controlsComponent: HTMLElement | undefined;
 
 export function getControlsComponent(): HTMLElement {
   setupEventListeners();
 
-  const controlsComponent = createElement({
+  controlsComponent = createElement({
     cssClass: CssClass.CONTROLS,
   });
 
@@ -60,29 +61,34 @@ function setupEventListeners() {
   if (hasSetupEventListeners) return;
 
   document.addEventListener("keydown", (event) => {
+    let direction: Direction | undefined;
+
     switch (event.key) {
       case "ArrowUp":
-        performMove(Direction.UP);
-        event.preventDefault(); // Prevent scrolling
+        direction = Direction.UP;
         break;
       case "ArrowDown":
-        performMove(Direction.DOWN);
-        event.preventDefault(); // Prevent scrolling
+        direction = Direction.DOWN;
         break;
       case "ArrowLeft":
-        performMove(Direction.LEFT);
-        event.preventDefault(); // Prevent scrolling
+        direction = Direction.LEFT;
         break;
       case "ArrowRight":
-        performMove(Direction.RIGHT);
-        event.preventDefault(); // Prevent scrolling
+        direction = Direction.RIGHT;
         break;
+    }
+
+    if (direction) {
+      event.preventDefault(); // Prevent default scrolling behavior
+      handleMoveButtonClick(direction);
     }
   });
 
   hasSetupEventListeners = true;
 }
 
-function handleMoveButtonClick(direction: Direction) {
-  performMove(direction);
+async function handleMoveButtonClick(direction: Direction) {
+  controlsComponent?.classList.add(CssClass.DISABLED);
+  await performMove(direction);
+  controlsComponent?.classList.remove(CssClass.DISABLED);
 }
