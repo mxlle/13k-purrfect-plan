@@ -23,10 +23,12 @@
   padding: 1rem;
 
   .icon-btn {
-    width: 4rem;
-    height: 4rem;
-    font-size: 1.8rem;
-    margin: -0.25rem;
+    &:not(:nth-child(5)) {
+      width: 4rem;
+      height: 4rem;
+      font-size: 1.8rem;
+      margin: -0.25rem;
+    }
 
     &:nth-child(1) {
       grid-column: 2;
@@ -47,10 +49,19 @@
       grid-column: 1;
       grid-row: 2;
     }
+
+    &:nth-child(5) {
+      grid-column: 2;
+      grid-row: 2;
+    }
   }
 }
 
 .#{$TOOL_CONTROLS} {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+
   button {
     color: $main-color;
   }

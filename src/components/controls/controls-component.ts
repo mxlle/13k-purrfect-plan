@@ -5,9 +5,11 @@ import { Direction, Tool, TurnMove } from "../../types";
 import "./controls-component.scss";
 import { performMove } from "../../logic/game-logic";
 import { getArrowComponent } from "../arrow-component/arrow-component";
+import { ActiveRecording, hasSoundForAction, saveRecording, startRecording } from "../../audio/sound-control/sound-control";
 
 let hasSetupEventListeners = false;
 let controlsComponent: HTMLElement | undefined;
+let activeRecording: ActiveRecording | undefined;
 
 export function getControlsComponent(): HTMLElement {
   setupEventListeners();
@@ -22,6 +24,7 @@ export function getControlsComponent(): HTMLElement {
 
   const moveButtons = getAllMoveButtons();
   moveButtons.forEach((button) => movementContainer.appendChild(button));
+  movementContainer.appendChild(createRecordButton([Direction.UP, Direction.RIGHT, Direction.DOWN, Direction.LEFT]));
 
   controlsComponent.appendChild(movementContainer);
 
@@ -29,15 +32,53 @@ export function getControlsComponent(): HTMLElement {
     cssClass: CssClass.TOOL_CONTROLS,
   });
 
-  const startButton = createButton({
+  const meowButton = createButton({
     text: "Meow",
     onClick: () => performMove(Tool.MEOW),
   });
 
-  toolContainer.appendChild(startButton);
+  toolContainer.appendChild(meowButton);
+  toolContainer.appendChild(createRecordButton([Tool.MEOW]));
   controlsComponent.appendChild(toolContainer);
 
   return controlsComponent;
+}
+
+async function toggleRecordSoundEffect(btn: HTMLButtonElement, actions: TurnMove[]) {
+  if (activeRecording) {
+    activeRecording.done.then((recording) => {
+      if (recording) {
+        for (const action of actions) {
+          saveRecording(action, recording);
+        }
+      }
+    });
+    activeRecording.stop();
+    btn.textContent = "🎤";
+    activeRecording = undefined;
+  } else {
+    const proceed = !hasSoundForAction(actions[0]) || confirm("Record new sound effect for this action?");
+
+    if (!proceed) return;
+
+    try {
+      activeRecording = await startRecording();
+      btn.textContent = "🟪";
+    } catch (error) {
+      console.error("Error starting recording:", error);
+      alert("Failed to start recording. Please check your microphone permissions.");
+    }
+  }
+}
+
+function createRecordButton(actions: TurnMove[]): HTMLElement {
+  const recordButton = createButton({
+    text: "🎤",
+    iconBtn: true,
+    onClick: () => void toggleRecordSoundEffect(recordButton, actions),
+  });
+
+  return recordButton;
 }
 
 function getAllMoveButtons(): HTMLElement[] {

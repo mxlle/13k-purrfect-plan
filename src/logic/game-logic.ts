@@ -7,6 +7,7 @@ import { createWinScreen } from "../components/win-screen/win-screen";
 import { requestAnimationFrameWithTimeout } from "../utils/promise-utils";
 import { CatId, isMother, PlacedCat } from "./data/cats";
 import { CellPosition, CellType } from "./data/cell";
+import { playSoundForAction } from "../audio/sound-control/sound-control";
 
 const KITTEN_DELAY_TIME = -1;
 const FREE_KITTEN_DELAY_TIME = -1; // Time to wait before free kittens start moving
@@ -26,6 +27,8 @@ export async function performMove(turnMove: TurnMove) {
   }
 
   isPerformingMove = true;
+
+  await playSoundForAction(turnMove);
 
   const kittensOnCell = getKittensOnCell(globals.placedCats, globals.motherCat);
 
