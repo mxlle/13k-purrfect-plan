@@ -146,7 +146,7 @@ $border-style: outset;
       ellipse {
         transform-box: fill-box;
         transform-origin: center;
-        animation: eye-blink 8s 8s infinite;
+        animation: eye-blink 8s 4s infinite;
       }
     }
   }
