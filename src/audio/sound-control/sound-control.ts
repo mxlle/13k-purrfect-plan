@@ -26,6 +26,29 @@ export type ActiveRecording = {
   done: Promise<string>; // base64 data URL
 };
 
+export async function requestMicrophoneAccess(): Promise<boolean> {
+  if (!window.isSecureContext || !navigator.mediaDevices?.getUserMedia) {
+    console.warn("Microphone access requires a secure context (HTTPS/localhost) and getUserMedia support.");
+    return false;
+  }
+
+  // If the Permissions API is available, check current state.
+  const perm = await navigator.permissions?.query({ name: "microphone" as PermissionName }).catch(() => null);
+
+  if (perm?.state === "granted") return true;
+  if (perm?.state === "denied") return false;
+
+  // State is "prompt" or unknown → trigger the prompt with a minimal request.
+  try {
+    const s = await navigator.mediaDevices.getUserMedia({ audio: true });
+    s.getTracks().forEach((t) => t.stop());
+    return true;
+  } catch (e: any) {
+    console.warn("Microphone access rejected:", e?.name, e?.message);
+    return false;
+  }
+}
+
 export async function startRecording(): Promise<ActiveRecording> {
   if (!navigator.mediaDevices?.getUserMedia) {
     throw new Error("Microphone capture is not supported on this device/browser.");

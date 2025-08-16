@@ -5,7 +5,13 @@ import { Direction, Tool, TurnMove } from "../../types";
 import "./controls-component.scss";
 import { performMove } from "../../logic/game-logic";
 import { getArrowComponent } from "../arrow-component/arrow-component";
-import { ActiveRecording, hasSoundForAction, saveRecording, startRecording } from "../../audio/sound-control/sound-control";
+import {
+  ActiveRecording,
+  hasSoundForAction,
+  requestMicrophoneAccess,
+  saveRecording,
+  startRecording,
+} from "../../audio/sound-control/sound-control";
 
 let hasSetupEventListeners = false;
 let controlsComponent: HTMLElement | undefined;
@@ -45,6 +51,12 @@ export function getControlsComponent(): HTMLElement {
 }
 
 async function toggleRecordSoundEffect(btn: HTMLButtonElement, actions: TurnMove[]) {
+  const ok = await requestMicrophoneAccess();
+
+  if (!ok) {
+    return;
+  }
+
   if (activeRecording) {
     activeRecording.done.then((recording) => {
       if (recording) {
