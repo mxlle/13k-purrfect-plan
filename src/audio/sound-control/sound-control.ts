@@ -33,14 +33,14 @@ export async function requestMicrophoneAccess(): Promise<boolean> {
   }
 
   // If the Permissions API is available, check current state.
-  const perm = await navigator.permissions?.query({ name: "microphone" as PermissionName }).catch(() => null);
+  const perm = await navigator.permissions?.query({ "name": "microphone" as PermissionName }).catch(() => null);
 
   if (perm?.state === "granted") return true;
   if (perm?.state === "denied") return false;
 
   // State is "prompt" or unknown → trigger the prompt with a minimal request.
   try {
-    const s = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const s = await navigator.mediaDevices.getUserMedia({ "audio": true });
     s.getTracks().forEach((t) => t.stop());
     return true;
   } catch (e: any) {
@@ -62,7 +62,7 @@ export async function startRecording(): Promise<ActiveRecording> {
   // 1) Always request minimal constraints first
   let stream: MediaStream;
   try {
-    stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    stream = await navigator.mediaDevices.getUserMedia({ "audio": true });
   } catch (err: any) {
     // Some Android variants throw this message even for audio: true — surface a clearer hint
     const name = err?.name ?? "Error";
