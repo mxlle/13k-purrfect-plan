@@ -108,7 +108,7 @@ function generateCat(id: number, isMother: boolean): Cat {
   const baseCat: BaseCat = {
     id,
     name,
-    size: isMother ? 3 : getRandomIntFromInterval(1, 2),
+    size: isMother ? 3 : 1,
     awake: true,
     isMother,
   };

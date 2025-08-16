@@ -67,6 +67,7 @@ main {
   @media (orientation: portrait) {
     grid-template-columns: 1fr;
     grid-template-rows: min-content auto auto;
+    justify-items: center;
   }
 }
 
