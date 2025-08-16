@@ -28,7 +28,6 @@ export type ActiveRecording = {
 };
 
 export async function startRecording(): Promise<ActiveRecording> {
-  // Basic feature checks
   if (!navigator.mediaDevices?.getUserMedia) {
     throw new Error("Microphone capture is not supported on this device/browser.");
   }
@@ -36,18 +35,34 @@ export async function startRecording(): Promise<ActiveRecording> {
     throw new Error("Recording is not supported on this device/browser.");
   }
 
-  // Pick a MIME type that this browser can actually produce
   const mimeType = pickSupportedMimeType();
 
-  // Mobile-friendly constraints for cleaner audio
-  const stream = await navigator.mediaDevices.getUserMedia({
-    audio: {
-      echoCancellation: true,
-      noiseSuppression: true,
-    },
-  });
+  // Build audio constraints only with features the browser reports as supported.
+  const audioConstraints: MediaTrackConstraints = {};
+  const getSupported = (navigator.mediaDevices as any).getSupportedConstraints?.bind(navigator.mediaDevices);
+  const supported: Partial<Record<keyof MediaTrackConstraints, boolean>> = getSupported ? getSupported() : {};
 
-  // Pass the chosen MIME type if available
+  if (supported.echoCancellation) audioConstraints.echoCancellation = true;
+  if (supported.noiseSuppression) audioConstraints.noiseSuppression = true;
+
+  // If nothing supported, fall back to a simple "audio: true" request.
+  const constraints: MediaStreamConstraints = {
+    audio: Object.keys(audioConstraints).length ? audioConstraints : true,
+  };
+
+  let stream: MediaStream;
+  try {
+    stream = await navigator.mediaDevices.getUserMedia(constraints);
+  } catch (err: any) {
+    // Safari-specific: retry with the simplest constraints if it complains about not requesting audio/video.
+    const msg = String(err?.message || "");
+    if (err?.name === "NotSupportedError" || /At least one of audio and video must be/i.test(msg)) {
+      stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    } else {
+      throw err;
+    }
+  }
+
   const recorder = new MediaRecorder(stream, mimeType ? { mimeType } : undefined);
   const chunks: BlobPart[] = [];
 
@@ -58,7 +73,6 @@ export async function startRecording(): Promise<ActiveRecording> {
   const done = new Promise<string>((resolve, reject) => {
     recorder.addEventListener("stop", async () => {
       try {
-        // Ensure the blob has a sane, playable type for the current browser
         const type = mimeType || recorder.mimeType || "audio/webm";
         const blob = new Blob(chunks, { type });
         const base64 = await blobToDataUrl(blob);
@@ -74,15 +88,13 @@ export async function startRecording(): Promise<ActiveRecording> {
     });
   });
 
-  // iOS Safari may not emit dataavailable without a timeslice; also call requestData() before stop()
-  recorder.start(250); // request chunks ~4x/s to ensure we get at least one
+  // Use a timeslice so iOS Safari reliably emits dataavailable; flush before stop().
+  recorder.start(250);
   const stop = () => {
     if (recorder.state === "recording") {
       try {
-        recorder.requestData(); // flush last chunk for Safari
-      } catch {
-        // ignore
-      }
+        recorder.requestData();
+      } catch {}
       recorder.stop();
     }
   };
