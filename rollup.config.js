@@ -52,7 +52,7 @@ export default {
         },
         compress: {
           booleans_as_integers: true,
-          drop_console: true,
+          // drop_console: true,
         },
       }),
     !js13k &&
