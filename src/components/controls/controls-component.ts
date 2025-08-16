@@ -63,15 +63,19 @@ function setupEventListeners() {
     switch (event.key) {
       case "ArrowUp":
         performMove(Direction.UP);
+        event.preventDefault(); // Prevent scrolling
         break;
       case "ArrowDown":
         performMove(Direction.DOWN);
+        event.preventDefault(); // Prevent scrolling
         break;
       case "ArrowLeft":
         performMove(Direction.LEFT);
+        event.preventDefault(); // Prevent scrolling
         break;
       case "ArrowRight":
         performMove(Direction.RIGHT);
+        event.preventDefault(); // Prevent scrolling
         break;
     }
   });

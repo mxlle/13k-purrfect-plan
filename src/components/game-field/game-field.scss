@@ -48,11 +48,11 @@ $border-style: outset;
   display: grid;
   place-items: center;
   position: relative;
+  overflow: hidden;
   // width: 100%;
   // height: 100%;
 
   .#{$CAT} {
-    border: 0.125rem dotted transparent;
     position: relative;
     display: grid;
     place-items: center;
@@ -74,15 +74,34 @@ $border-style: outset;
     &1 {
       font-size: 0.7em;
       z-index: 3;
+      transform: scale(1.3) translate(var(--t-x, 0), 15%);
     }
 
     &2 {
       font-size: 0.9em;
       z-index: 2;
+      transform: scale(1.6);
     }
 
     &3 {
       font-size: 1.2em;
+      transform: scale(2);
+    }
+  }
+
+  .#{$CAT_COLOR} {
+    &1 {
+      filter: hue-rotate(90deg);
+    }
+
+    &2 {
+      filter: hue-rotate(180deg);
+      --t-x: -10%;
+    }
+
+    &3 {
+      filter: hue-rotate(270deg);
+      --t-x: 10%;
     }
   }
 

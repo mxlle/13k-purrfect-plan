@@ -30,10 +30,10 @@ export const enum CssClass {
   BAD = "y",
 
   TABLE = "z",
-  MIDDLE = "A",
   IS_MOM = "is-mom",
   CAT = "cat",
   CAT_SIZE = "cat-size",
+  CAT_COLOR = "cat-color",
   EMOJI = "emoji",
   FIELD = "field",
   WON = "won",

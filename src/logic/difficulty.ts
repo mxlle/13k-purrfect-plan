@@ -38,8 +38,8 @@ export const difficultySettings: Record<Difficulty, Settings> = {
     maxAmount: 4,
   },
   [Difficulty.EXTREME]: {
-    minAmount: 5,
-    maxAmount: 5,
+    minAmount: 4,
+    maxAmount: 4,
   },
 };
 
