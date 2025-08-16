@@ -66,7 +66,7 @@ async function toggleRecordSoundEffect(btn: HTMLButtonElement, actions: TurnMove
       btn.textContent = "🟪";
     } catch (error) {
       console.error("Error starting recording:", error);
-      alert("Check mic permissions");
+      alert(error instanceof Error ? error.message : "unknown error");
     }
   }
 }
