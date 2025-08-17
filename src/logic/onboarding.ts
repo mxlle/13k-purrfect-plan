@@ -99,7 +99,7 @@ const lastSetup: InitialSetup = (() => {
     [C, o, _, _, _],
     [_, _, _, _, O],
     [M, _, _, _, _],
-    [_, T, _, c, _],
+    [_, T, _, _, _],
     [_, _, t, _, c],
   ];
 })();
@@ -122,6 +122,12 @@ function getCatsFromInitialSetup(initialSetup: InitialSetup): PlacedCat[] {
       if (typeof cell === "number") {
         const catId = cell as CatId;
         const cat = getCat(catId);
+
+        if (cats.some((c) => c.id === catId)) {
+          // TODO - remove after development phase
+          throw new Error(`Duplicate cat ID found: ${catId}`);
+        }
+
         cats.push({
           ...cat,
           row: rowIndex,
