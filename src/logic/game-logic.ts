@@ -23,6 +23,7 @@ export async function performMove(turnMove: TurnMove) {
   await playSoundForAction(turnMove);
 
   const kittensOnCell = getKittensOnCell(globals.placedCats, globals.motherCat);
+  const freeKittens = getKittensElsewhere(globals.placedCats, globals.motherCat);
 
   if (isTool(turnMove)) {
     await executeTool(turnMove);
@@ -32,12 +33,10 @@ export async function performMove(turnMove: TurnMove) {
     for (const kitten of kittensOnCell) {
       moveCat(kitten, turnMove);
     }
-  }
 
-  const freeKittens = getKittensElsewhere(globals.placedCats, globals.motherCat);
-
-  for (const kitten of freeKittens) {
-    handleKittenBehavior(kitten);
+    for (const kitten of freeKittens) {
+      handleKittenBehavior(kitten);
+    }
   }
 
   updateAllCatPositions();
