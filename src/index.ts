@@ -1,12 +1,11 @@
 import "./index.scss";
 
-import { createButton, createElement } from "./utils/html-utils";
+import { createElement } from "./utils/html-utils";
 import { PubSubEvent, pubSubService } from "./utils/pub-sub-service";
 import { initializeEmptyGameField, startNewGame } from "./components/game-field/game-field";
 import { initPoki } from "./poki-integration";
 import { isOnboarding } from "./logic/onboarding";
 import { isGameInProgress } from "./globals";
-import { createWinScreen } from "./components/win-screen/win-screen";
 
 let titleElement: HTMLElement;
 let currentScore = 0;
@@ -25,10 +24,9 @@ function init() {
 
   header.append(titleElement);
 
-  const btnContainer = createElement({
-    cssClass: "h-btns",
-  });
-
+  // const btnContainer = createElement({
+  //   cssClass: "h-btns",
+  // });
   // const muteButton = createButton({
   //   text: initializeMuted ? "🔇" : "🔊",
   //   onClick: (event: MouseEvent) => {
@@ -39,10 +37,10 @@ function init() {
   // });
   //
   // btnContainer.append(muteButton);
-
-  header.append(btnContainer);
-
-  btnContainer.append(createButton({ text: "⚙️", onClick: () => createWinScreen(currentScore, false), iconBtn: true }));
+  //
+  // header.append(btnContainer);
+  //
+  // btnContainer.append(createButton({ text: "⚙️", onClick: () => createWinScreen(currentScore, false), iconBtn: true }));
 
   document.body.append(header);
 
@@ -58,7 +56,7 @@ function init() {
     if (event.code === "Space") {
       console.debug("Space key pressed");
 
-      if (!isGameInProgress() && !isOnboarding()) {
+      if (!isGameInProgress()) {
         void startNewGame();
       }
     }

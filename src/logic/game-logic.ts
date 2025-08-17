@@ -2,11 +2,11 @@ import { Direction, isTool, Tool, TurnMove } from "../types";
 import { PubSubEvent, pubSubService } from "../utils/pub-sub-service";
 import { getKittensElsewhere, getKittensOnCell, isValidCellPosition } from "./checks";
 import { globals } from "../globals";
-import { createWinScreen } from "../components/win-screen/win-screen";
 import { requestAnimationFrameWithTimeout } from "../utils/promise-utils";
 import { CatId, isMother, PlacedCat } from "./data/cats";
 import { CellPosition, CellType, getCellDifference } from "./data/cell";
 import { playSoundForAction } from "../audio/sound-control/sound-control";
+import { CssClass } from "../utils/css-class";
 
 const KITTEN_DELAY_TIME = -1;
 const FREE_KITTEN_DELAY_TIME = -1; // Time to wait before free kittens start moving
@@ -230,7 +230,8 @@ function checkWinCondition() {
 
   if (allCatsOnOneCell) {
     globals.isWon = true;
-    createWinScreen(100, true);
+    document.body.classList.add(CssClass.WON);
+    pubSubService.publish(PubSubEvent.GAME_END);
   }
 }
 

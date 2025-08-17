@@ -12,6 +12,9 @@ import {
   saveRecording,
   startRecording,
 } from "../../audio/sound-control/sound-control";
+import { PubSubEvent, pubSubService } from "../../utils/pub-sub-service";
+import { addStartButton } from "../game-field/game-field";
+import { TranslationKey } from "../../translations/i18n";
 
 let hasSetupEventListeners = false;
 let controlsComponent: HTMLElement | undefined;
@@ -112,6 +115,12 @@ function getMoveButton(direction: Direction): HTMLElement {
 
 function setupEventListeners() {
   if (hasSetupEventListeners) return;
+
+  pubSubService.subscribe(PubSubEvent.GAME_END, () => {
+    if (!controlsComponent) return;
+
+    addStartButton(TranslationKey.NEW_GAME, controlsComponent);
+  });
 
   document.addEventListener("keydown", (event) => {
     let turnMove: TurnMove | undefined;

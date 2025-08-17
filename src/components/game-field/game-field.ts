@@ -1,14 +1,14 @@
 import "./game-field.scss";
 
 import { createButton, createElement } from "../../utils/html-utils";
-import { newGame } from "../../logic/game-logic";
+import { moveCatToCell, newGame } from "../../logic/game-logic";
 import { createCellElement } from "./cell-component";
 import { getTranslation, TranslationKey } from "../../translations/i18n";
 import { globals } from "../../globals";
 import { requestAnimationFrameWithTimeout } from "../../utils/promise-utils";
 import { getGameFieldData, placeCatsInitially } from "../../logic/initialize";
 import { handlePokiCommercial } from "../../poki-integration";
-import { getOnboardingData, increaseOnboardingStepIfApplicable, isOnboarding, wasOnboarding } from "../../logic/onboarding";
+import { getOnboardingData, increaseOnboardingStepIfApplicable, isSameLevel } from "../../logic/onboarding";
 import { getArrowComponent } from "../arrow-component/arrow-component";
 import { CssClass } from "../../utils/css-class";
 import { getControlsComponent } from "../controls/controls-component";
@@ -37,39 +37,40 @@ export async function initializeEmptyGameField() {
 
   gameFieldElem = generateGameFieldElement(baseData);
 
-  addStartButton(TranslationKey.START_GAME);
+  addStartButton(TranslationKey.START_GAME, gameFieldElem);
 
   appendGameField();
 }
 
-function addStartButton(buttonLabelKey: TranslationKey) {
+export function addStartButton(buttonLabelKey: TranslationKey, elementToAttachTo: HTMLElement) {
   startButton = createButton({
     text: getTranslation(buttonLabelKey),
     onClick: (event: MouseEvent) => {
-      if (isOnboarding()) {
-        increaseOnboardingStepIfApplicable();
-      }
       newGame();
       (event.target as HTMLElement)?.remove();
     },
   });
   startButton.classList.add(CssClass.START_BUTTON, "prm");
-  gameFieldElem.append(startButton);
+  elementToAttachTo.append(startButton);
 }
 
 export async function startNewGame() {
+  if (globals.isWon) {
+    increaseOnboardingStepIfApplicable();
+  }
+
   document.body.classList.remove(CssClass.SELECTING, CssClass.WON);
   globals.isWon = false;
   startButton?.remove();
 
   if (globals.gameFieldData.length && gameFieldElem) {
     // reset old game field
-    await cleanGameField(globals.gameFieldData);
+    // await cleanGameField(globals.gameFieldData);
     if (process.env.POKI_ENABLED === "true") await handlePokiCommercial();
-    await requestAnimationFrameWithTimeout(TIMEOUT_BETWEEN_GAMES);
+    // await requestAnimationFrameWithTimeout(TIMEOUT_BETWEEN_GAMES);
 
-    if (wasOnboarding()) {
-      console.debug("Was onboard, removing game field");
+    if (!isSameLevel()) {
+      console.debug("Was different setup, removing game field");
       gameFieldElem.remove();
       gameFieldElem = undefined;
       controlsElem?.remove();
@@ -122,6 +123,21 @@ export function getCellElement(cell: CellPosition): HTMLElement {
   return cellElements[cell.row]?.[cell.column];
 }
 
+function getMiddleCoordinates(): CellPosition | undefined {
+  if (!gameFieldElem) {
+    console.warn("No game field element to get middle cell from");
+    return undefined;
+  }
+
+  const rowCount = globals.gameFieldData.length;
+  const columnCount = globals.gameFieldData[0].length;
+
+  const middleRow = Math.floor(rowCount / 2);
+  const middleColumn = Math.floor(columnCount / 2);
+
+  return { row: middleRow, column: middleColumn };
+}
+
 export function generateGameFieldElement(gameFieldData: GameFieldData) {
   const gameField = createElement({
     cssClass: CssClass.FIELD,
@@ -160,14 +176,22 @@ function addOnboardingArrowIfApplicable() {
 }
 
 export async function initializeCatsOnGameField(cats: PlacedCat[]) {
+  const middleCellPosition = getMiddleCoordinates();
+  const middleCellElement = getCellElement(middleCellPosition);
+  middleCellElement.innerHTML = ""; // clear middle cell
+
   for (let i = 0; i < cats.length; i++) {
     const cat = cats[i];
-    const cellElement = getCellElement(cat);
-    cellElement.innerHTML = "";
-    cellElement.append(cat.catElement);
-    cat.catElement.style.transform = "translate(0, 0)"; // reset position
-    cat.initialPosition = { row: cat.row, column: cat.column };
-    await requestAnimationFrameWithTimeout(TIMEOUT_CELL_APPEAR);
+    middleCellElement.append(cat.catElement);
+    // cat.catElement.style.transform = "translate(0, 0)"; // reset position
+    cat.initialPosition = { ...middleCellPosition };
+  }
+
+  await requestAnimationFrameWithTimeout(TIMEOUT_BETWEEN_GAMES);
+
+  for (let i = 0; i < cats.length; i++) {
+    const cat = cats[i];
+    moveCatToCell(cat, cat);
   }
 }
 

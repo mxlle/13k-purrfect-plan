@@ -4,7 +4,7 @@ import { createDialog, Dialog } from "../dialog/dialog";
 import { createButton, createElement } from "../../utils/html-utils";
 import { getTranslation, TranslationKey } from "../../translations/i18n";
 import { newGame } from "../../logic/game-logic";
-import { getOnboardingData, increaseOnboardingStepIfApplicable, isOnboarding } from "../../logic/onboarding";
+import { getOnboardingData, isOnboarding } from "../../logic/onboarding";
 import {
   difficulties,
   difficultyEmoji,
@@ -32,9 +32,6 @@ export function createWinScreen(score: number, isComplete: boolean) {
 
   winDialog.open().then((playAgain) => {
     if (playAgain) {
-      if (isComplete || globals.isWon) {
-        increaseOnboardingStepIfApplicable();
-      }
       newGame();
     }
   });

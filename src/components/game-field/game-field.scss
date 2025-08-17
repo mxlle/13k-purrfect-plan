@@ -33,14 +33,14 @@ $border-style: outset;
       }
     }
   }
+}
 
-  .#{$START_BUTTON} {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 6;
-  }
+.#{$START_BUTTON} {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 6;
 }
 
 .#{$CELL} {
@@ -135,6 +135,10 @@ $border-style: outset;
     z-index: 3;
 
     transition: transform 0.3s ease-in-out;
+
+    .#{$WON} & {
+      animation: hueRotation 1s 0.5s linear 3;
+    }
   }
 
   .#{$CAT} {
@@ -159,6 +163,10 @@ $border-style: outset;
         transform-box: fill-box;
         transform-origin: center;
         animation: eye-blink 8s 4s infinite;
+
+        .#{$WON} & {
+          animation: none;
+        }
       }
     }
   }
@@ -193,10 +201,6 @@ $border-style: outset;
   .#{$CELL} {
     pointer-events: none;
   }
-
-  .#{$START_BUTTON} {
-    font-size: 0.8rem;
-  }
 }
 
 // scale y
@@ -215,5 +219,14 @@ $border-style: outset;
   }
   12% {
     transform: scaleY(1);
+  }
+}
+
+@keyframes hueRotation {
+  0% {
+    filter: hue-rotate(0deg);
+  }
+  100% {
+    filter: hue-rotate(360deg);
   }
 }

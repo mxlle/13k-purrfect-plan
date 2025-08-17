@@ -14,8 +14,8 @@ export function isOnboarding() {
   return globals.onboardingStep !== -1;
 }
 
-export function wasOnboarding() {
-  return isOnboarding() || globals.previousOnboardingStep !== undefined;
+export function isSameLevel() {
+  return globals.onboardingStep === globals.previousOnboardingStep || globals.previousOnboardingStep === undefined;
 }
 
 export interface OnboardingData {
