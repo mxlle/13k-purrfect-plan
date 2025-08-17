@@ -7,13 +7,14 @@ import { globals } from "../../globals";
 import { requestAnimationFrameWithTimeout } from "../../utils/promise-utils";
 import { getGameFieldData, placeCatsInitially } from "../../logic/initialize";
 import { handlePokiCommercial } from "../../poki-integration";
-import { getOnboardingData, increaseOnboardingStepIfApplicable, isSameLevel } from "../../logic/onboarding";
-import { getArrowComponent } from "../arrow-component/arrow-component";
+import { getOnboardingData, increaseOnboardingStepIfApplicable, isSameLevel, OnboardingData } from "../../logic/onboarding";
 import { CssClass } from "../../utils/css-class";
 import { getControlsComponent } from "../controls/controls-component";
 import { isMother, PlacedCat } from "../../logic/data/cats";
 import { Cell, CellPosition, GameFieldData, getCellDifference } from "../../logic/data/cell";
 import { PubSubEvent, pubSubService } from "../../utils/pub-sub-service";
+import { isTool } from "../../types";
+import { allInConfig } from "../config/config-component";
 
 let mainContainer: HTMLElement | undefined;
 let gameFieldElem: HTMLElement | undefined;
@@ -54,8 +55,10 @@ export function addStartButton(buttonLabelKey: TranslationKey, elementToAttachTo
   elementToAttachTo.append(startButton);
 }
 
-export async function startNewGame() {
-  if (globals.isWon) {
+export async function startNewGame(options: { shouldIncreaseLevel: boolean } = { shouldIncreaseLevel: true }) {
+  const isInitialStart = !globals.gameFieldData.length;
+
+  if (globals.isWon && options.shouldIncreaseLevel) {
     increaseOnboardingStepIfApplicable();
   }
 
@@ -64,6 +67,14 @@ export async function startNewGame() {
   globals.moves = 0;
 
   startButton?.remove();
+
+  let onboardingData: OnboardingData | undefined = getOnboardingData();
+
+  if (onboardingData) {
+    globals.config = onboardingData.config;
+  } else {
+    globals.config = allInConfig;
+  }
 
   pubSubService.publish(PubSubEvent.GAME_START);
 
@@ -98,9 +109,9 @@ export async function startNewGame() {
     await requestAnimationFrameWithTimeout(TIMEOUT_BETWEEN_GAMES);
   }
 
-  await initializeCatsOnGameField(globals.placedCats);
+  await initializeCatsOnGameField(globals.placedCats, isInitialStart);
 
-  addOnboardingArrowIfApplicable();
+  addOnboardingSuggestionIfApplicable();
 }
 
 function appendGameField() {
@@ -168,18 +179,33 @@ export function generateGameFieldElement(gameFieldData: GameFieldData) {
   return gameField;
 }
 
-function addOnboardingArrowIfApplicable() {
+function addOnboardingSuggestionIfApplicable() {
   const onboardingData = getOnboardingData();
 
-  if (onboardingData?.arrow) {
-    onboardingArrow = getArrowComponent(onboardingData.arrow.direction, true);
-    const cell = globals.gameFieldData[onboardingData.arrow.row][onboardingData.arrow.column];
-    const cellElement = getCellElement(cell);
-    cellElement.append(onboardingArrow);
+  if (onboardingData?.highlightedAction) {
+    let actionComponent: HTMLElement | null = null;
+
+    if (isTool(onboardingData.highlightedAction)) {
+      actionComponent = document.querySelector(`.${CssClass.MEOW_BUTTON}`) as HTMLElement | null;
+    } else {
+      const directionComponent = isTool(onboardingData.highlightedAction)
+        ? undefined
+        : (document.querySelector(`.${CssClass.ARROW}.${onboardingData?.highlightedAction}`) as HTMLElement | null);
+      actionComponent = directionComponent.parentNode as HTMLElement | null;
+    }
+
+    if (actionComponent) {
+      actionComponent.classList.add(CssClass.ONBOARDING_HIGHLIGHT);
+      let listener = () => {
+        actionComponent.classList.remove(CssClass.ONBOARDING_HIGHLIGHT);
+        actionComponent.removeEventListener("click", listener);
+      };
+      actionComponent.addEventListener("click", listener);
+    }
   }
 }
 
-export async function initializeCatsOnGameField(cats: PlacedCat[]) {
+export async function initializeCatsOnGameField(cats: PlacedCat[], isInitialStart: boolean) {
   const middleCellPosition = getMiddleCoordinates();
   const middleCellElement = getCellElement(middleCellPosition);
   middleCellElement.innerHTML = "";
@@ -190,7 +216,9 @@ export async function initializeCatsOnGameField(cats: PlacedCat[]) {
     cat.initialPosition = { ...middleCellPosition };
   }
 
-  await requestAnimationFrameWithTimeout(TIMEOUT_BETWEEN_GAMES);
+  if (!isInitialStart) {
+    await requestAnimationFrameWithTimeout(TIMEOUT_BETWEEN_GAMES);
+  }
 
   updateAllCatPositions();
 }

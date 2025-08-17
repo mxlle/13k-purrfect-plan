@@ -1,7 +1,7 @@
 export const enum CssClass {
   SELECTING = "a",
   DISABLED = "disabled",
-  PANIC = "c",
+  HIDDEN = "hidden",
   SCARED = "d",
   SCARY = "e",
   T13A = "f",
@@ -10,7 +10,7 @@ export const enum CssClass {
   HAS_LEFT = "i",
   HAS_RIGHT = "j",
   CELL = "cell",
-  IS_DRAGGING = "l",
+  ONBOARDING_HIGHLIGHT = "onboarding-highlight",
   ANIMATED = "animated",
 
   // arrows
@@ -25,6 +25,7 @@ export const enum CssClass {
   MOVEMENT_CONTROLS = "movement-controls",
   MOVES = "moves",
   TOOL_CONTROLS = "tool-controls",
+  MEOW_BUTTON = "meow",
   CONFIG = "config",
   CONFIG_CATEGORY = "category",
   SELECTED = "selected",
@@ -41,4 +42,5 @@ export const enum CssClass {
   FIELD = "field",
   WON = "won",
   START_BUTTON = "start-button",
+  NEW_GAME_CONTAINER = "new-game",
 }

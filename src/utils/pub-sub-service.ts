@@ -8,7 +8,7 @@ export const enum PubSubEvent {
 }
 
 type EventDataTypes = {
-  [PubSubEvent.START_NEW_GAME]: undefined;
+  [PubSubEvent.START_NEW_GAME]: { shouldIncreaseLevel: boolean };
   [PubSubEvent.GAME_START]: undefined;
   [PubSubEvent.GAME_END]: undefined;
   [PubSubEvent.MUTE_MUSIC]: undefined;

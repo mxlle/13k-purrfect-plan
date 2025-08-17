@@ -3,7 +3,7 @@ import { getLocalStorageItem, LocalStorageKey } from "./utils/local-storage";
 import { Difficulty, difficultySettings } from "./logic/difficulty";
 import { INITIAL_MOTHER_CAT, PlacedCat } from "./logic/data/cats";
 import { GameFieldData } from "./logic/data/cell";
-import { Config, defaultConfig } from "./components/config/config-component";
+import { allInConfig, Config } from "./components/config/config-component";
 
 interface GameGlobals {
   config: Config;
@@ -27,7 +27,7 @@ const initialDifficulty: Difficulty = difficultySetting ? Number(difficultySetti
 const initialSettings = difficultySettings[initialDifficulty];
 
 const defaultGlobals: GameGlobals = {
-  config: defaultConfig,
+  config: allInConfig,
   previousOnboardingStep: undefined,
   onboardingStep: onboardingStepSetting ? Number(onboardingStepSetting) : 0,
   gameFieldData: [],

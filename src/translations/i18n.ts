@@ -5,6 +5,7 @@ import { getDeTranslationMap } from "./de";
 export const enum TranslationKey {
   START_GAME,
   NEW_GAME,
+  RESTART_GAME,
   WIN,
   CONTINUE,
   BACK,

@@ -45,7 +45,7 @@ function init() {
   document.body.append(header);
 
   if (isOnboarding()) {
-    void startNewGame();
+    void startNewGame({ shouldIncreaseLevel: false });
   } else {
     void initializeEmptyGameField();
   }
@@ -57,13 +57,13 @@ function init() {
       console.debug("Space key pressed");
 
       if (!isGameInProgress()) {
-        void startNewGame();
+        void startNewGame({ shouldIncreaseLevel: true });
       }
     }
   });
 
-  pubSubService.subscribe(PubSubEvent.START_NEW_GAME, () => {
-    void startNewGame();
+  pubSubService.subscribe(PubSubEvent.START_NEW_GAME, (options) => {
+    void startNewGame(options);
   });
 }
 

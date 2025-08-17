@@ -3,8 +3,9 @@ import { globals } from "../globals";
 import { getRandomIntFromInterval, shuffleArray } from "../utils/random-utils";
 import { getEmptyFields } from "./checks";
 import { baseField } from "./base-field";
-import { ALL_CAT_IDS, Cat, getCat, PlacedCat } from "./data/cats";
+import { ALL_CAT_IDS, Cat, CatId, getCat, PlacedCat } from "./data/cats";
 import { Cell, CellType, GameFieldData } from "./data/cell";
+import { ConfigCategory } from "../components/config/config-component";
 
 export function placeCatsInitially(gameFieldData: GameFieldData): PlacedCat[] {
   let onboardingData: OnboardingData | undefined = getOnboardingData();
@@ -12,7 +13,7 @@ export function placeCatsInitially(gameFieldData: GameFieldData): PlacedCat[] {
   let placedCats: PlacedCat[];
 
   if (onboardingData) {
-    placedCats = applyPredefinedPositionsOfCharacters(onboardingData);
+    placedCats = applyPredefinedPositionsOfCats(onboardingData);
   } else {
     const charactersForGame = generateCatsForGame(gameFieldData);
     placedCats = randomlyApplyCharactersOnBoard(gameFieldData, charactersForGame);
@@ -38,6 +39,7 @@ export function getGameFieldData(): GameFieldData {
   let tableHeight = 8;
 
   if (onboardingData) {
+    globals.config = onboardingData.config;
     field = onboardingData.field;
   }
 
@@ -65,8 +67,10 @@ export function getGameFieldData(): GameFieldData {
 }
 
 function getGameFieldObject(type: CellType, row: number, column: number): Cell {
+  const isTypeAllowed = globals.config[ConfigCategory.OBJECTS][type];
+
   const obj: Cell = {
-    type,
+    type: isTypeAllowed ? type : CellType.EMPTY,
     row,
     column,
   };
@@ -80,7 +84,7 @@ function generateCatsForGame(gameField: GameFieldData): Cat[] {
   const amount = getRandomIntFromInterval(minAmount, maxAmount);
   const characters: Cat[] = [];
 
-  for (let catId of ALL_CAT_IDS) {
+  for (let catId of ALL_CAT_IDS.filter(shouldIncludeCat)) {
     const newCat = getCat(catId);
     const field = findValidField(gameField, placedCats, newCat);
 
@@ -131,12 +135,13 @@ function randomlyApplyCharactersOnBoard(gameFieldData: GameFieldData, characters
   return placedCats;
 }
 
-function applyPredefinedPositionsOfCharacters(onboardingData: OnboardingData): PlacedCat[] {
+function applyPredefinedPositionsOfCats(onboardingData: OnboardingData): PlacedCat[] {
   const { characters } = onboardingData;
 
-  return characters.map((cat): PlacedCat => {
-    return {
-      ...cat,
-    };
-  });
+  return characters.filter(shouldIncludeCat);
+}
+
+function shouldIncludeCat(catOrCatId: Cat | CatId): boolean {
+  const id = typeof catOrCatId === "object" ? catOrCatId.id : catOrCatId;
+  return globals.config[ConfigCategory.CATS][id];
 }

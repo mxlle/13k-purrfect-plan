@@ -13,9 +13,10 @@ import {
   startRecording,
 } from "../../audio/sound-control/sound-control";
 import { PubSubEvent, pubSubService } from "../../utils/pub-sub-service";
-import { addStartButton } from "../game-field/game-field";
 import { getTranslation, TranslationKey } from "../../translations/i18n";
 import { globals } from "../../globals";
+import { isOnboarding } from "../../logic/onboarding";
+import { ConfigCategory } from "../config/config-component";
 
 let hasSetupEventListeners = false;
 let controlsComponent: HTMLElement | undefined;
@@ -57,6 +58,7 @@ export function getControlsComponent(): HTMLElement {
     text: "Meow",
     onClick: () => handleMove(Tool.MEOW),
   });
+  meowButton.classList.add(CssClass.MEOW_BUTTON);
 
   recoveryInfoComponent = createElement();
 
@@ -64,6 +66,8 @@ export function getControlsComponent(): HTMLElement {
   toolContainer.appendChild(meowButton);
   toolContainer.appendChild(recoveryInfoComponent);
   controlsComponent.appendChild(toolContainer);
+
+  updateToolContainer();
 
   return controlsComponent;
 }
@@ -134,13 +138,14 @@ function setupEventListeners() {
   pubSubService.subscribe(PubSubEvent.GAME_END, () => {
     if (!controlsComponent) return;
 
-    addStartButton(TranslationKey.NEW_GAME, controlsComponent);
+    controlsComponent.appendChild(addContinueButtons());
   });
 
   pubSubService.subscribe(PubSubEvent.GAME_START, () => {
     toolsFrozenUntilTurn = undefined;
     updateRecoveryInfoComponent();
     updateTurnMovesComponent();
+    updateToolContainer();
   });
 
   document.addEventListener("keydown", (event) => {
@@ -171,6 +176,32 @@ function setupEventListeners() {
   });
 
   hasSetupEventListeners = true;
+}
+
+export function addContinueButtons() {
+  const newGameContainer = createElement({ cssClass: CssClass.NEW_GAME_CONTAINER });
+
+  const continueButton = createButton({
+    text: getTranslation(isOnboarding() ? TranslationKey.CONTINUE : TranslationKey.NEW_GAME),
+    onClick: () => {
+      pubSubService.publish(PubSubEvent.START_NEW_GAME);
+      newGameContainer.remove();
+    },
+  });
+  continueButton.classList.add("prm");
+
+  const restartButton = createButton({
+    text: getTranslation(TranslationKey.RESTART_GAME),
+    onClick: () => {
+      pubSubService.publish(PubSubEvent.START_NEW_GAME, { shouldIncreaseLevel: false });
+      newGameContainer.remove();
+    },
+  });
+
+  newGameContainer.appendChild(continueButton);
+  newGameContainer.appendChild(restartButton);
+
+  return newGameContainer;
 }
 
 async function handleMove(turnMove: TurnMove) {
@@ -212,4 +243,12 @@ function updateRecoveryInfoComponent() {
     recoveryInfoComponent.innerHTML = "";
     toolsFrozenUntilTurn = undefined;
   }
+}
+
+function updateToolContainer() {
+  if (!toolContainer) return;
+
+  const shouldHaveTools = Object.values(globals.config[ConfigCategory.TOOLS]).some(Boolean);
+
+  toolContainer.classList.toggle(CssClass.HIDDEN, !shouldHaveTools);
 }

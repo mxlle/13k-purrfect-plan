@@ -10,11 +10,28 @@
   height: fit-content;
 
   &.#{$DISABLED},
-  .#{$WON} & > *:not(.#{$START_BUTTON}) {
-    pointer-events: none;
-    opacity: 0.5;
-    filter: grayscale(80%);
+  .#{$WON} & > * {
+    &:not(.#{$NEW_GAME_CONTAINER}) {
+      pointer-events: none;
+      opacity: 0;
+      filter: grayscale(80%);
+
+      &.#{$MOVES} {
+        opacity: 0.5;
+      }
+    }
   }
+}
+
+.#{$NEW_GAME_CONTAINER} {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 6;
+  display: grid;
+  gap: 0.5rem;
+  place-items: center;
 }
 
 .#{$MOVEMENT_CONTROLS} {

@@ -3,8 +3,9 @@ import { TranslationKey } from "./i18n";
 export const enTranslations: Record<TranslationKey, string> = {
   [TranslationKey.START_GAME]: "Start game",
   [TranslationKey.NEW_GAME]: "New game",
+  [TranslationKey.RESTART_GAME]: "Do over",
   [TranslationKey.WIN]: "You win 🎉",
-  [TranslationKey.CONTINUE]: "Continue",
+  [TranslationKey.CONTINUE]: "Next",
   [TranslationKey.BACK]: "Back",
   [TranslationKey.DIFFICULTY]: "Difficulty",
   [TranslationKey.DIFFICULTY_EASY]: "Easy",

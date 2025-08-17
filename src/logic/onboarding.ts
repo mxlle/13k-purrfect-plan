@@ -1,13 +1,16 @@
-import { Direction } from "../types";
+import { Direction, Tool, TurnMove } from "../types";
 import { globals } from "../globals";
 import { LocalStorageKey, setLocalStorageItem } from "../utils/local-storage";
-import type { IntRange } from "type-fest";
 import { CatId, getCat, PlacedCat } from "./data/cats";
 import { CellType, getCellTypePlaceholders } from "./data/cell";
+import { allInConfig, Config, ConfigCategory, emptyConfig } from "../components/config/config-component";
 
 export const enum OnboardingStep {
   INTRO = 0,
-  LAST_SETUP = 1,
+  INTRO_SECOND_CAT = 1,
+  INTERMEDIATE_MEOW = 2,
+  INTERMEDIATE_OBJECTS = 3,
+  LAST_SETUP = 4,
 }
 
 export function isOnboarding() {
@@ -21,36 +24,55 @@ export function isSameLevel() {
 export interface OnboardingData {
   field: CellType[][];
   characters: PlacedCat[];
-  arrow?: {
-    row: number;
-    column: number;
-    direction: Direction;
-  };
+  highlightedAction?: TurnMove;
+  config: Config;
 }
-
-type BaseFieldIndex = IntRange<0, 9>;
-
-type ShortCharacterDefinition = [awake: 0 | 1, rowIndex: BaseFieldIndex, columnIndex: BaseFieldIndex];
-
-// a 4 by 4 grid
-const onboardingField = (() => {
-  const { _ } = getCellTypePlaceholders();
-  return [
-    [_, _, _, _],
-    [_, _, _, _],
-    [_, _, _, _],
-    [_, _, _, _],
-  ];
-})();
 
 export function getOnboardingData(): OnboardingData | undefined {
   const step = globals.onboardingStep;
 
   switch (step) {
     case OnboardingStep.INTRO:
-      return getOnboardingDataForIntro();
+    case OnboardingStep.INTRO_SECOND_CAT:
+      return {
+        field: getBaseFieldFromInitialSetup(introSetup),
+        characters: getCatsFromInitialSetup(introSetup),
+        highlightedAction: step === OnboardingStep.INTRO ? Direction.DOWN : undefined,
+        config: {
+          ...emptyConfig,
+          [ConfigCategory.CATS]: {
+            ...emptyConfig[ConfigCategory.CATS],
+            [CatId.MOONY]: true,
+            [CatId.IVY]: step === OnboardingStep.INTRO_SECOND_CAT,
+          },
+        },
+      };
+    case OnboardingStep.INTERMEDIATE_MEOW:
+    case OnboardingStep.INTERMEDIATE_OBJECTS:
+      return {
+        field: getBaseFieldFromInitialSetup(intermediateSetup),
+        characters: getCatsFromInitialSetup(intermediateSetup),
+        highlightedAction: step === OnboardingStep.INTERMEDIATE_MEOW ? Tool.MEOW : undefined,
+        config: {
+          ...emptyConfig,
+          [ConfigCategory.CATS]: { ...emptyConfig[ConfigCategory.CATS], [CatId.MOONY]: true, [CatId.IVY]: true },
+          [ConfigCategory.OBJECTS]: {
+            ...emptyConfig[ConfigCategory.OBJECTS],
+            [CellType.TREE]: step === OnboardingStep.INTERMEDIATE_OBJECTS,
+            [CellType.MOON]: step === OnboardingStep.INTERMEDIATE_OBJECTS,
+          },
+          [ConfigCategory.TOOLS]: {
+            ...emptyConfig[ConfigCategory.TOOLS],
+            [Tool.MEOW]: true,
+          },
+        },
+      };
     case OnboardingStep.LAST_SETUP:
-      return getOnboardingDataForLastSetup();
+      return {
+        field: getBaseFieldFromInitialSetup(lastSetup),
+        characters: getCatsFromInitialSetup(lastSetup),
+        config: allInConfig,
+      };
     default:
       return undefined;
   }
@@ -74,24 +96,26 @@ export function increaseOnboardingStepIfApplicable() {
   setLocalStorageItem(LocalStorageKey.ONBOARDING_STEP, step.toString());
 }
 
-function getOnboardingDataForIntro(): OnboardingData {
-  const short: ShortCharacterDefinition[] = [
-    [1, 1, 0],
-    [1, 3, 3],
-  ];
-
-  return {
-    field: onboardingField,
-    characters: getCatsWithPositionFromShortDescription(short),
-    // arrow: {
-    //   row: 1,
-    //   column: 0,
-    //   direction: Direction.UP,
-    // },
-  };
-}
-
 type InitialSetup = (CellType | CatId)[][];
+
+const introSetup: InitialSetup = (() => {
+  const { _, M, t, o, c, T, O, C } = getCellTypePlaceholders();
+  return [
+    [_, M, _],
+    [_, c, _],
+    [_, _, t],
+  ];
+})();
+
+const intermediateSetup: InitialSetup = (() => {
+  const { _, M, t, o, c, T, O, C } = getCellTypePlaceholders();
+  return [
+    [C, _, _, _],
+    [_, _, M, _],
+    [_, _, T, _],
+    [t, _, c, _],
+  ];
+})();
 
 const lastSetup: InitialSetup = (() => {
   const { _, M, t, o, c, T, O, C } = getCellTypePlaceholders();
@@ -103,13 +127,6 @@ const lastSetup: InitialSetup = (() => {
     [_, _, t, _, c],
   ];
 })();
-
-function getOnboardingDataForLastSetup(): OnboardingData {
-  return {
-    field: getBaseFieldFromInitialSetup(lastSetup),
-    characters: getCatsFromInitialSetup(lastSetup),
-  };
-}
 
 function getBaseFieldFromInitialSetup(initialSetup: InitialSetup): CellType[][] {
   return initialSetup.map((row) => row.map((cell) => (typeof cell === "string" ? cell : CellType.EMPTY)));
@@ -140,15 +157,4 @@ function getCatsFromInitialSetup(initialSetup: InitialSetup): PlacedCat[] {
   cats.sort((a, b) => a.id - b.id); // Sort cats by their ID for consistency
 
   return cats;
-}
-
-function getCatsWithPositionFromShortDescription(short: ShortCharacterDefinition[]): PlacedCat[] {
-  return short.map(([awake, rowIndex, columnIndex], index: number) => {
-    return {
-      ...getCat(index),
-      awake: Boolean(awake),
-      row: rowIndex,
-      column: columnIndex,
-    };
-  });
 }

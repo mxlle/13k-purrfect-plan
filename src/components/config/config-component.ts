@@ -10,7 +10,7 @@ import { globals } from "../../globals";
 
 let configComponent: HTMLElement | undefined;
 
-enum ConfigCategory {
+export enum ConfigCategory {
   CATS = "Cats",
   OBJECTS = "Objects",
   TOOLS = "Tools",
@@ -24,7 +24,13 @@ export interface Config {
 
 type ConfigItemId = CatId | CellType | Tool;
 
-export const defaultConfig: Config = {
+export const emptyConfig: Config = {
+  [ConfigCategory.CATS]: Object.fromEntries(ALL_CAT_IDS.map((catId, index) => [catId, index === 0])) as Record<CatId, boolean>,
+  [ConfigCategory.OBJECTS]: Object.fromEntries(Object.values(CellType).map((type) => [type, false])) as Record<CellType, boolean>,
+  [ConfigCategory.TOOLS]: Object.fromEntries(Object.values(Tool).map((tool) => [tool, false])) as Record<Tool, boolean>,
+};
+
+export const allInConfig: Config = {
   [ConfigCategory.CATS]: Object.fromEntries(ALL_CAT_IDS.map((catId) => [catId, true])) as Record<CatId, boolean>,
   [ConfigCategory.OBJECTS]: Object.fromEntries(Object.values(CellType).map((type) => [type, true])) as Record<CellType, boolean>,
   [ConfigCategory.TOOLS]: Object.fromEntries(Object.values(Tool).map((tool) => [tool, true])) as Record<Tool, boolean>,
