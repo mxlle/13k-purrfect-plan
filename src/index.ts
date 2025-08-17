@@ -3,8 +3,6 @@ import "./index.scss";
 import { createButton, createElement } from "./utils/html-utils";
 import { PubSubEvent, pubSubService } from "./utils/pub-sub-service";
 import { initializeEmptyGameField, startNewGame } from "./components/game-field/game-field";
-import { initAudio, togglePlayer } from "./audio/music-control";
-import { getLocalStorageItem, LocalStorageKey } from "./utils/local-storage";
 import { initPoki } from "./poki-integration";
 import { isOnboarding } from "./logic/onboarding";
 import { isGameInProgress } from "./globals";
@@ -13,7 +11,7 @@ import { createWinScreen } from "./components/win-screen/win-screen";
 let titleElement: HTMLElement;
 let currentScore = 0;
 
-const initializeMuted = getLocalStorageItem(LocalStorageKey.MUTED) === "true";
+// const initializeMuted = getLocalStorageItem(LocalStorageKey.MUTED) === "true";
 
 function init() {
   const header = createElement({
@@ -31,16 +29,16 @@ function init() {
     cssClass: "h-btns",
   });
 
-  const muteButton = createButton({
-    text: initializeMuted ? "🔇" : "🔊",
-    onClick: (event: MouseEvent) => {
-      const isActive = togglePlayer();
-      (event.target as HTMLElement).textContent = isActive ? "🔊" : "🔇";
-    },
-    iconBtn: true,
-  });
-
-  btnContainer.append(muteButton);
+  // const muteButton = createButton({
+  //   text: initializeMuted ? "🔇" : "🔊",
+  //   onClick: (event: MouseEvent) => {
+  //     const isActive = togglePlayer();
+  //     (event.target as HTMLElement).textContent = isActive ? "🔊" : "🔇";
+  //   },
+  //   iconBtn: true,
+  // });
+  //
+  // btnContainer.append(muteButton);
 
   header.append(btnContainer);
 
@@ -74,7 +72,7 @@ function init() {
 // INIT
 const initApp = async () => {
   init();
-  await initAudio(initializeMuted);
+  // await initAudio(initializeMuted);
 };
 
 if (process.env.POKI_ENABLED === "true") initPoki(initApp);
