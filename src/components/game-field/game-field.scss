@@ -164,12 +164,6 @@ $border-style: outset;
   }
 }
 
-.#{$WON} {
-  .#{$CELL} {
-    pointer-events: none;
-  }
-}
-
 // scale y
 @keyframes eye-blink {
   0% {

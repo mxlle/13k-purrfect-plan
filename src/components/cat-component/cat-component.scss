@@ -23,6 +23,47 @@
 
 .#{$IS_MOM} {
   color: #ff2ea6;
+
+  // speech bubble
+  &:before,
+  &:after {
+    position: absolute;
+    z-index: 9;
+    left: 50%;
+    transform: translateX(-50%) translateY(0.5em);
+    font-size: 0.3em;
+    pointer-events: none;
+    opacity: 0;
+    transition: all 0.3s 0.3s ease-in-out;
+  }
+
+  &:after {
+    content: "United!!";
+    top: -2.5em;
+    font-family: monospace;
+    padding: 0.5rem;
+    border-radius: 0.8rem;
+    background: white;
+  }
+
+  // start of speech bubble
+  &:before {
+    content: "";
+    top: -0.75em;
+    width: 0;
+    height: 0;
+    border-left: 0.5em solid transparent;
+    border-right: 0.5em solid transparent;
+    border-top: 0.5em solid white;
+  }
+
+  .#{$WON} & {
+    &:before,
+    &:after {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+  }
 }
 
 .#{$CAT_COLOR} {
