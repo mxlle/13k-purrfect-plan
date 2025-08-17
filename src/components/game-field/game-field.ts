@@ -183,7 +183,6 @@ export async function initializeCatsOnGameField(cats: PlacedCat[]) {
   for (let i = 0; i < cats.length; i++) {
     const cat = cats[i];
     middleCellElement.append(cat.catElement);
-    // cat.catElement.style.transform = "translate(0, 0)"; // reset position
     cat.initialPosition = { ...middleCellPosition };
   }
 

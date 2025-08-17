@@ -130,6 +130,9 @@ function getCatsFromInitialSetup(initialSetup: InitialSetup): PlacedCat[] {
       }
     });
   });
+
+  cats.sort((a, b) => a.id - b.id); // Sort cats by their ID for consistency
+
   return cats;
 }
 

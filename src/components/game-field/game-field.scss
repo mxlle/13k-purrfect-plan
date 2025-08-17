@@ -147,12 +147,10 @@ $border-style: outset;
     place-items: center;
     width: 100%;
     height: 100%;
-    z-index: 3;
 
     filter: drop-shadow(3px -2px 1px color-mix(in srgb, currentColor 20%, transparent));
 
     &:not(.#{$IS_MOM}) {
-      z-index: 4;
       transform: scale(0.7) translate(var(--t-x, 0), 22%);
     }
 
