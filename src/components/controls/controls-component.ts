@@ -33,7 +33,7 @@ export function getControlsComponent(): HTMLElement {
 
   const moveButtons = getAllMoveButtons();
   moveButtons.forEach((button) => movementContainer.appendChild(button));
-  movementContainer.appendChild(createRecordButton([Direction.UP, Direction.RIGHT, Direction.DOWN, Direction.LEFT]));
+  // movementContainer.appendChild(createRecordButton([Direction.UP, Direction.RIGHT, Direction.DOWN, Direction.LEFT]));
 
   controlsComponent.appendChild(movementContainer);
 
@@ -46,8 +46,8 @@ export function getControlsComponent(): HTMLElement {
     onClick: () => performMove(Tool.MEOW),
   });
 
-  toolContainer.appendChild(meowButton);
   toolContainer.appendChild(createRecordButton([Tool.MEOW]));
+  toolContainer.appendChild(meowButton);
   controlsComponent.appendChild(toolContainer);
 
   return controlsComponent;
