@@ -21,6 +21,12 @@ export enum Tool {
   MEOW = "meow",
 }
 
+type RecoveryTurnCount = number;
+
+export const RECOVERY_TIME_MAP: Record<Tool, RecoveryTurnCount> = {
+  [Tool.MEOW]: 2,
+};
+
 export type TurnMove = Direction | Tool;
 
 export function isTool(move: TurnMove): move is Tool {

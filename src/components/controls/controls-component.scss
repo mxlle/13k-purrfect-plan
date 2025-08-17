@@ -61,10 +61,30 @@
   }
 }
 
+.#{$MOVES} {
+  &::before {
+    content: "⏳ ";
+  }
+}
+
 .#{$TOOL_CONTROLS} {
   display: flex;
   gap: 1rem;
   align-items: center;
+
+  &.#{$DISABLED} {
+    button {
+      pointer-events: none;
+      opacity: 0.5;
+      filter: grayscale(80%);
+    }
+
+    :last-child {
+      &::before {
+        content: "⏳ ";
+      }
+    }
+  }
 
   button {
     color: $main-color;

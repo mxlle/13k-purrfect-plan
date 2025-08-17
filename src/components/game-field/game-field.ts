@@ -1,7 +1,6 @@
 import "./game-field.scss";
 
 import { createButton, createElement } from "../../utils/html-utils";
-import { newGame } from "../../logic/game-logic";
 import { createCellElement } from "./cell-component";
 import { getTranslation, TranslationKey } from "../../translations/i18n";
 import { globals } from "../../globals";
@@ -14,6 +13,7 @@ import { CssClass } from "../../utils/css-class";
 import { getControlsComponent } from "../controls/controls-component";
 import { isMother, PlacedCat } from "../../logic/data/cats";
 import { Cell, CellPosition, GameFieldData, getCellDifference } from "../../logic/data/cell";
+import { PubSubEvent, pubSubService } from "../../utils/pub-sub-service";
 
 let mainContainer: HTMLElement | undefined;
 let gameFieldElem: HTMLElement | undefined;
@@ -46,7 +46,7 @@ export function addStartButton(buttonLabelKey: TranslationKey, elementToAttachTo
   startButton = createButton({
     text: getTranslation(buttonLabelKey),
     onClick: (event: MouseEvent) => {
-      newGame();
+      pubSubService.publish(PubSubEvent.START_NEW_GAME);
       (event.target as HTMLElement)?.remove();
     },
   });
@@ -61,7 +61,11 @@ export async function startNewGame() {
 
   document.body.classList.remove(CssClass.SELECTING, CssClass.WON);
   globals.isWon = false;
+  globals.moves = 0;
+
   startButton?.remove();
+
+  pubSubService.publish(PubSubEvent.GAME_START);
 
   if (globals.gameFieldData.length && gameFieldElem) {
     // reset old game field

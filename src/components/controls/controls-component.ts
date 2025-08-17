@@ -1,6 +1,6 @@
 import { createButton, createElement } from "../../utils/html-utils";
 import { CssClass } from "../../utils/css-class";
-import { Direction, Tool, TurnMove } from "../../types";
+import { Direction, isTool, RECOVERY_TIME_MAP, Tool, TurnMove } from "../../types";
 
 import "./controls-component.scss";
 import { performMove } from "../../logic/game-logic";
@@ -14,11 +14,16 @@ import {
 } from "../../audio/sound-control/sound-control";
 import { PubSubEvent, pubSubService } from "../../utils/pub-sub-service";
 import { addStartButton } from "../game-field/game-field";
-import { TranslationKey } from "../../translations/i18n";
+import { getTranslation, TranslationKey } from "../../translations/i18n";
+import { globals } from "../../globals";
 
 let hasSetupEventListeners = false;
 let controlsComponent: HTMLElement | undefined;
+let turnMovesComponent: HTMLElement | undefined;
+let toolContainer: HTMLElement | undefined;
+let recoveryInfoComponent: HTMLElement | undefined;
 let activeRecording: ActiveRecording | undefined;
+let toolsFrozenUntilTurn: number | undefined;
 
 export function getControlsComponent(): HTMLElement {
   setupEventListeners();
@@ -26,6 +31,13 @@ export function getControlsComponent(): HTMLElement {
   controlsComponent = createElement({
     cssClass: CssClass.CONTROLS,
   });
+
+  turnMovesComponent = createElement({
+    cssClass: CssClass.MOVES,
+  });
+  updateTurnMovesComponent();
+
+  controlsComponent.appendChild(turnMovesComponent);
 
   const movementContainer = createElement({
     cssClass: CssClass.MOVEMENT_CONTROLS,
@@ -37,17 +49,20 @@ export function getControlsComponent(): HTMLElement {
 
   controlsComponent.appendChild(movementContainer);
 
-  const toolContainer = createElement({
+  toolContainer = createElement({
     cssClass: CssClass.TOOL_CONTROLS,
   });
 
   const meowButton = createButton({
     text: "Meow",
-    onClick: () => performMove(Tool.MEOW),
+    onClick: () => handleMove(Tool.MEOW),
   });
+
+  recoveryInfoComponent = createElement();
 
   toolContainer.appendChild(createRecordButton([Tool.MEOW]));
   toolContainer.appendChild(meowButton);
+  toolContainer.appendChild(recoveryInfoComponent);
   controlsComponent.appendChild(toolContainer);
 
   return controlsComponent;
@@ -103,7 +118,7 @@ function getAllMoveButtons(): HTMLElement[] {
 function getMoveButton(direction: Direction): HTMLElement {
   const button = createButton({
     text: "",
-    onClick: () => handleMoveButtonClick(direction),
+    onClick: () => handleMove(direction),
     iconBtn: true,
   });
 
@@ -120,6 +135,12 @@ function setupEventListeners() {
     if (!controlsComponent) return;
 
     addStartButton(TranslationKey.NEW_GAME, controlsComponent);
+  });
+
+  pubSubService.subscribe(PubSubEvent.GAME_START, () => {
+    toolsFrozenUntilTurn = undefined;
+    updateRecoveryInfoComponent();
+    updateTurnMovesComponent();
   });
 
   document.addEventListener("keydown", (event) => {
@@ -145,13 +166,50 @@ function setupEventListeners() {
 
     if (turnMove) {
       event.preventDefault(); // Prevent default scrolling behavior
-      void performMove(turnMove);
+      void handleMove(turnMove);
     }
   });
 
   hasSetupEventListeners = true;
 }
 
-async function handleMoveButtonClick(direction: Direction) {
-  await performMove(direction);
+async function handleMove(turnMove: TurnMove) {
+  if (isTool(turnMove) && toolsFrozenUntilTurn) {
+    return;
+  }
+
+  await performMove(turnMove);
+  globals.moves++;
+  updateTurnMovesComponent();
+
+  if (isTool(turnMove)) {
+    toolsFrozenUntilTurn = globals.moves + RECOVERY_TIME_MAP[turnMove];
+  }
+
+  updateRecoveryInfoComponent();
+}
+
+function updateTurnMovesComponent() {
+  if (!turnMovesComponent) return;
+
+  turnMovesComponent.innerHTML = `${getTranslation(TranslationKey.MOVES)}: ${globals.moves}`;
+}
+
+function updateRecoveryInfoComponent() {
+  if (!recoveryInfoComponent) return;
+
+  if (!toolsFrozenUntilTurn) {
+    recoveryInfoComponent.innerHTML = "";
+    toolContainer.classList.remove(CssClass.DISABLED);
+    return;
+  }
+
+  const turnsLeft = toolsFrozenUntilTurn - globals.moves;
+  recoveryInfoComponent.innerHTML = `${turnsLeft}`;
+  toolContainer.classList.toggle(CssClass.DISABLED, turnsLeft > 0);
+
+  if (turnsLeft <= 0) {
+    recoveryInfoComponent.innerHTML = "";
+    toolsFrozenUntilTurn = undefined;
+  }
 }

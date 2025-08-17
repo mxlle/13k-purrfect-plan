@@ -62,7 +62,7 @@ function init() {
     }
   });
 
-  pubSubService.subscribe(PubSubEvent.NEW_GAME, () => {
+  pubSubService.subscribe(PubSubEvent.START_NEW_GAME, () => {
     void startNewGame();
   });
 }

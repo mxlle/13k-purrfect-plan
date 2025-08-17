@@ -3,11 +3,7 @@ import { createElement } from "../../utils/html-utils";
 import "./index.scss";
 
 import { PubSubEvent, pubSubService } from "../../utils/pub-sub-service";
-import {
-  getLocalStorageItem,
-  LocalStorageKey,
-  setLocalStorageItem,
-} from "../../utils/local-storage";
+import { getLocalStorageItem, LocalStorageKey, setLocalStorageItem } from "../../utils/local-storage";
 import { globals } from "../../globals";
 
 const EMPTY_STAR = "☆";
@@ -50,7 +46,7 @@ export function getStarsForGameField() {
     setTimeout(() => stars.classList.toggle(starClass, false), 300);
   });
 
-  pubSubService.subscribe(PubSubEvent.NEW_GAME, () => {
+  pubSubService.subscribe(PubSubEvent.GAME_START, () => {
     currentStars = maxStars;
     updateStars(stars, currentStars);
   });

@@ -23,7 +23,7 @@ export const enum CssClass {
   // controls
   CONTROLS = "controls",
   MOVEMENT_CONTROLS = "movement-controls",
-  ACTION_CONTROLS = "u",
+  MOVES = "moves",
   TOOL_CONTROLS = "tool-controls",
   CONFIG = "config",
   CONFIG_CATEGORY = "category",

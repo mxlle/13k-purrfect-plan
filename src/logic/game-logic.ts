@@ -10,10 +10,6 @@ import { updateAllCatPositions } from "../components/game-field/game-field";
 
 let isPerformingMove = false;
 
-export function newGame() {
-  pubSubService.publish(PubSubEvent.NEW_GAME);
-}
-
 export async function performMove(turnMove: TurnMove) {
   console.debug(`Make move: ${turnMove}`);
 

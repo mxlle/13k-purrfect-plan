@@ -17,6 +17,7 @@ interface GameGlobals {
   settings: Settings;
   isWon: boolean;
   metaData?: GameMetaData;
+  moves: number;
 }
 
 const onboardingStepSetting = getLocalStorageItem(LocalStorageKey.ONBOARDING_STEP);
@@ -36,6 +37,7 @@ const defaultGlobals: GameGlobals = {
   difficulty: initialDifficulty,
   settings: initialSettings,
   isWon: false,
+  moves: 0,
 };
 
 export const globals: GameGlobals = { ...defaultGlobals };

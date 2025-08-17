@@ -3,7 +3,6 @@ import "./win-screen.scss";
 import { createDialog, Dialog } from "../dialog/dialog";
 import { createButton, createElement } from "../../utils/html-utils";
 import { getTranslation, TranslationKey } from "../../translations/i18n";
-import { newGame } from "../../logic/game-logic";
 import { getOnboardingData, isOnboarding } from "../../logic/onboarding";
 import {
   difficulties,
@@ -14,6 +13,7 @@ import {
   setDifficultyStats,
 } from "../../logic/difficulty";
 import { globals } from "../../globals";
+import { PubSubEvent, pubSubService } from "../../utils/pub-sub-service";
 
 let winDialog: Dialog | undefined;
 let difficultyElement: HTMLElement | undefined;
@@ -32,7 +32,7 @@ export function createWinScreen(score: number, isComplete: boolean) {
 
   winDialog.open().then((playAgain) => {
     if (playAgain) {
-      newGame();
+      pubSubService.publish(PubSubEvent.START_NEW_GAME);
     }
   });
 }
