@@ -1,7 +1,7 @@
 import "./game-field.scss";
 
 import { createButton, createElement } from "../../utils/html-utils";
-import { moveCatToCell, newGame } from "../../logic/game-logic";
+import { newGame } from "../../logic/game-logic";
 import { createCellElement } from "./cell-component";
 import { getTranslation, TranslationKey } from "../../translations/i18n";
 import { globals } from "../../globals";
@@ -13,7 +13,7 @@ import { getArrowComponent } from "../arrow-component/arrow-component";
 import { CssClass } from "../../utils/css-class";
 import { getControlsComponent } from "../controls/controls-component";
 import { isMother, PlacedCat } from "../../logic/data/cats";
-import { Cell, CellPosition, GameFieldData } from "../../logic/data/cell";
+import { Cell, CellPosition, GameFieldData, getCellDifference } from "../../logic/data/cell";
 
 let mainContainer: HTMLElement | undefined;
 let gameFieldElem: HTMLElement | undefined;
@@ -132,8 +132,8 @@ function getMiddleCoordinates(): CellPosition | undefined {
   const rowCount = globals.gameFieldData.length;
   const columnCount = globals.gameFieldData[0].length;
 
-  const middleRow = Math.floor(rowCount / 2);
-  const middleColumn = Math.floor(columnCount / 2);
+  const middleRow = Math.floor((rowCount - 1) / 2);
+  const middleColumn = Math.floor((columnCount - 1) / 2);
 
   return { row: middleRow, column: middleColumn };
 }
@@ -178,7 +178,7 @@ function addOnboardingArrowIfApplicable() {
 export async function initializeCatsOnGameField(cats: PlacedCat[]) {
   const middleCellPosition = getMiddleCoordinates();
   const middleCellElement = getCellElement(middleCellPosition);
-  middleCellElement.innerHTML = ""; // clear middle cell
+  middleCellElement.innerHTML = "";
 
   for (let i = 0; i < cats.length; i++) {
     const cat = cats[i];
@@ -188,10 +188,7 @@ export async function initializeCatsOnGameField(cats: PlacedCat[]) {
 
   await requestAnimationFrameWithTimeout(TIMEOUT_BETWEEN_GAMES);
 
-  for (let i = 0; i < cats.length; i++) {
-    const cat = cats[i];
-    moveCatToCell(cat, cat);
-  }
+  updateAllCatPositions();
 }
 
 export async function cleanGameField(gameFieldData: GameFieldData) {
@@ -202,4 +199,11 @@ export async function cleanGameField(gameFieldData: GameFieldData) {
     const cellElement = getCellElement(cell);
     cellElement.innerHTML = "";
   }
+}
+
+export function updateAllCatPositions() {
+  globals.placedCats.forEach((cat) => {
+    const diff = getCellDifference(cat, cat.initialPosition);
+    cat.catElement.style.transform = `translate(${diff.column * 100}%, ${diff.row * 100}%)`;
+  });
 }
