@@ -7,8 +7,11 @@ import { CellPosition, CellType } from "./data/cell";
 import { playSoundForAction } from "../audio/sound-control/sound-control";
 import { CssClass } from "../utils/css-class";
 import { updateAllCatPositions } from "../components/game-field/game-field";
+import { sleep } from "../utils/promise-utils";
 
 let isPerformingMove = false;
+
+const MEOW_TIME = 1500;
 
 export async function performMove(turnMove: TurnMove) {
   console.debug(`Make move: ${turnMove}`);
@@ -49,12 +52,20 @@ export async function performMove(turnMove: TurnMove) {
 async function executeTool(tool: Tool) {
   switch (tool) {
     case Tool.MEOW:
+      document.body.classList.add(CssClass.MEOW);
+
+      await sleep(300); // Wait for meow speech bubble to appear
+
       // all kittens move one cell in the direction of the mother cat
       const freeKittens = getKittensElsewhere(globals.placedCats, globals.motherCat);
 
       for (const kitten of freeKittens) {
         moveCatTowardsCell(kitten, globals.motherCat);
       }
+
+      setTimeout(() => {
+        document.body.classList.remove(CssClass.MEOW);
+      }, MEOW_TIME);
   }
 }
 

@@ -186,7 +186,7 @@ function addOnboardingSuggestionIfApplicable() {
     let actionComponent: HTMLElement | null = null;
 
     if (isTool(onboardingData.highlightedAction)) {
-      actionComponent = document.querySelector(`.${CssClass.MEOW_BUTTON}`) as HTMLElement | null;
+      actionComponent = document.querySelector(`.${CssClass.MEOW}`) as HTMLElement | null;
     } else {
       const directionComponent = isTool(onboardingData.highlightedAction)
         ? undefined

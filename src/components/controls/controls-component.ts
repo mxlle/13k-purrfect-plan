@@ -58,7 +58,7 @@ export function getControlsComponent(): HTMLElement {
     text: "Meow",
     onClick: () => handleMove(Tool.MEOW),
   });
-  meowButton.classList.add(CssClass.MEOW_BUTTON);
+  meowButton.classList.add(CssClass.MEOW);
 
   recoveryInfoComponent = createElement();
 

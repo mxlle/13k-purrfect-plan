@@ -25,7 +25,7 @@ export const enum CssClass {
   MOVEMENT_CONTROLS = "movement-controls",
   MOVES = "moves",
   TOOL_CONTROLS = "tool-controls",
-  MEOW_BUTTON = "meow",
+  MEOW = "meow",
   CONFIG = "config",
   CONFIG_CATEGORY = "category",
   SELECTED = "selected",
