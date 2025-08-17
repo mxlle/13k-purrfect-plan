@@ -11,7 +11,7 @@ $border-style: outset;
   margin: 0 auto;
   justify-content: center;
   height: fit-content;
-  border: calc(var(--s-size) / 4) solid $tile-color-alpha;
+  border: calc(var(--s-size) / 10) solid $tile-color-alpha;
 
   @include grid-mixins.board-tile-grid;
   @include grid-mixins.board-tile-grid-variables;
@@ -145,12 +145,16 @@ $border-style: outset;
     height: 100%;
     z-index: 3;
 
+    filter: drop-shadow(3px -2px 1px color-mix(in srgb, currentColor 20%, transparent));
+
     &:not(.#{$IS_MOM}) {
       z-index: 4;
       transform: scale(0.7) translate(var(--t-x, 0), 22%);
     }
 
     svg {
+      color: currentColor;
+
       ellipse {
         transform-box: fill-box;
         transform-origin: center;
@@ -161,29 +165,22 @@ $border-style: outset;
 
   .#{$IS_MOM} {
     transform: scale(0.95);
+    color: #ff2ea6;
   }
 
   .#{$CAT_COLOR} {
     &1 {
-      svg {
-        color: #c09402;
-      }
+      color: #c09402;
     }
 
     &2 {
-      --t-x: -25%;
-
-      svg {
-        color: #009e28;
-      }
+      --t-x: -35%;
+      color: #009e28;
     }
 
     &3 {
-      --t-x: 25%;
-
-      svg {
-        color: #106dff;
-      }
+      --t-x: 35%;
+      color: #106dff;
     }
   }
 
