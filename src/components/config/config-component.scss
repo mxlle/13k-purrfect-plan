@@ -8,10 +8,6 @@
   gap: 1rem;
 }
 
-.#{$ONBOARDING_HIGHLIGHT}:not(:hover) {
-  animation: boxShadowPulse 2s ease-in-out infinite;
-}
-
 .#{$CONFIG_CATEGORY} {
   div {
     display: flex;
@@ -31,17 +27,5 @@
     &:not(.#{$SELECTED}) {
       filter: grayscale(80%) opacity(0.7);
     }
-  }
-}
-
-@keyframes boxShadowPulse {
-  0% {
-    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.5);
-  }
-  70% {
-    box-shadow: 0 0 0 20px rgba(255, 255, 255, 0);
-  }
-  100% {
-    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
   }
 }
