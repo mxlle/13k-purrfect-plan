@@ -1,6 +1,5 @@
-import { createCatElement } from "../../components/game-field/cell-component";
-
 import { CellPosition } from "./cell";
+import { createCatElement } from "../../components/cat-component/cat-component";
 
 export enum CatId {
   MOTHER,

@@ -129,11 +129,7 @@ $border-style: outset;
   }
 
   .#{$CAT_BOX} {
-    position: relative;
-    width: 100%;
-    height: 100%;
     z-index: 3;
-
     transition: transform 0.3s ease-in-out;
 
     .#{$WON} & {
@@ -142,21 +138,11 @@ $border-style: outset;
   }
 
   .#{$CAT} {
-    position: relative;
-    display: grid;
-    place-items: center;
-    width: 100%;
-    height: 100%;
-
-    filter: drop-shadow(3px -2px 1px color-mix(in srgb, currentColor 20%, transparent));
-
     &:not(.#{$IS_MOM}) {
       transform: scale(0.7) translate(var(--t-x, 0), 22%);
     }
 
     svg {
-      color: currentColor;
-
       ellipse {
         transform-box: fill-box;
         transform-origin: center;
@@ -171,23 +157,6 @@ $border-style: outset;
 
   .#{$IS_MOM} {
     transform: scale(0.95);
-    color: #ff2ea6;
-  }
-
-  .#{$CAT_COLOR} {
-    &1 {
-      color: #c09402;
-    }
-
-    &2 {
-      --t-x: -35%;
-      color: #009e28;
-    }
-
-    &3 {
-      --t-x: 35%;
-      color: #106dff;
-    }
   }
 
   > .#{$CAT_BOX} {

@@ -1,0 +1,31 @@
+@import "../../names";
+@import "../../theme";
+
+.#{$CONFIG},
+.#{$CONFIG_CATEGORY} {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.#{$CONFIG_CATEGORY} {
+  div {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+  }
+
+  .#{$CAT_BOX},
+  .#{$CELL} {
+    position: relative;
+    height: 80px;
+    width: 80px;
+    cursor: pointer;
+
+    --t: #{$bg-primary};
+
+    &:not(.#{$SELECTED}) {
+      filter: grayscale(80%) opacity(0.7);
+    }
+  }
+}

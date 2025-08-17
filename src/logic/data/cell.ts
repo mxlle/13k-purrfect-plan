@@ -1,10 +1,10 @@
 import { CatId, PlacedCat } from "./cats";
 
-export const enum CellType {
+export enum CellType {
   EMPTY = "",
+  MOON = "🌙",
   TREE = "🌳",
   PUDDLE = "💧",
-  MOON = "🌙",
 }
 
 export interface CellPosition {
