@@ -55,10 +55,6 @@ body {
   display: grid;
   grid-template-rows: min-content 1fr;
   overflow: hidden; // to hide dialogs
-
-  @media (prefers-color-scheme: light) {
-    @include light-theme;
-  }
 }
 
 main {

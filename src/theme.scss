@@ -25,56 +25,19 @@ $tile-color-2-dark: #1f271c;
 $table-bg-dark: #563232;
 $table-border-dark: #905d5d;
 
-// light theme colors
-$text-primary-light: #1a1a1a;
-$text-secondary-light: #555;
-$text-tertiary-light: #888;
-$dialog-bg-light: rgba(255, 255, 255, 0.95);
-$overlay-bg-light: rgba(255, 255, 255, 0.3);
-$alpha-base-light: #09162a;
-$bg-alpha-05-light: rgba($alpha-base-light, 0.05);
-$bg-alpha-10-light: rgba($alpha-base-light, 0.1);
-$bg-primary-light: #f0f4f8;
-$bg-secondary-light: #dce5ee;
-$tile-color-1-light: #e2e8f0;
-$tile-color-1-light-alpha: rgba(#e2e8f0, 0.75);
-$tile-color-2-light: #ccd6e5;
-$table-bg-light: #a5644c;
-$table-border-light: #d8a28a;
-
-// theme css properties
-$text-primary: var(--txt, $text-primary-dark);
-$text-secondary: var(--txt-2, $text-secondary-dark);
-$text-tertiary: var(--txt-3, $text-tertiary-dark);
-$dialog-bg: var(--dlg-bg, $dialog-bg-dark);
-$overlay-bg: var(--olay-bg, $overlay-bg-dark);
-$bg-alpha-05: var(--bg-05, $bg-alpha-05-dark);
-$bg-alpha-10: var(--bg-10, $bg-alpha-10-dark);
-$bg-primary: var(--bg, $bg-primary-dark);
-$bg-secondary: var(--bg-2, $bg-secondary-dark);
-$tile-color-1: var(--tile-1, $tile-color-1-dark);
-$tile-color-2: var(--tile-2, $tile-color-2-dark);
-$tile-color-alpha: var(--tile-alpha, $tile-color-1-dark-alpha);
-$table-bg: var(--table-bg, $table-bg-dark);
-$table-border: var(--table-border, $table-border-dark);
-
-@mixin light-theme {
-  --txt: #{$text-primary-light};
-  --txt-2: #{$text-secondary-light};
-  --txt-3: #{$text-tertiary-light};
-  --dlg-bg: #{$dialog-bg-light};
-  --olay-bg: #{$overlay-bg-light};
-  --bg-05: #{$bg-alpha-05-light};
-  --bg-10: #{$bg-alpha-10-light};
-  --bg: #{$bg-primary-light};
-  --bg-2: #{$bg-secondary-light};
-  --tile-1: #{$tile-color-1-light};
-  --tile-2: #{$tile-color-2-light};
-  --tile-alpha: #{$tile-color-1-light-alpha};
-  --table-bg: #{$table-bg-light};
-  --table-border: #{$table-border-light};
-  --d-clr: #97012c;
-}
+// theme sass variables
+$text-primary: $text-primary-dark;
+$text-secondary: $text-secondary-dark;
+$text-tertiary: $text-tertiary-dark;
+$dialog-bg: $dialog-bg-dark;
+$overlay-bg: $overlay-bg-dark;
+$bg-alpha-05: $bg-alpha-05-dark;
+$bg-alpha-10: $bg-alpha-10-dark;
+$bg-primary: $bg-primary-dark;
+$bg-secondary: $bg-secondary-dark;
+$tile-color-1: $tile-color-1-dark;
+$tile-color-2: $tile-color-2-dark;
+$tile-color-alpha: $tile-color-1-dark-alpha;
 
 @mixin hover {
   @media (hover: hover) and (pointer: fine) {
@@ -85,17 +48,5 @@ $table-border: var(--table-border, $table-border-dark);
 
   &.touching {
     @content;
-  }
-}
-
-@keyframes opacityBlink {
-  0% {
-    opacity: 0.5;
-  }
-  50% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0.5;
   }
 }
