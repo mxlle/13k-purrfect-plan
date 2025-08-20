@@ -222,20 +222,26 @@ export async function initializeCatsOnGameField(cats: PlacedCat[], isInitialStar
     await requestAnimationFrameWithTimeout(TIMEOUT_BETWEEN_GAMES);
   }
 
-  updateAllCatPositions();
+  updateAllPositions();
 }
 
 export async function initializeObjectsOnGameField(placedObjects: PlacedObject[]) {
   for (let i = 0; i < placedObjects.length; i++) {
     const gameObject = placedObjects[i];
+    gameObject.initialPosition = { row: gameObject.row, column: gameObject.column };
     const cellElement = getCellElement(gameObject);
     cellElement.append(gameObject.objectElement);
   }
 }
 
-export function updateAllCatPositions() {
+export function updateAllPositions() {
   globals.placedCats.forEach((cat) => {
     const diff = getCellDifference(cat, cat.initialPosition);
     cat.catElement.style.transform = `translate(${diff.column * 100}%, ${diff.row * 100}%)`;
+  });
+
+  globals.placedObjects.forEach((obj) => {
+    const diff = getCellDifference(obj, obj.initialPosition);
+    obj.objectElement.style.transform = `translate(${diff.column * 100}%, ${diff.row * 100}%)`;
   });
 }

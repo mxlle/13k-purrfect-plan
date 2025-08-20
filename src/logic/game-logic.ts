@@ -6,7 +6,7 @@ import { CatId, isMother, PlacedCat } from "./data/cats";
 import { CellPosition } from "./data/cell";
 import { playSoundForAction } from "../audio/sound-control/sound-control";
 import { CssClass } from "../utils/css-class";
-import { updateAllCatPositions } from "../components/game-field/game-field";
+import { updateAllPositions } from "../components/game-field/game-field";
 import { sleep } from "../utils/promise-utils";
 import { shouldApplyKittenBehavior } from "./config";
 import { isMoon, isPuddle, isTree } from "./data/objects";
@@ -24,6 +24,9 @@ export async function performMove(turnMove: TurnMove) {
   }
 
   isPerformingMove = true;
+
+  globals.moves++;
+  doMoonMove();
 
   await playSoundForAction(turnMove);
 
@@ -44,11 +47,20 @@ export async function performMove(turnMove: TurnMove) {
     }
   }
 
-  updateAllCatPositions();
+  updateAllPositions();
 
   checkWinCondition();
 
   isPerformingMove = false;
+}
+
+function doMoonMove() {
+  const moon = globals.placedObjects.find(isMoon);
+  const width = globals.fieldSize.width;
+
+  if (moon) {
+    moon.column = moon.column < width - 1 ? moon.column + 1 : 0;
+  }
 }
 
 async function executeTool(tool: Tool) {

@@ -211,7 +211,6 @@ async function handleMove(turnMove: TurnMove) {
   }
 
   await performMove(turnMove);
-  globals.moves++;
   updateTurnMovesComponent();
 
   if (isTool(turnMove)) {

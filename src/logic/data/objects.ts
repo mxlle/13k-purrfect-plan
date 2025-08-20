@@ -15,7 +15,9 @@ interface ObjectWithElement extends BaseObject {
   objectElement: HTMLElement;
 }
 
-export interface PlacedObject extends ObjectWithElement, CellPosition {}
+export interface PlacedObject extends ObjectWithElement, CellPosition {
+  initialPosition?: CellPosition;
+}
 
 export const OBJECTS: Record<ObjectId, ObjectWithElement> = {
   [ObjectId.MOON]: {

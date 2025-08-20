@@ -33,6 +33,7 @@ export interface OnboardingData {
 
 export function getOnboardingData(): OnboardingData | undefined {
   const step = globals.onboardingStep;
+  let skipPositions: CellPosition[] = [];
 
   switch (step) {
     case OnboardingStep.INTRO:
@@ -46,7 +47,7 @@ export function getOnboardingData(): OnboardingData | undefined {
         ];
       })();
       const isFirstStep = step === OnboardingStep.INTRO;
-      const skipPositions: CellPosition[] = isFirstStep ? [{ row: 2, column: 2 }] : [];
+      skipPositions = isFirstStep ? [{ row: 2, column: 2 }] : [];
 
       return {
         field: getFieldSizeFromInitialSetup(introSetup),
@@ -67,10 +68,17 @@ export function getOnboardingData(): OnboardingData | undefined {
           [t, _, c, _],
         ];
       })();
+      const isMeowStep = step === OnboardingStep.INTERMEDIATE_MEOW;
+      skipPositions = isMeowStep
+        ? [
+            { row: 0, column: 0 },
+            { row: 2, column: 2 },
+          ]
+        : [];
 
       return {
         field: getFieldSizeFromInitialSetup(intermediateSetup),
-        ...getPlacedGameElementsFromInitialSetup(intermediateSetup),
+        ...getPlacedGameElementsFromInitialSetup(intermediateSetup, skipPositions),
         highlightedAction: step === OnboardingStep.INTERMEDIATE_MEOW ? Tool.MEOW : undefined,
         config: {
           ...emptyConfig,
