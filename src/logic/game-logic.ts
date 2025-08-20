@@ -3,12 +3,13 @@ import { PubSubEvent, pubSubService } from "../utils/pub-sub-service";
 import { getKittensElsewhere, getKittensOnCell, isValidCellPosition } from "./checks";
 import { globals } from "../globals";
 import { CatId, isMother, PlacedCat } from "./data/cats";
-import { CellPosition, CellType } from "./data/cell";
+import { CellPosition } from "./data/cell";
 import { playSoundForAction } from "../audio/sound-control/sound-control";
 import { CssClass } from "../utils/css-class";
 import { updateAllCatPositions } from "../components/game-field/game-field";
 import { sleep } from "../utils/promise-utils";
 import { shouldApplyKittenBehavior } from "./config";
+import { isMoon, isPuddle, isTree } from "./data/objects";
 
 let isPerformingMove = false;
 
@@ -90,7 +91,7 @@ function handleKittenBehavior(cat: PlacedCat) {
 
 function doMoonyMove(cat: PlacedCat) {
   // Moony moves towards the moon
-  const moonPosition = globals.gameFieldData.flat().find((cell) => cell.type === CellType.MOON);
+  const moonPosition = globals.placedObjects.find(isMoon);
 
   if (moonPosition) {
     moveCatTowardsCell(cat, moonPosition);
@@ -100,7 +101,7 @@ function doMoonyMove(cat: PlacedCat) {
 function doIvyMove(cat: PlacedCat) {
   // if next to a tree, then move clockwise around it
   const { row, column } = cat;
-  const treePosition = globals.gameFieldData.flat().find((cell) => cell.type === CellType.TREE);
+  const treePosition = globals.placedObjects.find(isTree);
 
   if (treePosition) {
     const rowDiff = treePosition.row - row;
@@ -156,7 +157,7 @@ function doIvyMove(cat: PlacedCat) {
 
 function doSplashyMove(cat: PlacedCat) {
   // Splashy moves towards the puddle
-  const waterPosition = globals.gameFieldData.flat().find((cell) => cell.type === CellType.PUDDLE);
+  const waterPosition = globals.placedObjects.find(isPuddle);
 
   if (waterPosition) {
     moveCatTowardsCell(cat, waterPosition);
@@ -175,7 +176,7 @@ function moveCatTowardsCell(cat: PlacedCat, targetCell: CellPosition) {
     // Move vertically firsts
     const newRow = cat.row + (rowDiff > 0 ? 1 : -1);
 
-    if (isValidCellPosition(globals.gameFieldData, { row: newRow, column: cat.column })) {
+    if (isValidCellPosition(globals.fieldSize, { row: newRow, column: cat.column }, globals.placedObjects)) {
       moveCatToCell(cat, { row: newRow, column: cat.column });
       return;
     }
@@ -183,7 +184,7 @@ function moveCatTowardsCell(cat: PlacedCat, targetCell: CellPosition) {
 
   const newColumn = cat.column + (columnDiff > 0 ? 1 : -1);
 
-  if (isValidCellPosition(globals.gameFieldData, { row: cat.row, column: newColumn })) {
+  if (isValidCellPosition(globals.fieldSize, { row: cat.row, column: newColumn }, globals.placedObjects)) {
     moveCatToCell(cat, { row: cat.row, column: newColumn });
     return;
   }
@@ -195,7 +196,7 @@ export function moveCat(cat: PlacedCat, direction: Direction) {
 }
 
 export function moveCatToCell(cat: PlacedCat, cell: CellPosition) {
-  const isValidMove = isValidCellPosition(globals.gameFieldData, cell);
+  const isValidMove = isValidCellPosition(globals.fieldSize, cell, globals.placedObjects);
 
   if (!isValidMove) {
     console.warn(`Invalid move for cat ${cat.name} to cell (${cell.row}, ${cell.column})`);

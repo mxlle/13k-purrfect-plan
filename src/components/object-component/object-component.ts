@@ -2,15 +2,16 @@ import { createElement } from "../../utils/html-utils";
 import { CssClass } from "../../utils/css-class";
 
 import "./object-component.scss";
-import { CellType } from "../../logic/data/cell";
 
-const cellTypeToCssClass: Record<Exclude<CellType, CellType.EMPTY>, CssClass> = {
-  [CellType.TREE]: CssClass.TREE,
-  [CellType.PUDDLE]: CssClass.PUDDLE,
-  [CellType.MOON]: CssClass.MOON,
-};
+import { ObjectId } from "../../logic/data/objects";
 
-export function createObjectElement(type: CellType): HTMLElement {
+export function createObjectElement(type: ObjectId): HTMLElement {
+  const cellTypeToCssClass: Record<ObjectId, CssClass> = {
+    [ObjectId.TREE]: CssClass.TREE,
+    [ObjectId.PUDDLE]: CssClass.PUDDLE,
+    [ObjectId.MOON]: CssClass.MOON,
+  };
+
   const objectBox = createElement({
     cssClass: CssClass.OBJECT_BOX,
   });

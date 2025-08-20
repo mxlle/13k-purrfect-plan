@@ -1,5 +1,7 @@
 import { isMother, PlacedCat } from "./data/cats";
-import { Cell, CellPosition, CellType, GameFieldData, isEmptyField } from "./data/cell";
+import { CellPosition, isEmptyField, isSameCell } from "./data/cell";
+import { FieldSize } from "./data/field-size";
+import { isTree, PlacedObject } from "./data/objects";
 
 // get all 8 neighbors of a cell
 export function getNeighbors(placedCats: PlacedCat[], self: PlacedCat): PlacedCat[] {
@@ -21,18 +23,26 @@ export function getKittensElsewhere(placedCats: PlacedCat[], cell: CellPosition)
   return placedCats.filter((cat) => !isMother(cat) && (cat.row !== cell.row || cat.column !== cell.column));
 }
 
-export function getEmptyFields(gameFieldData: GameFieldData, placedCats: PlacedCat[]) {
-  return gameFieldData.flat().filter((cell) => isEmptyField(placedCats, cell));
+export function getEmptyFields(fieldSize: FieldSize, placedCats: PlacedCat[], placedObjects: PlacedObject[]): CellPosition[] {
+  return getAllCellPositions(fieldSize).filter((cell) => isEmptyField(cell, placedCats, placedObjects));
 }
 
-const findField = (gameFieldData: GameFieldData, position: CellPosition): Cell | undefined => {
-  return gameFieldData[position.row]?.[position.column];
-};
+export function getAllCellPositions(fieldSize: FieldSize): CellPosition[] {
+  const positions: CellPosition[] = [];
+  for (let row = 0; row < fieldSize.height; row++) {
+    for (let column = 0; column < fieldSize.width; column++) {
+      positions.push({ row, column });
+    }
+  }
+  return positions;
+}
 
-export function isValidCellPosition(gameFieldData: GameFieldData, position: CellPosition): boolean {
-  const field = findField(gameFieldData, position);
+export function isValidCellPosition(fieldSize: FieldSize, position: CellPosition, placedObjects: PlacedObject[]): boolean {
+  if (position.row < 0 || position.row >= fieldSize.height || position.column < 0 || position.column >= fieldSize.width) {
+    return false;
+  }
 
-  return field !== undefined && field.type !== CellType.TREE;
+  return !placedObjects.some((obj) => isSameCell(obj, position) && isTree(obj));
 }
 
 export function getMotherCat(placedCats: PlacedCat[]): PlacedCat | undefined {

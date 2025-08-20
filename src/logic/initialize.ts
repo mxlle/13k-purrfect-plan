@@ -1,13 +1,14 @@
 import { getOnboardingData, OnboardingData } from "./onboarding";
 import { globals } from "../globals";
 import { getRandomIntFromInterval, shuffleArray } from "../utils/random-utils";
-import { getEmptyFields } from "./checks";
-import { baseField } from "./base-field";
+import { getAllCellPositions, getEmptyFields } from "./checks";
 import { ALL_CAT_IDS, Cat, getCat, PlacedCat } from "./data/cats";
-import { Cell, CellType, GameFieldData } from "./data/cell";
-import { ConfigCategory, shouldIncludeCat } from "./config";
+import { CellPosition } from "./data/cell";
+import { shouldIncludeCat } from "./config";
+import { DEFAULT_FIELD_SIZE, FieldSize } from "./data/field-size";
+import { PlacedObject } from "./data/objects";
 
-export function placeCatsInitially(gameFieldData: GameFieldData): PlacedCat[] {
+export function placeCatsInitially(fieldSize: FieldSize): PlacedCat[] {
   let onboardingData: OnboardingData | undefined = getOnboardingData();
 
   let placedCats: PlacedCat[];
@@ -15,8 +16,8 @@ export function placeCatsInitially(gameFieldData: GameFieldData): PlacedCat[] {
   if (onboardingData) {
     placedCats = applyPredefinedPositionsOfCats(onboardingData);
   } else {
-    const charactersForGame = generateCatsForGame(gameFieldData);
-    placedCats = randomlyApplyCharactersOnBoard(gameFieldData, charactersForGame);
+    const charactersForGame = generateCatsForGame(fieldSize);
+    placedCats = randomlyApplyCharactersOnBoard(fieldSize, charactersForGame);
 
     //const time = performance.now();
     const par = 42;
@@ -33,52 +34,15 @@ export function placeCatsInitially(gameFieldData: GameFieldData): PlacedCat[] {
   return placedCats;
 }
 
-export function getGameFieldData(): GameFieldData {
-  let field = baseField;
+export function initializeGameField() {
   let onboardingData: OnboardingData | undefined = getOnboardingData();
-  let tableHeight = 8;
 
-  if (onboardingData) {
-    globals.config = onboardingData.config;
-    field = onboardingData.field;
-  }
+  globals.fieldSize = onboardingData ? onboardingData.field : DEFAULT_FIELD_SIZE;
 
-  document.body.style.setProperty("--s-cnt", field.length.toString());
-  document.body.style.setProperty("--table-height", tableHeight.toString());
-
-  if (tableHeight % 2 === 0) {
-    const topValue = (tableHeight / 2 - 1) * -100;
-    document.body.style.setProperty("--table-top", topValue.toString() + "%");
-  }
-
-  const gameField: GameFieldData = [];
-  for (let row = 0; row < field.length; row++) {
-    const baseRow = field[row];
-    const rowArray: Cell[] = [];
-    for (let column = 0; column < baseRow.length; column++) {
-      const baseCell = baseRow[column];
-
-      rowArray.push(getGameFieldObject(baseCell, row, column));
-    }
-    gameField.push(rowArray);
-  }
-
-  return gameField;
+  document.body.style.setProperty("--s-cnt", globals.fieldSize.width.toString());
 }
 
-function getGameFieldObject(type: CellType, row: number, column: number): Cell {
-  const isTypeAllowed = globals.config[ConfigCategory.OBJECTS][type];
-
-  const obj: Cell = {
-    type: isTypeAllowed ? type : CellType.EMPTY,
-    row,
-    column,
-  };
-
-  return obj;
-}
-
-function generateCatsForGame(gameField: GameFieldData): Cat[] {
+function generateCatsForGame(fieldSize: FieldSize): Cat[] {
   const placedCats: PlacedCat[] = [];
   const { minAmount, maxAmount } = globals.settings;
   const amount = getRandomIntFromInterval(minAmount, maxAmount);
@@ -86,7 +50,7 @@ function generateCatsForGame(gameField: GameFieldData): Cat[] {
 
   for (let catId of ALL_CAT_IDS.filter(shouldIncludeCat)) {
     const newCat = getCat(catId);
-    const field = findValidField(gameField, placedCats, newCat);
+    const field = findValidField(fieldSize, placedCats, [], newCat);
 
     if (field) {
       characters.push(newCat);
@@ -102,18 +66,23 @@ function generateCatsForGame(gameField: GameFieldData): Cat[] {
   return characters;
 }
 
-export function findValidField(gameFieldData: GameFieldData, placedCats: PlacedCat[], _cat: Cat): Cell | undefined {
-  const emptyFields = getEmptyFields(gameFieldData, placedCats);
+export function findValidField(
+  fieldSize: FieldSize,
+  placedCats: PlacedCat[],
+  placedObjects: PlacedObject[],
+  _cat: Cat,
+): CellPosition | undefined {
+  const emptyFields = getEmptyFields(fieldSize, placedCats, placedObjects);
 
   return emptyFields[0];
 }
 
-function randomlyApplyCharactersOnBoard(gameFieldData: GameFieldData, characters: Cat[], iteration: number = 0): PlacedCat[] {
+function randomlyApplyCharactersOnBoard(fieldSize: FieldSize, characters: Cat[], iteration: number = 0): PlacedCat[] {
   const placedCats: PlacedCat[] = [];
   const copyOfCharacters = [...characters];
-  const allFields = gameFieldData.flat();
+  const allFields = getAllCellPositions(fieldSize);
   const shuffledRequiredFields = shuffleArray(allFields).slice(0, copyOfCharacters.length);
-  shuffledRequiredFields.forEach((cell: Cell) => {
+  shuffledRequiredFields.forEach((cell: CellPosition) => {
     const cat = copyOfCharacters.pop();
 
     if (!cat) {
@@ -129,14 +98,14 @@ function randomlyApplyCharactersOnBoard(gameFieldData: GameFieldData, characters
   if (shouldReshuffle) {
     console.info("not a good setup");
 
-    return randomlyApplyCharactersOnBoard(gameFieldData, characters, iteration + 1);
+    return randomlyApplyCharactersOnBoard(fieldSize, characters, iteration + 1);
   }
 
   return placedCats;
 }
 
 function applyPredefinedPositionsOfCats(onboardingData: OnboardingData): PlacedCat[] {
-  const { characters } = onboardingData;
+  const { cats } = onboardingData;
 
-  return characters.filter(shouldIncludeCat);
+  return cats.filter(shouldIncludeCat);
 }

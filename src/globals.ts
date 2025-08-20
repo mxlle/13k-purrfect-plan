@@ -2,16 +2,18 @@ import { GameMetaData, Settings } from "./types";
 import { getLocalStorageItem, LocalStorageKey } from "./utils/local-storage";
 import { Difficulty, difficultySettings } from "./logic/difficulty";
 import { INITIAL_MOTHER_CAT, PlacedCat } from "./logic/data/cats";
-import { GameFieldData } from "./logic/data/cell";
 import { allInConfig, Config } from "./logic/config";
+import { PlacedObject } from "./logic/data/objects";
+import { DEFAULT_FIELD_SIZE, FieldSize } from "./logic/data/field-size";
 
 interface GameGlobals {
   config: Config;
   previousOnboardingStep: number | undefined;
   onboardingStep: number;
-  gameFieldData: GameFieldData;
+  fieldSize: FieldSize;
   motherCat: PlacedCat;
   placedCats: PlacedCat[];
+  placedObjects: PlacedObject[];
   language: string;
   difficulty: Difficulty;
   settings: Settings;
@@ -30,9 +32,10 @@ const defaultGlobals: GameGlobals = {
   config: allInConfig,
   previousOnboardingStep: undefined,
   onboardingStep: onboardingStepSetting ? Number(onboardingStepSetting) : 0,
-  gameFieldData: [],
-  placedCats: [],
+  fieldSize: DEFAULT_FIELD_SIZE,
   motherCat: INITIAL_MOTHER_CAT,
+  placedCats: [],
+  placedObjects: [],
   language: "en",
   difficulty: initialDifficulty,
   settings: initialSettings,
@@ -57,5 +60,5 @@ function getNumFromParam(param: string, fallback: number) {
 }
 
 export function isGameInProgress(): boolean {
-  return !globals.isWon && globals.gameFieldData.length > 0 && globals.placedCats.length > 0;
+  return !globals.isWon && globals.placedCats.length > 0;
 }

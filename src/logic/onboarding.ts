@@ -2,8 +2,10 @@ import { Direction, Tool, TurnMove } from "../types";
 import { globals } from "../globals";
 import { LocalStorageKey, setLocalStorageItem } from "../utils/local-storage";
 import { ALL_CAT_IDS, CatId, getCat, PlacedCat } from "./data/cats";
-import { CellPosition, CellType, containsCell, getCellTypePlaceholders } from "./data/cell";
+import { CellPosition, containsCell, EMPTY_CELL, getCellTypePlaceholders } from "./data/cell";
 import { allInConfig, Config, ConfigCategory, emptyConfig } from "./config";
+import { getObject, ObjectId, PlacedObject } from "./data/objects";
+import { FieldSize } from "./data/field-size";
 
 export const enum OnboardingStep {
   INTRO = 0,
@@ -22,8 +24,9 @@ export function isSameLevel() {
 }
 
 export interface OnboardingData {
-  field: CellType[][];
-  characters: PlacedCat[];
+  field: FieldSize;
+  cats: PlacedCat[];
+  objects: PlacedObject[];
   highlightedAction?: TurnMove;
   config: Config;
 }
@@ -46,8 +49,8 @@ export function getOnboardingData(): OnboardingData | undefined {
       const skipPositions: CellPosition[] = isFirstStep ? [{ row: 2, column: 2 }] : [];
 
       return {
-        field: getBaseFieldFromInitialSetup(introSetup),
-        characters: getCatsFromInitialSetup(introSetup, skipPositions),
+        field: getFieldSizeFromInitialSetup(introSetup),
+        ...getPlacedGameElementsFromInitialSetup(introSetup, skipPositions),
         highlightedAction: isFirstStep ? Direction.DOWN : undefined,
         config: {
           ...emptyConfig,
@@ -66,16 +69,16 @@ export function getOnboardingData(): OnboardingData | undefined {
       })();
 
       return {
-        field: getBaseFieldFromInitialSetup(intermediateSetup),
-        characters: getCatsFromInitialSetup(intermediateSetup),
+        field: getFieldSizeFromInitialSetup(intermediateSetup),
+        ...getPlacedGameElementsFromInitialSetup(intermediateSetup),
         highlightedAction: step === OnboardingStep.INTERMEDIATE_MEOW ? Tool.MEOW : undefined,
         config: {
           ...emptyConfig,
           [ConfigCategory.CATS]: { ...emptyConfig[ConfigCategory.CATS], [CatId.MOONY]: true, [CatId.IVY]: true },
           [ConfigCategory.OBJECTS]: {
             ...emptyConfig[ConfigCategory.OBJECTS],
-            [CellType.TREE]: step === OnboardingStep.INTERMEDIATE_OBJECTS,
-            [CellType.MOON]: step === OnboardingStep.INTERMEDIATE_OBJECTS,
+            [ObjectId.TREE]: step === OnboardingStep.INTERMEDIATE_OBJECTS,
+            [ObjectId.MOON]: step === OnboardingStep.INTERMEDIATE_OBJECTS,
           },
           [ConfigCategory.TOOLS]: {
             ...emptyConfig[ConfigCategory.TOOLS],
@@ -96,8 +99,8 @@ export function getOnboardingData(): OnboardingData | undefined {
       })();
 
       return {
-        field: getBaseFieldFromInitialSetup(lastSetup),
-        characters: getCatsFromInitialSetup(lastSetup),
+        field: getFieldSizeFromInitialSetup(lastSetup),
+        ...getPlacedGameElementsFromInitialSetup(lastSetup),
         config: allInConfig,
       };
     default:
@@ -123,14 +126,22 @@ export function increaseOnboardingStepIfApplicable() {
   setLocalStorageItem(LocalStorageKey.ONBOARDING_STEP, step.toString());
 }
 
-type InitialSetup = (CellType | CatId)[][];
+type InitialSetup = (ObjectId | CatId | typeof EMPTY_CELL)[][];
 
-function getBaseFieldFromInitialSetup(initialSetup: InitialSetup): CellType[][] {
-  return initialSetup.map((row) => row.map((cell) => (typeof cell === "string" ? cell : CellType.EMPTY)));
+function getFieldSizeFromInitialSetup(initialSetup: InitialSetup): FieldSize {
+  const height = initialSetup.length;
+  const width = initialSetup[0]?.length || 1;
+  return { width, height };
 }
 
-function getCatsFromInitialSetup(initialSetup: InitialSetup, skipPositions: CellPosition[] = []): PlacedCat[] {
+interface PlacedGameElements {
+  cats: PlacedCat[];
+  objects: PlacedObject[];
+}
+
+function getPlacedGameElementsFromInitialSetup(initialSetup: InitialSetup, skipPositions: CellPosition[] = []): PlacedGameElements {
   const cats: PlacedCat[] = [];
+  const objects: PlacedObject[] = [];
   let lastKitten: PlacedCat | undefined;
   initialSetup.forEach((row, rowIndex) => {
     row.forEach((cell, columnIndex) => {
@@ -154,6 +165,21 @@ function getCatsFromInitialSetup(initialSetup: InitialSetup, skipPositions: Cell
         cats.push(placedCat);
 
         lastKitten = placedCat;
+      } else if (typeof cell === "string" && cell !== EMPTY_CELL) {
+        const gameObject = getObject(cell);
+
+        if (objects.some((o) => o.id === gameObject.id)) {
+          // TODO - remove after development phase
+          throw new Error(`Duplicate object ID found: ${gameObject.id}`);
+        }
+
+        const placedObject: PlacedObject = {
+          ...gameObject,
+          row: rowIndex,
+          column: columnIndex,
+        };
+
+        objects.push(placedObject);
       }
     });
   });
@@ -173,5 +199,5 @@ function getCatsFromInitialSetup(initialSetup: InitialSetup, skipPositions: Cell
 
   cats.sort((a, b) => a.id - b.id); // Sort cats by their ID for consistency
 
-  return cats;
+  return { cats, objects };
 }

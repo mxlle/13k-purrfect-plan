@@ -3,10 +3,10 @@ import { CssClass } from "../../utils/css-class";
 
 import "./config-component.scss";
 import { ALL_CAT_IDS, getCat, isMother } from "../../logic/data/cats";
-import { CellType } from "../../logic/data/cell";
 import { globals } from "../../globals";
 import { createObjectElement } from "../object-component/object-component";
 import { allCategories, ConfigCategory, ConfigItemId } from "../../logic/config";
+import { ObjectId } from "../../logic/data/objects";
 
 let configComponent: HTMLElement | undefined;
 
@@ -46,7 +46,7 @@ function getConfigCategoryElement(category: ConfigCategory): HTMLElement {
       }
       break;
     case ConfigCategory.OBJECTS:
-      const allObjects = Object.values(CellType).filter(Boolean);
+      const allObjects = Object.values(ObjectId).filter(Boolean);
       for (const objectType of allObjects) {
         const objectElem = createObjectElement(objectType);
         transformToConfigItemElement(category, objectType, objectElem as HTMLElement);

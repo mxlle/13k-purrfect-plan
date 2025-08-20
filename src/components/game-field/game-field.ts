@@ -4,17 +4,18 @@ import { createButton, createElement } from "../../utils/html-utils";
 import { getTranslation, TranslationKey } from "../../translations/i18n";
 import { globals } from "../../globals";
 import { requestAnimationFrameWithTimeout } from "../../utils/promise-utils";
-import { getGameFieldData, placeCatsInitially } from "../../logic/initialize";
+import { initializeGameField, placeCatsInitially } from "../../logic/initialize";
 import { handlePokiCommercial } from "../../poki-integration";
 import { getOnboardingData, increaseOnboardingStepIfApplicable, isSameLevel, OnboardingData } from "../../logic/onboarding";
 import { CssClass } from "../../utils/css-class";
 import { getControlsComponent } from "../controls/controls-component";
 import { isMother, PlacedCat } from "../../logic/data/cats";
-import { Cell, CellPosition, CellType, GameFieldData, getCellDifference } from "../../logic/data/cell";
+import { CellPosition, getCellDifference } from "../../logic/data/cell";
 import { PubSubEvent, pubSubService } from "../../utils/pub-sub-service";
 import { isTool } from "../../types";
-import { createObjectElement } from "../object-component/object-component";
 import { allInConfig, shouldApplyKittenBehavior } from "../../logic/config";
+import { FieldSize } from "../../logic/data/field-size";
+import { PlacedObject } from "../../logic/data/objects";
 
 let mainContainer: HTMLElement | undefined;
 let gameFieldElem: HTMLElement | undefined;
@@ -29,14 +30,12 @@ const TIMEOUT_CELL_APPEAR = -1;
 export async function initializeEmptyGameField() {
   document.body.classList.remove(CssClass.SELECTING);
 
-  const baseData = getGameFieldData();
-
   if (gameFieldElem) {
     console.error("initialize function should only be called once");
     return;
   }
 
-  gameFieldElem = generateGameFieldElement(baseData);
+  gameFieldElem = generateGameFieldElement(globals.fieldSize);
 
   addStartButton(TranslationKey.START_GAME, gameFieldElem);
 
@@ -56,7 +55,7 @@ export function addStartButton(buttonLabelKey: TranslationKey, elementToAttachTo
 }
 
 export async function startNewGame(options: { shouldIncreaseLevel: boolean } = { shouldIncreaseLevel: true }) {
-  const isInitialStart = !globals.gameFieldData.length;
+  const isInitialStart = !globals.placedCats.length;
 
   if (globals.isWon && options.shouldIncreaseLevel) {
     increaseOnboardingStepIfApplicable();
@@ -78,7 +77,7 @@ export async function startNewGame(options: { shouldIncreaseLevel: boolean } = {
 
   pubSubService.publish(PubSubEvent.GAME_START);
 
-  if (globals.gameFieldData.length && gameFieldElem) {
+  if (gameFieldElem) {
     // reset old game field
     // await cleanGameField(globals.gameFieldData);
     if (process.env.POKI_ENABLED === "true") await handlePokiCommercial();
@@ -90,24 +89,24 @@ export async function startNewGame(options: { shouldIncreaseLevel: boolean } = {
       gameFieldElem = undefined;
       controlsElem?.remove();
       controlsElem = undefined;
-      globals.gameFieldData = [];
     }
   }
 
   console.debug("Starting new game, onboarding step", globals.onboardingStep);
 
-  if (!globals.gameFieldData.length) {
-    globals.gameFieldData = getGameFieldData();
-  }
+  initializeGameField();
 
-  globals.placedCats = placeCatsInitially(globals.gameFieldData);
+  globals.placedObjects = onboardingData?.objects || [];
+  globals.placedCats = placeCatsInitially(globals.fieldSize);
   globals.motherCat = globals.placedCats.find(isMother);
 
   if (!gameFieldElem) {
-    gameFieldElem = generateGameFieldElement(globals.gameFieldData);
+    gameFieldElem = generateGameFieldElement(globals.fieldSize);
     appendGameField();
     await requestAnimationFrameWithTimeout(TIMEOUT_BETWEEN_GAMES);
   }
+
+  await initializeObjectsOnGameField(globals.placedObjects);
 
   await initializeCatsOnGameField(globals.placedCats, isInitialStart);
 
@@ -144,8 +143,8 @@ function getMiddleCoordinates(): CellPosition | undefined {
     return undefined;
   }
 
-  const rowCount = globals.gameFieldData.length;
-  const columnCount = globals.gameFieldData[0].length;
+  const rowCount = globals.fieldSize.height;
+  const columnCount = globals.fieldSize.width;
 
   const middleRow = Math.floor((rowCount - 1) / 2);
   const middleColumn = Math.floor((columnCount - 1) / 2);
@@ -153,33 +152,28 @@ function getMiddleCoordinates(): CellPosition | undefined {
   return { row: middleRow, column: middleColumn };
 }
 
-export function generateGameFieldElement(gameFieldData: GameFieldData) {
+export function generateGameFieldElement(fieldSize: FieldSize) {
   const gameField = createElement({
     cssClass: CssClass.FIELD,
   });
   cellElements.length = 0;
 
-  gameFieldData.forEach((row, _rowIndex) => {
+  for (let rowIndex = 0; rowIndex < fieldSize.height; rowIndex++) {
     const rowElements: HTMLElement[] = [];
     const rowElem = createElement({
       cssClass: "row",
     });
     gameField.append(rowElem);
 
-    row.forEach((cell, _columnIndex) => {
+    for (let columnIndex = 0; columnIndex < fieldSize.width; columnIndex++) {
       const cellElement = createElement({ cssClass: CssClass.CELL });
-
-      if (cell.type !== CellType.EMPTY) {
-        const objectBox = createObjectElement(cell.type);
-        cellElement.append(objectBox);
-      }
 
       rowElem.append(cellElement);
       rowElements.push(cellElement);
-    });
+    }
 
     cellElements.push(rowElements);
-  });
+  }
 
   return gameField;
 }
@@ -213,7 +207,6 @@ function addOnboardingSuggestionIfApplicable() {
 export async function initializeCatsOnGameField(cats: PlacedCat[], isInitialStart: boolean) {
   const middleCellPosition = getMiddleCoordinates();
   const middleCellElement = getCellElement(middleCellPosition);
-  middleCellElement.innerHTML = "";
 
   for (let i = 0; i < cats.length; i++) {
     const cat = cats[i];
@@ -232,13 +225,11 @@ export async function initializeCatsOnGameField(cats: PlacedCat[], isInitialStar
   updateAllCatPositions();
 }
 
-export async function cleanGameField(gameFieldData: GameFieldData) {
-  const allCells = gameFieldData.flat();
-
-  for (let i = 0; i < allCells.length; i++) {
-    const cell: Cell = allCells[i];
-    const cellElement = getCellElement(cell);
-    cellElement.innerHTML = "";
+export async function initializeObjectsOnGameField(placedObjects: PlacedObject[]) {
+  for (let i = 0; i < placedObjects.length; i++) {
+    const gameObject = placedObjects[i];
+    const cellElement = getCellElement(gameObject);
+    cellElement.append(gameObject.objectElement);
   }
 }
 

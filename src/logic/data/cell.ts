@@ -1,30 +1,23 @@
 import { CatId, PlacedCat } from "./cats";
-
-export enum CellType {
-  EMPTY = "",
-  MOON = "🌙",
-  TREE = "🌳",
-  PUDDLE = "💧",
-}
+import { ObjectId, PlacedObject } from "./objects";
 
 export interface CellPosition {
   row: number;
   column: number;
 }
 
-export interface Cell extends CellPosition {
-  type: CellType;
-}
+export const EMPTY_CELL = " " as const;
 
-export type GameFieldData = Cell[][];
-const getType = (typeOrObject: string | Cell) => (typeof typeOrObject === "string" ? typeOrObject : typeOrObject.type);
-
-export function isEmptyField(placedCats: PlacedCat[], cell: Cell): boolean {
-  return !hasCat(placedCats, cell);
+export function isEmptyField(cell: CellPosition, placedCats: PlacedCat[], placedObjects: PlacedObject[]): boolean {
+  return !hasCat(placedCats, cell) && !hasObject(placedObjects, cell);
 }
 
 export function hasCat(placedCats: PlacedCat[], cell: CellPosition): boolean {
   return placedCats.some((p) => isSameCell(p, cell));
+}
+
+export function hasObject(placedObjects: PlacedObject[], cell: CellPosition): boolean {
+  return placedObjects.some((p) => isSameCell(p, cell));
 }
 
 export function findCat(placedCats: PlacedCat[], cell: CellPosition): PlacedCat | undefined {
@@ -48,10 +41,10 @@ export function getCellDifference(cell1: CellPosition, cell2: CellPosition): Cel
 
 export function getCellTypePlaceholders() {
   return {
-    _: CellType.EMPTY,
-    T: CellType.TREE,
-    O: CellType.PUDDLE,
-    C: CellType.MOON,
+    _: EMPTY_CELL,
+    T: ObjectId.TREE,
+    O: ObjectId.PUDDLE,
+    C: ObjectId.MOON,
     M: CatId.MOTHER,
     t: CatId.IVY,
     o: CatId.SPLASHY,
