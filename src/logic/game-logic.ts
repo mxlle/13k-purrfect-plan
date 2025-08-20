@@ -58,8 +58,8 @@ function doMoonMove() {
   const moon = globals.placedObjects.find(isMoon);
   const width = globals.fieldSize.width;
 
-  if (moon) {
-    moon.column = moon.column < width - 1 ? moon.column + 1 : 0;
+  if (moon && moon.column < width) {
+    moon.column = moon.column + 1;
   }
 }
 

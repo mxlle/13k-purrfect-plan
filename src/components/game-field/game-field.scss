@@ -51,7 +51,7 @@ $border-style: outset;
 
   .#{$CAT_BOX} {
     z-index: 3;
-    transition: transform 0.3s ease-in-out;
+    transition: transform 0.3s;
 
     .#{$WON} & {
       animation: hueRotation 1s 0.5s linear 3;
@@ -60,7 +60,9 @@ $border-style: outset;
 
   .#{$OBJECT_BOX} {
     z-index: 2;
-    transition: transform 0.3s ease-in-out;
+    transition:
+      transform 0.3s,
+      opacity 0.3s;
   }
 
   .#{$CAT} {

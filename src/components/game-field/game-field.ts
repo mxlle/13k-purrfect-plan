@@ -16,6 +16,7 @@ import { isTool } from "../../types";
 import { allInConfig, shouldApplyKittenBehavior } from "../../logic/config";
 import { FieldSize } from "../../logic/data/field-size";
 import { PlacedObject } from "../../logic/data/objects";
+import { isValidCellPosition } from "../../logic/checks";
 
 let mainContainer: HTMLElement | undefined;
 let gameFieldElem: HTMLElement | undefined;
@@ -243,5 +244,11 @@ export function updateAllPositions() {
   globals.placedObjects.forEach((obj) => {
     const diff = getCellDifference(obj, obj.initialPosition);
     obj.objectElement.style.transform = `translate(${diff.column * 100}%, ${diff.row * 100}%)`;
+
+    if (!isValidCellPosition(globals.fieldSize, obj, [])) {
+      obj.objectElement.style.opacity = "0";
+    } else {
+      obj.objectElement.style.opacity = "1";
+    }
   });
 }
