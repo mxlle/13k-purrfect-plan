@@ -3,9 +3,9 @@ import { globals } from "../globals";
 import { getRandomIntFromInterval, shuffleArray } from "../utils/random-utils";
 import { getEmptyFields } from "./checks";
 import { baseField } from "./base-field";
-import { ALL_CAT_IDS, Cat, CatId, getCat, PlacedCat } from "./data/cats";
+import { ALL_CAT_IDS, Cat, getCat, PlacedCat } from "./data/cats";
 import { Cell, CellType, GameFieldData } from "./data/cell";
-import { ConfigCategory } from "../components/config/config-component";
+import { ConfigCategory, shouldIncludeCat } from "./config";
 
 export function placeCatsInitially(gameFieldData: GameFieldData): PlacedCat[] {
   let onboardingData: OnboardingData | undefined = getOnboardingData();
@@ -139,9 +139,4 @@ function applyPredefinedPositionsOfCats(onboardingData: OnboardingData): PlacedC
   const { characters } = onboardingData;
 
   return characters.filter(shouldIncludeCat);
-}
-
-function shouldIncludeCat(catOrCatId: Cat | CatId): boolean {
-  const id = typeof catOrCatId === "object" ? catOrCatId.id : catOrCatId;
-  return globals.config[ConfigCategory.CATS][id];
 }

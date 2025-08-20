@@ -2,41 +2,13 @@ import { createElement } from "../../utils/html-utils";
 import { CssClass } from "../../utils/css-class";
 
 import "./config-component.scss";
-import { ALL_CAT_IDS, CatId, getCat, isMother } from "../../logic/data/cats";
+import { ALL_CAT_IDS, getCat, isMother } from "../../logic/data/cats";
 import { CellType } from "../../logic/data/cell";
-import { Tool } from "../../types";
 import { globals } from "../../globals";
 import { createObjectElement } from "../object-component/object-component";
+import { allCategories, ConfigCategory, ConfigItemId } from "../../logic/config";
 
 let configComponent: HTMLElement | undefined;
-
-export enum ConfigCategory {
-  CATS = "Cats",
-  OBJECTS = "Objects",
-  TOOLS = "Tools",
-}
-
-export interface Config {
-  [ConfigCategory.CATS]: Record<CatId, boolean>;
-  [ConfigCategory.OBJECTS]: Record<CellType, boolean>;
-  [ConfigCategory.TOOLS]: Record<Tool, boolean>;
-}
-
-type ConfigItemId = CatId | CellType | Tool;
-
-export const emptyConfig: Config = {
-  [ConfigCategory.CATS]: Object.fromEntries(ALL_CAT_IDS.map((catId, index) => [catId, index === 0])) as Record<CatId, boolean>,
-  [ConfigCategory.OBJECTS]: Object.fromEntries(Object.values(CellType).map((type) => [type, false])) as Record<CellType, boolean>,
-  [ConfigCategory.TOOLS]: Object.fromEntries(Object.values(Tool).map((tool) => [tool, false])) as Record<Tool, boolean>,
-};
-
-export const allInConfig: Config = {
-  [ConfigCategory.CATS]: Object.fromEntries(ALL_CAT_IDS.map((catId) => [catId, true])) as Record<CatId, boolean>,
-  [ConfigCategory.OBJECTS]: Object.fromEntries(Object.values(CellType).map((type) => [type, true])) as Record<CellType, boolean>,
-  [ConfigCategory.TOOLS]: Object.fromEntries(Object.values(Tool).map((tool) => [tool, true])) as Record<Tool, boolean>,
-};
-
-const allCategories: ConfigCategory[] = Object.values(ConfigCategory);
 
 export function getConfigComponent(): HTMLElement {
   configComponent = createElement({

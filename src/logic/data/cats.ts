@@ -9,6 +9,9 @@ export enum CatId {
 }
 
 export const ALL_CAT_IDS = Object.values(CatId).filter((id) => typeof id === "number") as CatId[];
+export const ALL_KITTEN_IDS = ALL_CAT_IDS.filter((id) => id !== CatId.MOTHER);
+
+export type KittenId = Exclude<CatId, CatId.MOTHER>;
 
 export const CAT_NAMES: Record<CatId, string> = {
   [CatId.MOTHER]: "Amara",

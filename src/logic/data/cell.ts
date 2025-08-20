@@ -35,6 +35,10 @@ export function isSameCell(cell1: CellPosition, cell2: CellPosition) {
   return cell1.row === cell2.row && cell1.column === cell2.column;
 }
 
+export function containsCell(cells: CellPosition[], cell: CellPosition): boolean {
+  return cells.some((c) => isSameCell(c, cell));
+}
+
 export function getCellDifference(cell1: CellPosition, cell2: CellPosition): CellPosition {
   return {
     row: cell1.row - cell2.row,

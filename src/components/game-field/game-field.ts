@@ -13,8 +13,8 @@ import { isMother, PlacedCat } from "../../logic/data/cats";
 import { Cell, CellPosition, CellType, GameFieldData, getCellDifference } from "../../logic/data/cell";
 import { PubSubEvent, pubSubService } from "../../utils/pub-sub-service";
 import { isTool } from "../../types";
-import { allInConfig } from "../config/config-component";
 import { createObjectElement } from "../object-component/object-component";
+import { allInConfig, shouldApplyKittenBehavior } from "../../logic/config";
 
 let mainContainer: HTMLElement | undefined;
 let gameFieldElem: HTMLElement | undefined;
@@ -219,6 +219,10 @@ export async function initializeCatsOnGameField(cats: PlacedCat[], isInitialStar
     const cat = cats[i];
     middleCellElement.append(cat.catElement);
     cat.initialPosition = { ...middleCellPosition };
+
+    if (shouldApplyKittenBehavior(cat)) {
+      cat.catElement.classList.add(`${CssClass.CAT_COLOR}${cat.id}`);
+    }
   }
 
   if (!isInitialStart) {

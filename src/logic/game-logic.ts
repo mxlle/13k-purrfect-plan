@@ -8,6 +8,7 @@ import { playSoundForAction } from "../audio/sound-control/sound-control";
 import { CssClass } from "../utils/css-class";
 import { updateAllCatPositions } from "../components/game-field/game-field";
 import { sleep } from "../utils/promise-utils";
+import { shouldApplyKittenBehavior } from "./config";
 
 let isPerformingMove = false;
 
@@ -70,6 +71,10 @@ async function executeTool(tool: Tool) {
 }
 
 function handleKittenBehavior(cat: PlacedCat) {
+  if (!shouldApplyKittenBehavior(cat)) {
+    return;
+  }
+
   switch (cat.id) {
     case CatId.MOONY:
       doMoonyMove(cat);

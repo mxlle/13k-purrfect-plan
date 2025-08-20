@@ -16,7 +16,8 @@ import { PubSubEvent, pubSubService } from "../../utils/pub-sub-service";
 import { getTranslation, TranslationKey } from "../../translations/i18n";
 import { globals } from "../../globals";
 import { isOnboarding } from "../../logic/onboarding";
-import { ConfigCategory } from "../config/config-component";
+
+import { ConfigCategory } from "../../logic/config";
 
 let hasSetupEventListeners = false;
 let controlsComponent: HTMLElement | undefined;

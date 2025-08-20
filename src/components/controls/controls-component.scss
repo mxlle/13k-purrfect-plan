@@ -23,7 +23,7 @@
   }
 }
 
-.#{$ONBOARDING_HIGHLIGHT}:not(:hover) {
+.#{$ONBOARDING_HIGHLIGHT} {
   animation: boxShadowPulse 2s ease-in-out infinite;
 }
 
