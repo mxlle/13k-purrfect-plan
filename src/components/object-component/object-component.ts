@@ -1,5 +1,7 @@
 import { createElement } from "../../utils/html-utils";
 import { CssClass } from "../../utils/css-class";
+
+import "./object-component.scss";
 import { CellType } from "../../logic/data/cell";
 
 const cellTypeToCssClass: Record<Exclude<CellType, CellType.EMPTY>, CssClass> = {
@@ -8,10 +10,16 @@ const cellTypeToCssClass: Record<Exclude<CellType, CellType.EMPTY>, CssClass> = 
   [CellType.MOON]: CssClass.MOON,
 };
 
-export function createCellElement(cell: { type: CellType }): HTMLElement {
-  const cellElem = createElement({
-    cssClass: CssClass.CELL + " " + (cellTypeToCssClass[cell.type] || ""),
+export function createObjectElement(type: CellType): HTMLElement {
+  const objectBox = createElement({
+    cssClass: CssClass.OBJECT_BOX,
   });
 
-  return cellElem;
+  const objectElem = createElement({
+    cssClass: `${cellTypeToCssClass[type]}`,
+  });
+
+  objectBox.append(objectElem);
+
+  return objectBox;
 }

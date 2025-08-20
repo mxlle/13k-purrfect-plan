@@ -4,9 +4,9 @@ import { CssClass } from "../../utils/css-class";
 import "./config-component.scss";
 import { ALL_CAT_IDS, CatId, getCat, isMother } from "../../logic/data/cats";
 import { CellType } from "../../logic/data/cell";
-import { createCellElement } from "../game-field/cell-component";
 import { Tool } from "../../types";
 import { globals } from "../../globals";
+import { createObjectElement } from "../object-component/object-component";
 
 let configComponent: HTMLElement | undefined;
 
@@ -76,7 +76,7 @@ function getConfigCategoryElement(category: ConfigCategory): HTMLElement {
     case ConfigCategory.OBJECTS:
       const allObjects = Object.values(CellType).filter(Boolean);
       for (const objectType of allObjects) {
-        const objectElem = createCellElement({ type: objectType });
+        const objectElem = createObjectElement(objectType);
         transformToConfigItemElement(category, objectType, objectElem as HTMLElement);
         contentElem.appendChild(objectElem);
       }

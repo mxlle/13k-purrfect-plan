@@ -1,7 +1,6 @@
 import "./game-field.scss";
 
 import { createButton, createElement } from "../../utils/html-utils";
-import { createCellElement } from "./cell-component";
 import { getTranslation, TranslationKey } from "../../translations/i18n";
 import { globals } from "../../globals";
 import { requestAnimationFrameWithTimeout } from "../../utils/promise-utils";
@@ -11,10 +10,11 @@ import { getOnboardingData, increaseOnboardingStepIfApplicable, isSameLevel, Onb
 import { CssClass } from "../../utils/css-class";
 import { getControlsComponent } from "../controls/controls-component";
 import { isMother, PlacedCat } from "../../logic/data/cats";
-import { Cell, CellPosition, GameFieldData, getCellDifference } from "../../logic/data/cell";
+import { Cell, CellPosition, CellType, GameFieldData, getCellDifference } from "../../logic/data/cell";
 import { PubSubEvent, pubSubService } from "../../utils/pub-sub-service";
 import { isTool } from "../../types";
 import { allInConfig } from "../config/config-component";
+import { createObjectElement } from "../object-component/object-component";
 
 let mainContainer: HTMLElement | undefined;
 let gameFieldElem: HTMLElement | undefined;
@@ -167,7 +167,12 @@ export function generateGameFieldElement(gameFieldData: GameFieldData) {
     gameField.append(rowElem);
 
     row.forEach((cell, _columnIndex) => {
-      const cellElement = createCellElement(cell);
+      const cellElement = createElement({ cssClass: CssClass.CELL });
+
+      if (cell.type !== CellType.EMPTY) {
+        const objectBox = createObjectElement(cell.type);
+        cellElement.append(objectBox);
+      }
 
       rowElem.append(cellElement);
       rowElements.push(cellElement);

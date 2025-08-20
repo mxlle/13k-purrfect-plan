@@ -35,6 +35,7 @@ export const enum CssClass {
   CAT = "cat",
   CAT_BOX = "cat-box",
   CAT_COLOR = "cat-color",
+  OBJECT_BOX = "object-box",
   TREE = "tree",
   PUDDLE = "puddle",
   MOON = "moon",
