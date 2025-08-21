@@ -64,6 +64,6 @@ export function calculatePar(placedCats: PlacedCat[], placedObjects: PlacedObjec
   return bestParInfo;
 }
 
-function copyObjects<T>(objects: T[]): T[] {
+export function copyObjects<T>(objects: T[]): T[] {
   return objects.map((obj) => ({ ...obj })); // Shallow copy for simplicity
 }

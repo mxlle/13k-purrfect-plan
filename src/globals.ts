@@ -13,7 +13,9 @@ interface GameGlobals {
   fieldSize: FieldSize;
   motherCat: PlacedCat;
   placedCats: PlacedCat[];
+  previouslyPlacedCats: PlacedCat[];
   placedObjects: PlacedObject[];
+  previouslyPlacedObjects: PlacedObject[];
   language: string;
   difficulty: Difficulty;
   settings: Settings;
@@ -36,7 +38,9 @@ const defaultGlobals: GameGlobals = {
   fieldSize: DEFAULT_FIELD_SIZE,
   motherCat: INITIAL_MOTHER_CAT,
   placedCats: [],
+  previouslyPlacedCats: [],
   placedObjects: [],
+  previouslyPlacedObjects: [],
   language: "en",
   difficulty: initialDifficulty,
   settings: initialSettings,

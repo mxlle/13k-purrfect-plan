@@ -23,7 +23,7 @@ import { allInConfig, shouldApplyKittenBehavior } from "../../logic/config";
 import { FieldSize } from "../../logic/data/field-size";
 import { PlacedObject } from "../../logic/data/objects";
 import { isValidCellPosition } from "../../logic/checks";
-import { calculatePar } from "../../logic/par";
+import { calculatePar, copyObjects } from "../../logic/par";
 
 let mainContainer: HTMLElement | undefined;
 let gameFieldElem: HTMLElement | undefined;
@@ -102,8 +102,14 @@ export async function startNewGame(options: { shouldIncreaseLevel: boolean } = {
 
   initializeGameField();
 
-  globals.placedObjects = onboardingData?.objects || defaultPlacedObjects;
-  globals.placedCats = placeCatsInitially(globals.fieldSize, globals.placedObjects);
+  globals.placedObjects = options.shouldIncreaseLevel
+    ? onboardingData?.objects || copyObjects(defaultPlacedObjects)
+    : globals.previouslyPlacedObjects;
+  globals.previouslyPlacedObjects = copyObjects(globals.placedObjects);
+  globals.placedCats = options.shouldIncreaseLevel
+    ? placeCatsInitially(globals.fieldSize, globals.placedObjects)
+    : [...globals.previouslyPlacedCats];
+  globals.previouslyPlacedCats = copyObjects(globals.placedCats);
   globals.motherCat = globals.placedCats.find(isMother);
 
   const performanceStart = performance.now();
