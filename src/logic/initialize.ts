@@ -7,7 +7,7 @@ import { CellPosition } from "./data/cell";
 import { shouldIncludeCat } from "./config";
 import { DEFAULT_FIELD_SIZE, FieldSize } from "./data/field-size";
 import { PlacedObject } from "./data/objects";
-import { calculatePar, MAX_PAR } from "./par";
+import { calculatePar, MAX_PAR, MIN_PAR } from "./par";
 
 export function placeCatsInitially(fieldSize: FieldSize, placedObjects: PlacedObject[]): PlacedCat[] {
   let onboardingData: OnboardingData | undefined = getOnboardingData();
@@ -56,7 +56,7 @@ function randomlyApplyCatsOnBoard(
 
   const parInfo = calculatePar(placedCats, placedObjects, []);
 
-  if (parInfo.par > MAX_PAR && iteration < 10) {
+  if ((parInfo.par > MAX_PAR || parInfo.par < MIN_PAR) && iteration < 10) {
     console.info("not a good setup");
 
     return randomlyApplyCatsOnBoard(fieldSize, characters, placedObjects, iteration + 1);

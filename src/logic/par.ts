@@ -12,6 +12,7 @@ interface ParInfo {
 let iterationCount = 1;
 
 export const MAX_PAR = 6;
+export const MIN_PAR = 2;
 
 export function calculatePar(placedCats: PlacedCat[], placedObjects: PlacedObject[], previousMoves: TurnMove[]): ParInfo {
   if (previousMoves.length === 0) {
