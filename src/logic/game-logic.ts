@@ -26,9 +26,23 @@ export async function performMove(turnMove: TurnMove) {
   isPerformingMove = true;
 
   globals.moves++;
-  doMoonMove();
 
   await playSoundForAction(turnMove);
+  isTool(turnMove) && (await preToolAction(turnMove));
+
+  await calculateNewPositions(turnMove);
+
+  isTool(turnMove) && (await postToolAction(turnMove));
+
+  updateAllPositions();
+
+  checkWinCondition();
+
+  isPerformingMove = false;
+}
+
+async function calculateNewPositions(turnMove: TurnMove) {
+  doMoonMove();
 
   const kittensOnCell = getKittensOnCell(globals.placedCats, globals.motherCat);
   const freeKittens = getKittensElsewhere(globals.placedCats, globals.motherCat);
@@ -46,12 +60,6 @@ export async function performMove(turnMove: TurnMove) {
       handleKittenBehavior(kitten);
     }
   }
-
-  updateAllPositions();
-
-  checkWinCondition();
-
-  isPerformingMove = false;
 }
 
 function doMoonMove() {
@@ -63,23 +71,36 @@ function doMoonMove() {
   }
 }
 
-async function executeTool(tool: Tool) {
+async function preToolAction(tool: Tool) {
   switch (tool) {
     case Tool.MEOW:
       document.body.classList.add(CssClass.MEOW);
 
       await sleep(300); // Wait for meow speech bubble to appear
 
+      break;
+  }
+}
+
+async function postToolAction(tool: Tool) {
+  switch (tool) {
+    case Tool.MEOW:
+      setTimeout(() => {
+        document.body.classList.remove(CssClass.MEOW);
+      }, MEOW_TIME);
+      break;
+  }
+}
+
+async function executeTool(tool: Tool) {
+  switch (tool) {
+    case Tool.MEOW:
       // all kittens move one cell in the direction of the mother cat
       const freeKittens = getKittensElsewhere(globals.placedCats, globals.motherCat);
 
       for (const kitten of freeKittens) {
         moveCatTowardsCell(kitten, globals.motherCat);
       }
-
-      setTimeout(() => {
-        document.body.classList.remove(CssClass.MEOW);
-      }, MEOW_TIME);
   }
 }
 
