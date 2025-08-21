@@ -180,6 +180,8 @@ function setupEventListeners() {
 }
 
 export function addContinueButtons() {
+  const hasAchievedGoal = globals.isWon && globals.moves.length <= globals.par;
+
   const newGameContainer = createElement({ cssClass: CssClass.NEW_GAME_CONTAINER });
 
   const continueButton = createButton({
@@ -189,7 +191,7 @@ export function addContinueButtons() {
       newGameContainer.remove();
     },
   });
-  continueButton.classList.add("prm");
+  hasAchievedGoal && continueButton.classList.add("prm");
 
   const restartButton = createButton({
     text: getTranslation(TranslationKey.RESTART_GAME),
@@ -198,6 +200,8 @@ export function addContinueButtons() {
       newGameContainer.remove();
     },
   });
+
+  !hasAchievedGoal && restartButton.classList.add("prm");
 
   newGameContainer.appendChild(continueButton);
   newGameContainer.appendChild(restartButton);
