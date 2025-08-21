@@ -17,6 +17,7 @@ import { allInConfig, shouldApplyKittenBehavior } from "../../logic/config";
 import { FieldSize } from "../../logic/data/field-size";
 import { PlacedObject } from "../../logic/data/objects";
 import { isValidCellPosition } from "../../logic/checks";
+import { calculatePar } from "../../logic/par";
 
 let mainContainer: HTMLElement | undefined;
 let gameFieldElem: HTMLElement | undefined;
@@ -64,7 +65,7 @@ export async function startNewGame(options: { shouldIncreaseLevel: boolean } = {
 
   document.body.classList.remove(CssClass.SELECTING, CssClass.WON);
   globals.isWon = false;
-  globals.moves = 0;
+  globals.moves.length = 0;
 
   startButton?.remove();
 
@@ -100,6 +101,13 @@ export async function startNewGame(options: { shouldIncreaseLevel: boolean } = {
   globals.placedObjects = onboardingData?.objects || [];
   globals.placedCats = placeCatsInitially(globals.fieldSize);
   globals.motherCat = globals.placedCats.find(isMother);
+
+  const performanceStart = performance.now();
+  const parInfo = calculatePar(globals.placedCats, globals.placedObjects, []);
+  globals.par = parInfo.par;
+  const performanceEnd = performance.now();
+  const performanceTime = performanceEnd - performanceStart;
+  console.debug("Calculated par:", parInfo, "Time taken:", Math.round(performanceTime), "ms");
 
   if (!gameFieldElem) {
     gameFieldElem = generateGameFieldElement(globals.fieldSize);

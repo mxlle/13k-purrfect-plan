@@ -1,4 +1,4 @@
-import { Direction, isTool, Tool, TurnMove } from "../types";
+import { Direction, isTool, RECOVERY_TIME_MAP, Tool, TurnMove } from "../types";
 import { PubSubEvent, pubSubService } from "../utils/pub-sub-service";
 import { getKittensElsewhere, getKittensOnCell, isValidCellPosition } from "./checks";
 import { globals } from "../globals";
@@ -9,7 +9,7 @@ import { CssClass } from "../utils/css-class";
 import { updateAllPositions } from "../components/game-field/game-field";
 import { sleep } from "../utils/promise-utils";
 import { shouldApplyKittenBehavior } from "./config";
-import { isMoon, isPuddle, isTree } from "./data/objects";
+import { isMoon, isPuddle, isTree, PlacedObject } from "./data/objects";
 
 let isPerformingMove = false;
 
@@ -23,14 +23,19 @@ export async function performMove(turnMove: TurnMove) {
     return;
   }
 
+  if (!isValidMove(turnMove, globals.placedCats, globals.placedObjects, globals.moves)) {
+    console.warn(`Invalid move: ${turnMove}`);
+    return;
+  }
+
   isPerformingMove = true;
 
-  globals.moves++;
+  globals.moves.push(turnMove);
 
   await playSoundForAction(turnMove);
   isTool(turnMove) && (await preToolAction(turnMove));
 
-  await calculateNewPositions(turnMove);
+  calculateNewPositions(turnMove, globals.placedCats, globals.placedObjects);
 
   isTool(turnMove) && (await postToolAction(turnMove));
 
@@ -41,29 +46,62 @@ export async function performMove(turnMove: TurnMove) {
   isPerformingMove = false;
 }
 
-async function calculateNewPositions(turnMove: TurnMove) {
-  doMoonMove();
+export function isValidMove(
+  turnMove: TurnMove,
+  placedCats: PlacedCat[],
+  placedObjects: PlacedObject[],
+  previousMoves: TurnMove[],
+): boolean {
+  const motherCat = placedCats.find(isMother);
 
-  const kittensOnCell = getKittensOnCell(globals.placedCats, globals.motherCat);
-  const freeKittens = getKittensElsewhere(globals.placedCats, globals.motherCat);
+  if (!motherCat) {
+    console.error("Mother cat not found, cannot perform move.");
+    return false;
+  }
 
   if (isTool(turnMove)) {
-    await executeTool(turnMove);
+    const recoveryTime = RECOVERY_TIME_MAP[turnMove];
+    // If the move is a tool, check if it can be used based on the recovery time
+    const lastIndex = previousMoves.lastIndexOf(turnMove);
+
+    return lastIndex === -1 || previousMoves.length - lastIndex > recoveryTime;
+  }
+
+  const newPosition = newCellPositionFromDirection(motherCat, turnMove);
+
+  return isValidCellPosition(globals.fieldSize, newPosition, placedObjects);
+}
+
+export function calculateNewPositions(turnMove: TurnMove, placedCats: PlacedCat[], placedObjects: PlacedObject[]) {
+  doMoonMove(placedObjects);
+
+  const motherCat = placedCats.find(isMother);
+
+  if (!motherCat) {
+    console.error("Mother cat not found, cannot perform move.");
+    return;
+  }
+
+  const kittensOnCell = getKittensOnCell(placedCats, motherCat);
+  const freeKittens = getKittensElsewhere(placedCats, motherCat);
+
+  if (isTool(turnMove)) {
+    executeTool(turnMove, placedCats, placedObjects);
   } else {
-    moveCat(globals.motherCat, turnMove);
+    moveCat(motherCat, turnMove, placedObjects);
 
     for (const kitten of kittensOnCell) {
-      moveCat(kitten, turnMove);
+      moveCat(kitten, turnMove, placedObjects);
     }
 
     for (const kitten of freeKittens) {
-      handleKittenBehavior(kitten);
+      handleKittenBehavior(kitten, placedObjects);
     }
   }
 }
 
-function doMoonMove() {
-  const moon = globals.placedObjects.find(isMoon);
+function doMoonMove(placedObjects: PlacedObject[]) {
+  const moon = placedObjects.find(isMoon);
   const width = globals.fieldSize.width;
 
   if (moon && moon.column < width) {
@@ -92,49 +130,51 @@ async function postToolAction(tool: Tool) {
   }
 }
 
-async function executeTool(tool: Tool) {
+function executeTool(tool: Tool, placedCats: PlacedCat[], placedObjects: PlacedObject[]) {
+  const motherCat = placedCats.find(isMother);
+
   switch (tool) {
     case Tool.MEOW:
       // all kittens move one cell in the direction of the mother cat
-      const freeKittens = getKittensElsewhere(globals.placedCats, globals.motherCat);
+      const freeKittens = getKittensElsewhere(placedCats, motherCat);
 
       for (const kitten of freeKittens) {
-        moveCatTowardsCell(kitten, globals.motherCat);
+        moveCatTowardsCell(kitten, motherCat, placedObjects);
       }
   }
 }
 
-function handleKittenBehavior(cat: PlacedCat) {
+function handleKittenBehavior(cat: PlacedCat, placedObjects: PlacedObject[]) {
   if (!shouldApplyKittenBehavior(cat)) {
     return;
   }
 
   switch (cat.id) {
     case CatId.MOONY:
-      doMoonyMove(cat);
+      doMoonyMove(cat, placedObjects);
       break;
     case CatId.IVY:
-      doIvyMove(cat);
+      doIvyMove(cat, placedObjects);
       break;
     case CatId.SPLASHY:
-      doSplashyMove(cat);
+      doSplashyMove(cat, placedObjects);
       break;
   }
 }
 
-function doMoonyMove(cat: PlacedCat) {
+function doMoonyMove(cat: PlacedCat, placedObjects: PlacedObject[]) {
   // Moony moves towards the moon
-  const moonPosition = globals.placedObjects.find(isMoon);
+  const moonPosition = placedObjects.find(isMoon);
 
   if (moonPosition) {
-    moveCatTowardsCell(cat, moonPosition);
+    moveCatTowardsCell(cat, moonPosition, placedObjects);
   }
 }
 
-function doIvyMove(cat: PlacedCat) {
+function doIvyMove(cat: PlacedCat, placedObjects: PlacedObject[]) {
   // if next to a tree, then move clockwise around it
   const { row, column } = cat;
-  const treePosition = globals.placedObjects.find(isTree);
+  const treePosition = placedObjects.find(isTree);
 
   if (treePosition) {
     const rowDiff = treePosition.row - row;
@@ -152,7 +192,7 @@ function doIvyMove(cat: PlacedCat) {
           newColumn = column + 1; // move right
         }
 
-        moveCatToCell(cat, { row: newRow, column: newColumn });
+        moveCatToCell(cat, { row: newRow, column: newColumn }, placedObjects);
         return;
       }
 
@@ -164,40 +204,40 @@ function doIvyMove(cat: PlacedCat) {
           newColumn = column - 1; // move left
         }
 
-        moveCatToCell(cat, { row: newRow, column: newColumn });
+        moveCatToCell(cat, { row: newRow, column: newColumn }, placedObjects);
         return;
       }
 
       if (columnDiff === 1) {
         // cat to the left of tree
         newRow = row - 1; // move up
-        moveCatToCell(cat, { row: newRow, column });
+        moveCatToCell(cat, { row: newRow, column }, placedObjects);
         return;
       }
 
       if (columnDiff === -1) {
         // cat to the right of tree
         newRow = row + 1; // move down
-        moveCatToCell(cat, { row: newRow, column });
+        moveCatToCell(cat, { row: newRow, column }, placedObjects);
         return;
       }
     } else {
       // If not next to a tree, just move towards the tree
-      moveCatTowardsCell(cat, treePosition);
+      moveCatTowardsCell(cat, treePosition, placedObjects);
     }
   }
 }
 
-function doSplashyMove(cat: PlacedCat) {
+function doSplashyMove(cat: PlacedCat, placedObjects: PlacedObject[]) {
   // Splashy moves towards the puddle
-  const waterPosition = globals.placedObjects.find(isPuddle);
+  const waterPosition = placedObjects.find(isPuddle);
 
   if (waterPosition) {
-    moveCatTowardsCell(cat, waterPosition);
+    moveCatTowardsCell(cat, waterPosition, placedObjects);
   }
 }
 
-function moveCatTowardsCell(cat: PlacedCat, targetCell: CellPosition) {
+function moveCatTowardsCell(cat: PlacedCat, targetCell: CellPosition, placedObjects: PlacedObject[]) {
   const rowDiff = targetCell.row - cat.row;
   const columnDiff = targetCell.column - cat.column;
 
@@ -209,27 +249,27 @@ function moveCatTowardsCell(cat: PlacedCat, targetCell: CellPosition) {
     // Move vertically firsts
     const newRow = cat.row + (rowDiff > 0 ? 1 : -1);
 
-    if (isValidCellPosition(globals.fieldSize, { row: newRow, column: cat.column }, globals.placedObjects)) {
-      moveCatToCell(cat, { row: newRow, column: cat.column });
+    if (isValidCellPosition(globals.fieldSize, { row: newRow, column: cat.column }, placedObjects)) {
+      moveCatToCell(cat, { row: newRow, column: cat.column }, placedObjects);
       return;
     }
   }
 
   const newColumn = cat.column + (columnDiff > 0 ? 1 : -1);
 
-  if (isValidCellPosition(globals.fieldSize, { row: cat.row, column: newColumn }, globals.placedObjects)) {
-    moveCatToCell(cat, { row: cat.row, column: newColumn });
+  if (isValidCellPosition(globals.fieldSize, { row: cat.row, column: newColumn }, placedObjects)) {
+    moveCatToCell(cat, { row: cat.row, column: newColumn }, placedObjects);
     return;
   }
 }
 
-export function moveCat(cat: PlacedCat, direction: Direction) {
+export function moveCat(cat: PlacedCat, direction: Direction, placedObjects: PlacedObject[]) {
   const newPosition = newCellPositionFromDirection(cat, direction);
-  moveCatToCell(cat, newPosition);
+  moveCatToCell(cat, newPosition, placedObjects);
 }
 
-export function moveCatToCell(cat: PlacedCat, cell: CellPosition) {
-  const isValidMove = isValidCellPosition(globals.fieldSize, cell, globals.placedObjects);
+export function moveCatToCell(cat: PlacedCat, cell: CellPosition, placedObjects: PlacedObject[]) {
+  const isValidMove = isValidCellPosition(globals.fieldSize, cell, placedObjects);
 
   if (!isValidMove) {
     console.warn(`Invalid move for cat ${cat.name} to cell (${cell.row}, ${cell.column})`);
@@ -257,15 +297,23 @@ function updateInventory(cat: PlacedCat) {
 }
 
 function checkWinCondition() {
-  const allCatsOnOneCell = globals.placedCats.every((cat) => {
-    return cat.row === globals.placedCats[0].row && cat.column === globals.placedCats[0].column;
-  });
-
-  if (allCatsOnOneCell) {
+  if (isWinConditionMet(globals.placedCats)) {
     globals.isWon = true;
     document.body.classList.add(CssClass.WON);
     pubSubService.publish(PubSubEvent.GAME_END);
   }
+}
+
+export function isWinConditionMet(placedCats: PlacedCat[]): boolean {
+  if (placedCats.length === 0) {
+    return false; // No cats to win with
+  }
+
+  const firstCatPosition = { row: placedCats[0].row, column: placedCats[0].column };
+
+  return placedCats.every((cat) => {
+    return cat.row === firstCatPosition.row && cat.column === firstCatPosition.column;
+  });
 }
 
 function newCellPositionFromDirection(fromCell: CellPosition, direction: Direction): CellPosition {

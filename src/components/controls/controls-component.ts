@@ -214,7 +214,7 @@ async function handleMove(turnMove: TurnMove) {
   updateTurnMovesComponent();
 
   if (isTool(turnMove)) {
-    toolsFrozenUntilTurn = globals.moves + RECOVERY_TIME_MAP[turnMove];
+    toolsFrozenUntilTurn = globals.moves.length + RECOVERY_TIME_MAP[turnMove];
   }
 
   updateRecoveryInfoComponent();
@@ -223,7 +223,8 @@ async function handleMove(turnMove: TurnMove) {
 function updateTurnMovesComponent() {
   if (!turnMovesComponent) return;
 
-  turnMovesComponent.innerHTML = `${getTranslation(TranslationKey.MOVES)}: ${globals.moves}`;
+  const parString = globals.par ? ` / ${globals.par}` : "";
+  turnMovesComponent.innerHTML = `${getTranslation(TranslationKey.MOVES)}: ${globals.moves.length}${parString}`;
 }
 
 function updateRecoveryInfoComponent() {
@@ -235,7 +236,7 @@ function updateRecoveryInfoComponent() {
     return;
   }
 
-  const turnsLeft = toolsFrozenUntilTurn - globals.moves;
+  const turnsLeft = toolsFrozenUntilTurn - globals.moves.length;
   recoveryInfoComponent.innerHTML = `${turnsLeft}`;
   toolContainer.classList.toggle(CssClass.DISABLED, turnsLeft > 0);
 

@@ -32,3 +32,5 @@ export type TurnMove = Direction | Tool;
 export function isTool(move: TurnMove): move is Tool {
   return Object.values(Tool).includes(move as Tool);
 }
+
+export const ALL_TURN_MOVES = [...Object.values(Direction), ...Object.values(Tool)] as const;

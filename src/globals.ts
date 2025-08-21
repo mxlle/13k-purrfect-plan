@@ -1,4 +1,4 @@
-import { GameMetaData, Settings } from "./types";
+import { GameMetaData, Settings, TurnMove } from "./types";
 import { getLocalStorageItem, LocalStorageKey } from "./utils/local-storage";
 import { Difficulty, difficultySettings } from "./logic/difficulty";
 import { INITIAL_MOTHER_CAT, PlacedCat } from "./logic/data/cats";
@@ -19,7 +19,8 @@ interface GameGlobals {
   settings: Settings;
   isWon: boolean;
   metaData?: GameMetaData;
-  moves: number;
+  moves: TurnMove[];
+  par?: number;
 }
 
 const onboardingStepSetting = getLocalStorageItem(LocalStorageKey.ONBOARDING_STEP);
@@ -40,7 +41,7 @@ const defaultGlobals: GameGlobals = {
   difficulty: initialDifficulty,
   settings: initialSettings,
   isWon: false,
-  moves: 0,
+  moves: [],
 };
 
 export const globals: GameGlobals = { ...defaultGlobals };
