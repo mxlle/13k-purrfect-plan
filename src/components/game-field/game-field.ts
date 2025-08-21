@@ -102,13 +102,15 @@ export async function startNewGame(options: { shouldIncreaseLevel: boolean } = {
 
   initializeGameField();
 
-  globals.placedObjects = options.shouldIncreaseLevel
-    ? onboardingData?.objects || copyObjects(defaultPlacedObjects)
-    : globals.previouslyPlacedObjects;
+  globals.placedObjects =
+    options.shouldIncreaseLevel || globals.previouslyPlacedObjects.length === 0
+      ? onboardingData?.objects || copyObjects(defaultPlacedObjects)
+      : globals.previouslyPlacedObjects;
   globals.previouslyPlacedObjects = copyObjects(globals.placedObjects);
-  globals.placedCats = options.shouldIncreaseLevel
-    ? placeCatsInitially(globals.fieldSize, globals.placedObjects)
-    : [...globals.previouslyPlacedCats];
+  globals.placedCats =
+    options.shouldIncreaseLevel || globals.previouslyPlacedCats.length === 0
+      ? placeCatsInitially(globals.fieldSize, globals.placedObjects)
+      : [...globals.previouslyPlacedCats];
   globals.previouslyPlacedCats = copyObjects(globals.placedCats);
   globals.motherCat = globals.placedCats.find(isMother);
 
