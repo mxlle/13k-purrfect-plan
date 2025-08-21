@@ -98,11 +98,11 @@ export function getOnboardingData(): OnboardingData | undefined {
       const lastSetup: InitialSetup = (() => {
         const { _, M, t, o, c, T, O, C } = getCellTypePlaceholders();
         return [
-          [C, o, _, _, _],
+          [C, _, M, _, _],
           [_, _, _, _, O],
-          [M, _, _, _, _],
-          [_, T, _, _, _],
-          [_, _, t, _, c],
+          [o, _, _, _, _],
+          [_, _, T, _, _],
+          [_, t, _, _, c],
         ];
       })();
 
