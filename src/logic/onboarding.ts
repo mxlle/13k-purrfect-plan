@@ -31,6 +31,19 @@ export interface OnboardingData {
   config: Config;
 }
 
+const lastSetup: InitialSetup = (() => {
+  const { _, M, t, o, c, T, O, C } = getCellTypePlaceholders();
+  return [
+    [C, _, M, _, _],
+    [_, _, _, _, O],
+    [o, _, _, _, _],
+    [_, _, T, _, _],
+    [_, t, _, _, c],
+  ];
+})();
+
+export const defaultPlacedObjects = getPlacedGameElementsFromInitialSetup(lastSetup).objects;
+
 export function getOnboardingData(): OnboardingData | undefined {
   const step = globals.onboardingStep;
   let skipPositions: CellPosition[] = [];
@@ -95,17 +108,6 @@ export function getOnboardingData(): OnboardingData | undefined {
         },
       };
     case OnboardingStep.LAST_SETUP:
-      const lastSetup: InitialSetup = (() => {
-        const { _, M, t, o, c, T, O, C } = getCellTypePlaceholders();
-        return [
-          [C, _, M, _, _],
-          [_, _, _, _, O],
-          [o, _, _, _, _],
-          [_, _, T, _, _],
-          [_, t, _, _, c],
-        ];
-      })();
-
       return {
         field: getFieldSizeFromInitialSetup(lastSetup),
         ...getPlacedGameElementsFromInitialSetup(lastSetup),
@@ -127,7 +129,7 @@ export function increaseOnboardingStepIfApplicable() {
   let step = globals.onboardingStep + 1;
 
   if (step > OnboardingStep.LAST_SETUP) {
-    step = OnboardingStep.LAST_SETUP; // temp: always this //-1;
+    step = -1;
   }
 
   globals.onboardingStep = step;

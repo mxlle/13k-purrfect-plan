@@ -6,7 +6,13 @@ import { globals } from "../../globals";
 import { requestAnimationFrameWithTimeout } from "../../utils/promise-utils";
 import { initializeGameField, placeCatsInitially } from "../../logic/initialize";
 import { handlePokiCommercial } from "../../poki-integration";
-import { getOnboardingData, increaseOnboardingStepIfApplicable, isSameLevel, OnboardingData } from "../../logic/onboarding";
+import {
+  defaultPlacedObjects,
+  getOnboardingData,
+  increaseOnboardingStepIfApplicable,
+  isSameLevel,
+  OnboardingData,
+} from "../../logic/onboarding";
 import { CssClass } from "../../utils/css-class";
 import { getControlsComponent } from "../controls/controls-component";
 import { isMother, PlacedCat } from "../../logic/data/cats";
@@ -39,12 +45,12 @@ export async function initializeEmptyGameField() {
 
   gameFieldElem = generateGameFieldElement(globals.fieldSize);
 
-  addStartButton(TranslationKey.START_GAME, gameFieldElem);
+  addStartButton(TranslationKey.NEW_GAME, gameFieldElem);
 
   appendGameField();
 }
 
-export function addStartButton(buttonLabelKey: TranslationKey, elementToAttachTo: HTMLElement) {
+function addStartButton(buttonLabelKey: TranslationKey, elementToAttachTo: HTMLElement) {
   startButton = createButton({
     text: getTranslation(buttonLabelKey),
     onClick: (event: MouseEvent) => {
@@ -77,8 +83,6 @@ export async function startNewGame(options: { shouldIncreaseLevel: boolean } = {
     globals.config = allInConfig;
   }
 
-  pubSubService.publish(PubSubEvent.GAME_START);
-
   if (gameFieldElem) {
     // reset old game field
     // await cleanGameField(globals.gameFieldData);
@@ -98,8 +102,8 @@ export async function startNewGame(options: { shouldIncreaseLevel: boolean } = {
 
   initializeGameField();
 
-  globals.placedObjects = onboardingData?.objects || [];
-  globals.placedCats = placeCatsInitially(globals.fieldSize);
+  globals.placedObjects = onboardingData?.objects || defaultPlacedObjects;
+  globals.placedCats = placeCatsInitially(globals.fieldSize, globals.placedObjects);
   globals.motherCat = globals.placedCats.find(isMother);
 
   const performanceStart = performance.now();
@@ -108,6 +112,8 @@ export async function startNewGame(options: { shouldIncreaseLevel: boolean } = {
   const performanceEnd = performance.now();
   const performanceTime = performanceEnd - performanceStart;
   console.debug("Calculated par:", parInfo, "Time taken:", Math.round(performanceTime), "ms");
+
+  pubSubService.publish(PubSubEvent.GAME_START);
 
   if (!gameFieldElem) {
     gameFieldElem = generateGameFieldElement(globals.fieldSize);
