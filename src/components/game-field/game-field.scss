@@ -12,26 +12,13 @@ $border-style: outset;
   justify-content: center;
   height: fit-content;
   border: calc(var(--s-size) / 10) solid $tile-color-alpha;
+  overflow: hidden;
 
   @include grid-mixins.board-tile-grid;
   @include grid-mixins.board-tile-grid-variables;
 
   .row {
     display: contents;
-
-    &:nth-child(even) {
-      .#{$CELL} {
-        &:nth-child(odd) {
-          --t: #{$tile-color-2};
-        }
-      }
-    }
-
-    &:nth-child(odd) {
-      .#{$CELL}:not(:nth-child(odd)) {
-        --t: #{$tile-color-2};
-      }
-    }
   }
 }
 
