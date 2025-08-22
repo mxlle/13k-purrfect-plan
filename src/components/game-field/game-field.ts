@@ -143,7 +143,7 @@ export async function startNewGame(options: { shouldIncreaseLevel: boolean } = {
   globals.par = parInfo.par;
   const performanceEnd = performance.now();
   const performanceTime = performanceEnd - performanceStart;
-  console.debug("Calculated par:", parInfo, "Time taken:", Math.round(performanceTime), "ms");
+  console.debug("Calculated par:", parInfo.moves.join(" > "), parInfo.par, "Time taken:", Math.round(performanceTime), "ms");
 
   pubSubService.publish(PubSubEvent.GAME_START);
 
@@ -254,9 +254,10 @@ function addOnboardingSuggestionIfApplicable() {
 export async function initializeCatsOnGameField(cats: PlacedCat[], isInitialStart: boolean) {
   const middleCellPosition = getMiddleCoordinates();
   const middleCellElement = getCellElement(middleCellPosition);
+  const sortedCats = [...cats].sort((a, b) => a.id - b.id);
 
-  for (let i = 0; i < cats.length; i++) {
-    const cat = cats[i];
+  for (let i = 0; i < sortedCats.length; i++) {
+    const cat = sortedCats[i];
     middleCellElement.append(cat.catElement);
     cat.initialPosition = { ...middleCellPosition };
 
