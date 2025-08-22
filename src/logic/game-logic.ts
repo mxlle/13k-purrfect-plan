@@ -82,6 +82,7 @@ export function calculateNewPositions(turnMove: TurnMove, placedCats: PlacedCat[
     return;
   }
 
+  const previousMotherPosition = { row: motherCat.row, column: motherCat.column };
   const kittensOnCell = getKittensOnCell(placedCats, motherCat);
   const freeKittens = getKittensElsewhere(placedCats, motherCat);
 
@@ -95,7 +96,7 @@ export function calculateNewPositions(turnMove: TurnMove, placedCats: PlacedCat[
     }
 
     for (const kitten of freeKittens) {
-      handleKittenBehavior(kitten, placedObjects);
+      handleKittenBehavior(kitten, placedObjects, previousMotherPosition);
     }
   }
 }
@@ -144,10 +145,12 @@ function executeTool(tool: Tool, placedCats: PlacedCat[], placedObjects: PlacedO
   }
 }
 
-function handleKittenBehavior(cat: PlacedCat, placedObjects: PlacedObject[]) {
+function handleKittenBehavior(cat: PlacedCat, placedObjects: PlacedObject[], previousMotherPosition: CellPosition) {
   if (!shouldApplyKittenBehavior(cat)) {
     return;
   }
+
+  const previousPosition = { row: cat.row, column: cat.column };
 
   switch (cat.id) {
     case CatId.MOONY:
@@ -159,6 +162,11 @@ function handleKittenBehavior(cat: PlacedCat, placedObjects: PlacedObject[]) {
     case CatId.SPLASHY:
       doSplashyMove(cat, placedObjects);
       break;
+  }
+
+  // on swap, revert kitten to previous position
+  if (cat.row === previousMotherPosition.row && cat.column === previousMotherPosition.column) {
+    moveCatToCell(cat, previousPosition, placedObjects);
   }
 }
 
