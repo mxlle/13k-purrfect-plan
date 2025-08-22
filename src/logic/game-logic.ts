@@ -3,7 +3,7 @@ import { PubSubEvent, pubSubService } from "../utils/pub-sub-service";
 import { getKittensElsewhere, getKittensOnCell, isValidCellPosition } from "./checks";
 import { globals } from "../globals";
 import { CatId, isMother, PlacedCat } from "./data/cats";
-import { CellPosition } from "./data/cell";
+import { CellPosition, isSameCell } from "./data/cell";
 import { playSoundForAction } from "../audio/sound-control/sound-control";
 import { CssClass } from "../utils/css-class";
 import { updateAllPositions } from "../components/game-field/game-field";
@@ -96,7 +96,7 @@ export function calculateNewPositions(turnMove: TurnMove, placedCats: PlacedCat[
     }
 
     for (const kitten of freeKittens) {
-      handleKittenBehavior(kitten, placedObjects, previousMotherPosition);
+      handleKittenBehavior(kitten, placedObjects, previousMotherPosition, motherCat);
     }
   }
 }
@@ -145,7 +145,12 @@ function executeTool(tool: Tool, placedCats: PlacedCat[], placedObjects: PlacedO
   }
 }
 
-function handleKittenBehavior(cat: PlacedCat, placedObjects: PlacedObject[], previousMotherPosition: CellPosition) {
+function handleKittenBehavior(
+  cat: PlacedCat,
+  placedObjects: PlacedObject[],
+  previousMotherPosition: CellPosition,
+  newMotherPosition: CellPosition,
+) {
   if (!shouldApplyKittenBehavior(cat)) {
     return;
   }
@@ -165,7 +170,8 @@ function handleKittenBehavior(cat: PlacedCat, placedObjects: PlacedObject[], pre
   }
 
   // on swap, revert kitten to previous position
-  if (cat.row === previousMotherPosition.row && cat.column === previousMotherPosition.column) {
+  if (isSameCell(cat, previousMotherPosition) && isSameCell(previousPosition, newMotherPosition)) {
+    console.debug(`Reverting ${cat.name} to previous position:`, previousPosition);
     moveCatToCell(cat, previousPosition, placedObjects);
   }
 }

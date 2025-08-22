@@ -12,7 +12,7 @@ interface ParInfo {
 let iterationCount = 1;
 
 export const MAX_PAR = 5;
-export const MIN_PAR = 2;
+export const MIN_PAR = 3;
 
 export const FALLBACK_PAR = 42; // Fallback value for par when no solution is found
 
