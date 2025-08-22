@@ -1,5 +1,6 @@
 import { CellPosition } from "./cell";
 import { createCatElement } from "../../components/cat-component/cat-component";
+import { Emoji } from "../../utils/emojis/emoji-util";
 
 export enum CatId {
   MOTHER,
@@ -18,6 +19,13 @@ export const CAT_NAMES: Record<CatId, string> = {
   [CatId.MOONY]: "Moony",
   [CatId.IVY]: "Ivy",
   [CatId.SPLASHY]: "Splashy",
+};
+
+export const CAT_IDENTIFIER: Record<CatId, Emoji> = {
+  [CatId.MOTHER]: "🟣",
+  [CatId.MOONY]: "🟡",
+  [CatId.IVY]: "🟢",
+  [CatId.SPLASHY]: "🔵",
 };
 
 const cachedCats: Record<CatId, Cat> = {

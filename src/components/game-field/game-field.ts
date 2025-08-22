@@ -24,6 +24,7 @@ import { FieldSize } from "../../logic/data/field-size";
 import { isMoon, PlacedObject } from "../../logic/data/objects";
 import { isValidCellPosition } from "../../logic/checks";
 import { calculatePar, copyObjects } from "../../logic/par";
+import { deserializeGame, serializeGame } from "../../logic/serializer";
 
 let mainContainer: HTMLElement | undefined;
 let gameFieldElem: HTMLElement | undefined;
@@ -102,16 +103,39 @@ export async function startNewGame(options: { shouldIncreaseLevel: boolean } = {
 
   initializeGameField();
 
-  globals.placedObjects =
-    options.shouldIncreaseLevel || globals.previouslyPlacedObjects.length === 0
-      ? onboardingData?.objects || copyObjects(defaultPlacedObjects)
-      : globals.previouslyPlacedObjects;
+  const gameSetupFromHash = location.hash.replace("#", "");
+
+  if (gameSetupFromHash && !onboardingData && !options.shouldIncreaseLevel) {
+    try {
+      const parsedGameSetup = deserializeGame(decodeURI(gameSetupFromHash));
+      globals.fieldSize = parsedGameSetup.fieldSize;
+      globals.placedCats = parsedGameSetup.placedCats;
+      globals.placedObjects = parsedGameSetup.placedObjects;
+      console.debug("Loaded game setup from hash:", parsedGameSetup);
+    } catch (error) {
+      console.error("Failed to parse game setup from hash:", error);
+    }
+  } else {
+    globals.placedObjects =
+      options.shouldIncreaseLevel || globals.previouslyPlacedObjects.length === 0
+        ? onboardingData?.objects || copyObjects(defaultPlacedObjects)
+        : globals.previouslyPlacedObjects;
+    globals.placedCats =
+      options.shouldIncreaseLevel || globals.previouslyPlacedCats.length === 0
+        ? placeCatsInitially(globals.fieldSize, globals.placedObjects)
+        : [...globals.previouslyPlacedCats];
+
+    const serializedGameSetup = serializeGame({
+      fieldSize: globals.fieldSize,
+      placedCats: globals.placedCats,
+      placedObjects: globals.placedObjects,
+    });
+    location.hash = onboardingData ? "" : `#${serializedGameSetup}`;
+  }
+
   globals.previouslyPlacedObjects = copyObjects(globals.placedObjects);
-  globals.placedCats =
-    options.shouldIncreaseLevel || globals.previouslyPlacedCats.length === 0
-      ? placeCatsInitially(globals.fieldSize, globals.placedObjects)
-      : [...globals.previouslyPlacedCats];
   globals.previouslyPlacedCats = copyObjects(globals.placedCats);
+
   globals.motherCat = globals.placedCats.find(isMother);
 
   const performanceStart = performance.now();

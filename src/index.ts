@@ -44,7 +44,7 @@ function init() {
 
   document.body.append(header);
 
-  if (isOnboarding()) {
+  if (isOnboarding() || location.hash.length > 1) {
     void startNewGame({ shouldIncreaseLevel: false });
   } else {
     void initializeEmptyGameField();
