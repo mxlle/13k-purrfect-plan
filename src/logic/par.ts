@@ -14,6 +14,8 @@ let iterationCount = 1;
 export const MAX_PAR = 5;
 export const MIN_PAR = 2;
 
+export const FALLBACK_PAR = 42; // Fallback value for par when no solution is found
+
 export function calculatePar(placedCats: PlacedCat[], placedObjects: PlacedObject[], previousMoves: TurnMove[]): ParInfo {
   if (previousMoves.length === 0) {
     iterationCount = 1; // Reset iteration count for a new calculation
@@ -30,7 +32,7 @@ export function calculatePar(placedCats: PlacedCat[], placedObjects: PlacedObjec
     return { par: -1, moves: previousMoves }; // Limit the recursion depth to prevent excessive computation
   }
 
-  let bestParInfo: ParInfo = { par: 42, moves: [] };
+  let bestParInfo: ParInfo = { par: FALLBACK_PAR, moves: [] };
 
   const shuffledMoves = shuffleArray([...ALL_TURN_MOVES]);
 

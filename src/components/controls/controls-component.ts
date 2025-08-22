@@ -18,6 +18,7 @@ import { globals } from "../../globals";
 import { isOnboarding } from "../../logic/onboarding";
 
 import { ConfigCategory } from "../../logic/config";
+import { FALLBACK_PAR } from "../../logic/par";
 
 let hasSetupEventListeners = false;
 let controlsComponent: HTMLElement | undefined;
@@ -227,7 +228,7 @@ async function handleMove(turnMove: TurnMove) {
 function updateTurnMovesComponent() {
   if (!turnMovesComponent) return;
 
-  const parString = globals.par ? ` / ${globals.par}` : "";
+  const parString = globals.par ? ` / ${globals.par < FALLBACK_PAR ? globals.par : "?"}` : "";
   turnMovesComponent.innerHTML = `${getTranslation(TranslationKey.MOVES)}: ${globals.moves.length}${parString}`;
 }
 
