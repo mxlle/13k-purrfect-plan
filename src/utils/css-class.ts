@@ -39,6 +39,7 @@ export const enum CssClass {
   TREE = "tree",
   PUDDLE = "puddle",
   MOON = "moon",
+  DARKNESS = "darkness",
   EMOJI = "emoji",
   FIELD = "field",
   WON = "won",

@@ -21,7 +21,7 @@ import { PubSubEvent, pubSubService } from "../../utils/pub-sub-service";
 import { isTool } from "../../types";
 import { allInConfig, shouldApplyKittenBehavior } from "../../logic/config";
 import { FieldSize } from "../../logic/data/field-size";
-import { PlacedObject } from "../../logic/data/objects";
+import { isMoon, PlacedObject } from "../../logic/data/objects";
 import { isValidCellPosition } from "../../logic/checks";
 import { calculatePar, copyObjects } from "../../logic/par";
 
@@ -267,10 +267,14 @@ export function updateAllPositions() {
     const diff = getCellDifference(obj, obj.initialPosition);
     obj.objectElement.style.transform = `translate(${diff.column * 100}%, ${diff.row * 100}%)`;
 
-    if (!isValidCellPosition(globals.fieldSize, obj, [])) {
-      obj.objectElement.style.opacity = "0";
-    } else {
-      obj.objectElement.style.opacity = "1";
+    if (isMoon(obj)) {
+      if (!isValidCellPosition(globals.fieldSize, obj, [])) {
+        obj.objectElement.style.opacity = "0";
+        document.body.classList.toggle(CssClass.DARKNESS, true);
+      } else {
+        obj.objectElement.style.opacity = "1";
+        document.body.classList.toggle(CssClass.DARKNESS, false);
+      }
     }
   });
 }

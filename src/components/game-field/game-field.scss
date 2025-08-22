@@ -13,12 +13,18 @@ $border-style: outset;
   height: fit-content;
   border: calc(var(--s-size) / 10) solid $tile-color-alpha;
   overflow: hidden;
+  transition: border-color 0.3s;
 
   @include grid-mixins.board-tile-grid;
   @include grid-mixins.board-tile-grid-variables;
 
   .row {
     display: contents;
+  }
+
+  .#{$DARKNESS}:not(.#{$WON}) & {
+    --t: #{mix($tile-color-1, $bg-primary, 10%)};
+    border-color: mix($tile-color-1, $bg-primary, 15%);
   }
 }
 
@@ -35,6 +41,7 @@ $border-style: outset;
   display: grid;
   place-items: center;
   position: relative;
+  transition: background-color 0.3s;
 
   .#{$CAT_BOX} {
     z-index: 3;
