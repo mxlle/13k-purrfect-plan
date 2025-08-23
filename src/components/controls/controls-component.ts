@@ -231,7 +231,7 @@ function updateTurnMovesComponent() {
 
   const par = getParFromGameState(globals.gameState);
   const parString = par ? ` / ${par < FALLBACK_PAR ? par : "?"}` : "";
-  turnMovesComponent.innerHTML = `${getTranslation(TranslationKey.MOVES)}: ${globals.gameState.moves.length}${parString}`;
+  turnMovesComponent.innerHTML = `${getTranslation(TranslationKey.MOVES)}: ${globals.gameState?.moves.length ?? 0}${parString}`;
 }
 
 function updateRecoveryInfoComponent() {
@@ -254,7 +254,7 @@ function updateRecoveryInfoComponent() {
 }
 
 function updateToolContainer() {
-  if (!toolContainer) return;
+  if (!toolContainer || !globals.gameState) return;
 
   const shouldHaveTools = Object.values(globals.gameState.setup.config[ConfigCategory.TOOLS]).some(Boolean);
 

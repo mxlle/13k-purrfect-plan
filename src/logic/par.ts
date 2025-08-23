@@ -5,7 +5,7 @@ import { copyGameState, GameSetup, GameState, getInitialGameState } from "./data
 
 interface ParInfo {
   par: number;
-  moves: TurnMove[];
+  possibleSolutions: TurnMove[][];
 }
 
 let iterationCount = 1;
@@ -18,10 +18,20 @@ export const FALLBACK_PAR = 42; // Fallback value for par when no solution is fo
 export function calculatePar(gameSetup: GameSetup): ParInfo {
   const performanceStart = performance.now();
   const gameState = getInitialGameState(gameSetup);
+  console.info("Starting par calculation...", gameSetup, gameState);
   const parInfo = calculateParInner(gameState);
   const performanceEnd = performance.now();
   const performanceTime = performanceEnd - performanceStart;
-  console.info("Calculated par:", parInfo.moves.join(" > "), parInfo.par, "Time taken:", Math.round(performanceTime), "ms");
+  console.info(
+    "Calculated par:",
+    parInfo.par,
+    "Time taken:",
+    Math.round(performanceTime),
+    "ms",
+    parInfo.possibleSolutions.length + " solutions: ",
+    parInfo.possibleSolutions,
+  );
+  console.info("First solution:", parInfo.possibleSolutions[0]?.join(" > "));
 
   return parInfo;
 }
@@ -36,15 +46,15 @@ function calculateParInner(gameState: GameState): ParInfo {
   }
 
   if (isWinConditionMet(gameState)) {
-    return { par: 0, moves: previousMoves }; // Already won, no moves needed
+    return { par: 0, possibleSolutions: [previousMoves] }; // Already won, no moves needed
   }
 
   if (previousMoves.length >= MAX_PAR) {
     // console.warn("Too many moves, returning -1 to indicate failure.");
-    return { par: -1, moves: previousMoves }; // Limit the recursion depth to prevent excessive computation
+    return { par: FALLBACK_PAR, possibleSolutions: [previousMoves] }; // Limit the recursion depth to prevent excessive computation
   }
 
-  let bestParInfo: ParInfo = { par: FALLBACK_PAR, moves: [] };
+  let bestParInfo: ParInfo = { par: FALLBACK_PAR, possibleSolutions: [] };
 
   const shuffledMoves = shuffleArray([...ALL_TURN_MOVES]);
 
@@ -54,7 +64,8 @@ function calculateParInner(gameState: GameState): ParInfo {
     }
 
     const copiedGameState = copyGameState(gameState);
-    copiedGameState.moves.push(move);
+    const newMoves = [...previousMoves, move];
+    copiedGameState.moves = newMoves;
 
     calculateNewPositions(copiedGameState, move);
 
@@ -62,12 +73,10 @@ function calculateParInner(gameState: GameState): ParInfo {
     const parInfo = calculateParInner(copiedGameState);
     const newPar = parInfo.par + 1;
 
-    if (parInfo.par === 0) {
-      return { ...parInfo, par: newPar }; // Found a winning move
-    }
-
-    if (parInfo.par > 0 && parInfo.par < bestParInfo.par) {
-      bestParInfo = { ...parInfo, par: newPar }; // Increment the par count for this move
+    if (newPar < bestParInfo.par) {
+      bestParInfo = { ...parInfo, par: newPar };
+    } else if (newPar === bestParInfo.par) {
+      bestParInfo = { par: newPar, possibleSolutions: [...bestParInfo.possibleSolutions, ...parInfo.possibleSolutions] }; // Increment the par count for this move
     }
   }
 

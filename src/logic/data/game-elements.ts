@@ -29,7 +29,6 @@ export interface GameState {
   currentPositions: GameElementPositions;
   representations: GameElementRepresentations;
   moves: TurnMove[];
-  currentlyPossibleSolutions: TurnMove[][];
 }
 
 export function isValidGameSetup(setup: GameSetup): boolean {
@@ -60,7 +59,6 @@ export function getInitialGameState(setup: GameSetup): GameState {
     currentPositions: deepCopyElementsMap(setup.elementPositions),
     representations,
     moves: [],
-    currentlyPossibleSolutions: [...setup.possibleSolutions],
   };
 }
 
@@ -115,6 +113,5 @@ export function copyGameState(state: GameState): GameState {
     currentPositions: deepCopyElementsMap(state.currentPositions),
     representations: deepCopyElementsMap(state.representations),
     moves: [...state.moves],
-    currentlyPossibleSolutions: state.currentlyPossibleSolutions.map((solution) => [...solution]),
   };
 }

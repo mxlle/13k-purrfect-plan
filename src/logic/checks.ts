@@ -33,5 +33,9 @@ export function isValidCellPosition(gameState: GameState, position: CellPosition
     return false;
   }
 
+  if (!gameState.currentPositions[ObjectId.TREE]) {
+    return true;
+  }
+
   return !isSameCell(position, gameState.currentPositions[ObjectId.TREE]);
 }

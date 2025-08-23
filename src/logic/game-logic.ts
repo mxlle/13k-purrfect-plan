@@ -7,7 +7,7 @@ import { playSoundForAction } from "../audio/sound-control/sound-control";
 import { CssClass } from "../utils/css-class";
 import { updateAllPositions } from "../components/game-field/game-field";
 import { sleep } from "../utils/promise-utils";
-import { shouldApplyKittenBehavior } from "./config";
+import { ConfigCategory, shouldApplyKittenBehavior } from "./config";
 import { ObjectId } from "./data/objects";
 import { GameState } from "./data/game-elements";
 
@@ -57,6 +57,10 @@ export function isValidMove(gameState: GameState, turnMove: TurnMove): boolean {
   }
 
   if (isTool(turnMove)) {
+    if (!gameState.setup.config[ConfigCategory.TOOLS][turnMove]) {
+      return false;
+    }
+
     const recoveryTime = RECOVERY_TIME_MAP[turnMove];
     // If the move is a tool, check if it can be used based on the recovery time
     const lastIndex = gameState.moves.lastIndexOf(turnMove);
