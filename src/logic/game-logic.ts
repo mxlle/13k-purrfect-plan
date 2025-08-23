@@ -83,7 +83,7 @@ export function calculateNewPositions(gameState: GameState, turnMove: TurnMove):
     return gameState.currentPositions;
   }
 
-  doMoonMove(gameState);
+  const newMoonPosition = doMoonMove(gameState);
 
   const kittensOnCell = getKittensOnCell(gameState, previousMotherPosition);
   const freeKittens = getKittensElsewhere(gameState, previousMotherPosition);
@@ -102,25 +102,24 @@ export function calculateNewPositions(gameState: GameState, turnMove: TurnMove):
     }
 
     for (const kitten of freeKittens) {
-      newElementPositions[kitten] = handleKittenBehavior(
-        gameState,
-        kitten,
-        previousMotherPosition,
-        gameState.currentPositions[CatId.MOTHER],
-      );
+      newElementPositions[kitten] = handleKittenBehavior(gameState, kitten, previousMotherPosition, newElementPositions[CatId.MOTHER]);
     }
   }
+
+  newElementPositions[ObjectId.MOON] = newMoonPosition;
 
   return newElementPositions;
 }
 
-function doMoonMove(gameState: GameState) {
+function doMoonMove(gameState: GameState): CellPosition {
   const moon = gameState.currentPositions[ObjectId.MOON];
   const width = gameState.setup.fieldSize;
 
   if (moon && moon.column < width) {
-    moon.column = moon.column + 1;
+    return { ...moon, column: moon.column + 1 };
   }
+
+  return moon;
 }
 
 async function preToolAction(tool: Tool) {
