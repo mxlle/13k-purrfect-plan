@@ -9,18 +9,19 @@ import { PubSubEvent } from "./src/utils/pub-sub-service";
 import { LocalStorageKey } from "./src/utils/local-storage";
 import { mapEntries, memoize } from "./src/utils/utils";
 
-const replaceEnum = (name: string, object: object) =>
-  mapEntries(object, ([key, value]) => [`${name}.${key}`, JSON.stringify(value)]);
+const replaceEnum = (name: string, object: object) => mapEntries(object, ([key, value]) => [`${name}.${key}`, JSON.stringify(value)]);
 
-const idGenerator = (i = 0) => () => {
-  const dict = "1234567890-qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM_";
-  let str = "";
-  if (i % dict.length === 0) i += 11;
-  for (let x = i++; x > 0; x = Math.floor(x / dict.length)) {
-    str += dict[x % dict.length];
-  }
-  return str;
-};
+const idGenerator =
+  (i = 0) =>
+  () => {
+    const dict = "1234567890-qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM_";
+    let str = "";
+    if (i % dict.length === 0) i += 11;
+    for (let x = i++; x > 0; x = Math.floor(x / dict.length)) {
+      str += dict[x % dict.length];
+    }
+    return str;
+  };
 
 export default defineConfig(({ mode, command }) => {
   const production = command === "build";
@@ -42,7 +43,7 @@ export default defineConfig(({ mode, command }) => {
         },
         compress: {
           booleans_as_integers: true,
-          drop_console: true,
+          drop_console: js13k,
           hoist_funs: true,
           keep_fargs: false,
           passes: 3,
