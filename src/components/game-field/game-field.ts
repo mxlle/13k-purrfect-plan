@@ -1,6 +1,6 @@
 import styles from "./game-field.module.scss";
 import { getControlsComponent, styles as controlsStyles } from "../controls/controls-component";
-import { cssClassByDirection, styles as arrowStyles } from "../arrow-component/arrow-component";
+import { cssClassByDirection, getArrowComponent, styles as arrowStyles } from "../arrow-component/arrow-component";
 import { getCatIdClass, styles as catStyles } from "../cat-component/cat-component";
 
 import { createButton, createElement } from "../../utils/html-utils";
@@ -11,17 +11,24 @@ import { generateRandomGameSetup } from "../../logic/initialize";
 import { handlePokiCommercial } from "../../poki-integration";
 import { getOnboardingData, increaseOnboardingStepIfApplicable, isSameLevel, OnboardingData } from "../../logic/onboarding";
 import { CssClass } from "../../utils/css-class";
-import { ALL_CAT_IDS } from "../../logic/data/catId";
-import { CellPosition, getCellDifference } from "../../logic/data/cell";
+import { ALL_CAT_IDS, ALL_KITTEN_IDS } from "../../logic/data/catId";
+import { CellPosition, getCellDifference, getDirection } from "../../logic/data/cell";
 import { PubSubEvent, pubSubService } from "../../utils/pub-sub-service";
-import { isTool } from "../../types";
+import { isTool, SpecialAction } from "../../types";
 import { ConfigCategory } from "../../logic/config";
 import { FieldSize } from "../../logic/data/field-size";
 import { ALL_OBJECT_IDS, ObjectId } from "../../logic/data/objects";
 import { isValidCellPosition } from "../../logic/checks";
 import { deserializeGame, serializeGame } from "../../logic/serializer";
-import { GameElementId, GameSetup, GameState, getInitialGameState, isValidGameSetup } from "../../logic/data/game-elements";
-import { isWinConditionMet } from "../../logic/game-logic";
+import {
+  GameElementId,
+  GameElementPositions,
+  GameSetup,
+  GameState,
+  getInitialGameState,
+  isValidGameSetup,
+} from "../../logic/data/game-elements";
+import { calculateNewPositions, isWinConditionMet } from "../../logic/game-logic";
 import { TranslationKey } from "../../translations/translationKey";
 
 let mainContainer: HTMLElement | undefined;
@@ -121,6 +128,7 @@ export async function startNewGame(options: { shouldIncreaseLevel: boolean } = {
   }
 
   globals.gameState = getInitialGameState(gameSetup);
+  globals.nextPositionsIfWait = calculateNewPositions(globals.gameState, SpecialAction.WAIT);
   const serializedGameSetup = serializeGame(gameSetup);
   location.hash = onboardingData ? "" : `#${serializedGameSetup}`;
   document.body.style.setProperty("--s-cnt", globals.gameState.setup.fieldSize.toString());
@@ -135,9 +143,9 @@ export async function startNewGame(options: { shouldIncreaseLevel: boolean } = {
 
   await initializeObjectsOnGameField(globals.gameState);
 
-  await initializeCatsOnGameField(globals.gameState, isInitialStart);
+  await initializeCatsOnGameField(globals.gameState, globals.nextPositionsIfWait, isInitialStart);
 
-  addOnboardingSuggestionIfApplicable();
+  addOnboardingSuggestionIfApplicable(onboardingData);
 }
 
 function appendGameField() {
@@ -190,9 +198,7 @@ export function generateGameFieldElement(fieldSize: FieldSize) {
   return gameField;
 }
 
-function addOnboardingSuggestionIfApplicable() {
-  const onboardingData = getOnboardingData();
-
+function addOnboardingSuggestionIfApplicable(onboardingData: OnboardingData | undefined) {
   if (onboardingData?.highlightedAction) {
     let actionComponent: HTMLElement | null = null;
 
@@ -216,7 +222,11 @@ function addOnboardingSuggestionIfApplicable() {
   }
 }
 
-export async function initializeCatsOnGameField(gameState: GameState, isInitialStart: boolean) {
+export async function initializeCatsOnGameField(
+  gameState: GameState,
+  nextPositionsIfWait: GameElementPositions | undefined,
+  isInitialStart: boolean,
+) {
   for (const catId of ALL_CAT_IDS) {
     const representation = gameState.representations[catId];
 
@@ -231,7 +241,7 @@ export async function initializeCatsOnGameField(gameState: GameState, isInitialS
     await requestAnimationFrameWithTimeout(TIMEOUT_BETWEEN_GAMES);
   }
 
-  updateAllPositions(gameState);
+  updateAllPositions(gameState, nextPositionsIfWait);
 }
 
 export async function initializeObjectsOnGameField(gameState: GameState) {
@@ -245,7 +255,7 @@ export async function initializeObjectsOnGameField(gameState: GameState) {
   }
 }
 
-export function updateAllPositions(gameState: GameState) {
+export function updateAllPositions(gameState: GameState, nextPositionsIfWait: GameElementPositions | undefined) {
   for (const gameElementId in gameState.representations) {
     const representation = gameState.representations[gameElementId as GameElementId];
     const position = gameState.currentPositions[gameElementId as GameElementId];
@@ -261,6 +271,17 @@ export function updateAllPositions(gameState: GameState) {
       } else {
         representation.htmlElement.style.opacity = "1";
         document.body.classList.toggle(CssClass.DARKNESS, false);
+      }
+    }
+
+    if (ALL_KITTEN_IDS.includes(gameElementId as any) && nextPositionsIfWait) {
+      const existingArrow = representation.htmlElement.querySelector(`.${arrowStyles.arrow}`);
+      existingArrow?.remove();
+
+      const nextPosition = nextPositionsIfWait[gameElementId as GameElementId];
+      if (nextPosition) {
+        const direction = getDirection(position, nextPosition);
+        direction && representation.htmlElement.append(getArrowComponent(direction));
       }
     }
   }

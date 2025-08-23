@@ -10,7 +10,7 @@ export const ConfigCategory = defineEnum({
   KITTEN_BEHAVIOR: "Kitten Behavior",
   OBJECTS: "Objects",
   TOOLS: "Tools",
-})
+});
 
 export interface Config {
   [ConfigCategory.CATS]: Record<CatId, boolean>;

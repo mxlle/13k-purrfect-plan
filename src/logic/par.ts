@@ -1,7 +1,7 @@
 import { ALL_TURN_MOVES, TurnMove } from "../types";
 import { calculateNewPositions, isValidMove, isWinConditionMet } from "./game-logic";
 import { shuffleArray } from "../utils/random-utils";
-import { copyGameState, GameSetup, GameState, getInitialGameState } from "./data/game-elements";
+import { copyGameState, deepCopyElementsMap, GameSetup, GameState, getInitialGameState } from "./data/game-elements";
 
 interface ParInfo {
   par: number;
@@ -67,7 +67,7 @@ function calculateParInner(gameState: GameState): ParInfo {
     const newMoves = [...previousMoves, move];
     copiedGameState.moves = newMoves;
 
-    copiedGameState.currentPositions = calculateNewPositions(copiedGameState, move);
+    copiedGameState.currentPositions = deepCopyElementsMap(calculateNewPositions(copiedGameState, move));
 
     // Recursively calculate par for the next moves
     const parInfo = calculateParInner(copiedGameState);

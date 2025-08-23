@@ -1,6 +1,7 @@
 import { CatId } from "./catId";
 import { ObjectId } from "./objects";
 import { GameSetup } from "./game-elements";
+import { Direction } from "../../types";
 
 export interface CellPosition {
   row: number;
@@ -11,8 +12,6 @@ export const EMPTY_CELL = " " as const;
 
 export function isEmptyField(cell: CellPosition, gameSetup: GameSetup): boolean {
   const occupiedPositions = Object.values(gameSetup.elementPositions).filter(Boolean) as CellPosition[];
-  console.debug("Occupied positions:", occupiedPositions);
-
   return occupiedPositions.every((pos: CellPosition) => !isSameCell(pos, cell));
 }
 
@@ -29,6 +28,22 @@ export function getCellDifference(cell1: CellPosition, cell2: CellPosition): Cel
     row: cell1.row - cell2.row,
     column: cell1.column - cell2.column,
   };
+}
+
+export function getDirection(from: CellPosition, to: CellPosition): Direction | null {
+  const diff = getCellDifference(to, from);
+
+  if (diff.row === 0 && diff.column > 0) {
+    return Direction.RIGHT;
+  } else if (diff.row === 0 && diff.column < 0) {
+    return Direction.LEFT;
+  } else if (diff.column === 0 && diff.row > 0) {
+    return Direction.DOWN;
+  } else if (diff.column === 0 && diff.row < 0) {
+    return Direction.UP;
+  }
+
+  return null; // Not a straight line
 }
 
 export function getCellTypePlaceholders() {

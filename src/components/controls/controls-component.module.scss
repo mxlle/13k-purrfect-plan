@@ -47,6 +47,10 @@
   width: fit-content;
   padding: 1rem;
 
+  button {
+    color: $main-color;
+  }
+
   :global(.#{$ICON_BTN}) {
     &:not(:nth-child(5)) {
       width: 4rem;

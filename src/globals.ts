@@ -1,13 +1,14 @@
 import { Settings } from "./types";
 import { getLocalStorageItem, LocalStorageKey } from "./utils/local-storage";
 import { Difficulty, difficultySettings } from "./logic/difficulty";
-import { GameState } from "./logic/data/game-elements";
+import { GameElementPositions, GameState } from "./logic/data/game-elements";
 import { isWinConditionMet } from "./logic/game-logic";
 
 interface GameGlobals {
   previousOnboardingStep: number | undefined;
   onboardingStep: number;
   gameState: GameState | undefined;
+  nextPositionsIfWait: GameElementPositions | undefined;
   language: string;
   difficulty: Difficulty;
   settings: Settings;
@@ -16,13 +17,14 @@ interface GameGlobals {
 const onboardingStepSetting = getLocalStorageItem(LocalStorageKey.ONBOARDING_STEP);
 const difficultySetting = getLocalStorageItem(LocalStorageKey.DIFFICULTY);
 
-const initialDifficulty = difficultySetting ? Number(difficultySetting) as Difficulty : Difficulty.EASY;
+const initialDifficulty = difficultySetting ? (Number(difficultySetting) as Difficulty) : Difficulty.EASY;
 const initialSettings = difficultySettings[initialDifficulty];
 
 const defaultGlobals: GameGlobals = {
   previousOnboardingStep: undefined,
   onboardingStep: onboardingStepSetting ? Number(onboardingStepSetting) : 0,
   gameState: undefined,
+  nextPositionsIfWait: undefined,
   language: "en",
   difficulty: initialDifficulty,
   settings: initialSettings,

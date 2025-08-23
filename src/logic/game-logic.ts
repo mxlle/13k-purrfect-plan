@@ -1,4 +1,4 @@
-import { Direction, isTool, RECOVERY_TIME_MAP, Tool, TurnMove } from "../types";
+import { Direction, isDirection, isSpecialAction, isTool, RECOVERY_TIME_MAP, SpecialAction, Tool, TurnMove } from "../types";
 import { PubSubEvent, pubSubService } from "../utils/pub-sub-service";
 import { getKittensElsewhere, getKittensOnCell, isValidCellPosition } from "./checks";
 import { ALL_CAT_IDS, CatId } from "./data/catId";
@@ -12,6 +12,7 @@ import { ObjectId } from "./data/objects";
 import { deepCopyElementsMap, GameElementPositions, GameState } from "./data/game-elements";
 
 import { styles as catStyles } from "../components/cat-component/cat-component";
+import { globals } from "../globals";
 
 let isPerformingMove = false;
 
@@ -41,7 +42,9 @@ export async function performMove(gameState: GameState, turnMove: TurnMove) {
 
   isTool(turnMove) && (await postToolAction(turnMove));
 
-  updateAllPositions(gameState);
+  globals.nextPositionsIfWait = calculateNewPositions(gameState, SpecialAction.WAIT);
+
+  updateAllPositions(gameState, globals.nextPositionsIfWait);
 
   if (isWinConditionMet(gameState)) {
     pubSubService.publish(PubSubEvent.GAME_END);
@@ -56,6 +59,10 @@ export function isValidMove(gameState: GameState, turnMove: TurnMove): boolean {
   if (!motherPosition) {
     console.error("Mother cat not found, cannot perform move.");
     return false;
+  }
+
+  if (isSpecialAction(turnMove)) {
+    return true;
   }
 
   if (isTool(turnMove)) {
@@ -95,10 +102,12 @@ export function calculateNewPositions(gameState: GameState, turnMove: TurnMove):
   } else {
     newElementPositions = deepCopyElementsMap(gameState.currentPositions);
 
-    newElementPositions[CatId.MOTHER] = moveCat(gameState, CatId.MOTHER, turnMove);
+    if (isDirection(turnMove)) {
+      newElementPositions[CatId.MOTHER] = moveCat(gameState, CatId.MOTHER, turnMove);
 
-    for (const kitten of kittensOnCell) {
-      newElementPositions[kitten] = moveCat(gameState, kitten, turnMove);
+      for (const kitten of kittensOnCell) {
+        newElementPositions[kitten] = moveCat(gameState, kitten, turnMove);
+      }
     }
 
     for (const kitten of freeKittens) {
@@ -166,11 +175,12 @@ function handleKittenBehavior(
   previousMotherPosition: CellPosition,
   newMotherPosition: CellPosition,
 ): CellPosition {
+  const previousPosition = { ...gameState.currentPositions[kitten] };
+
   if (!shouldApplyKittenBehavior(gameState.setup, kitten)) {
-    return;
+    return previousPosition;
   }
 
-  const previousPosition = { ...gameState.currentPositions[kitten] };
   let newPosition: CellPosition = { ...previousPosition };
 
   switch (kitten) {

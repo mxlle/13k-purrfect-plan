@@ -8,7 +8,7 @@
   place-items: center;
 
   svg {
-    color: theme.$main-color;
+    color: currentColor;
     width: 75%;
     height: 75%;
   }
@@ -25,6 +25,13 @@
 
   &.down {
     transform: rotate(90deg);
+  }
+
+  :global(.#{$CAT_BOX}) & {
+    position: absolute;
+    top: 0;
+    opacity: 0.15;
+    z-index: -1;
   }
 }
 
