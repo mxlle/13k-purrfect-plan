@@ -15,4 +15,5 @@ export const enTranslations: Record<TranslationKey, string> = {
   [TranslationKey.MOVES]: "Moves",
   [TranslationKey.HIGHSCORE]: "Top:",
   [TranslationKey.AVERAGE]: "Avg:",
+  [TranslationKey.POSSIBLE_SOLUTIONS]: "Remaining solutions",
 };

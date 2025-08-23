@@ -23,4 +23,5 @@ const deTranslations: Record<TranslationKey, string> = {
   [TranslationKey.MOVES]: "Züge",
   [TranslationKey.HIGHSCORE]: "Top:",
   [TranslationKey.AVERAGE]: "Ø",
+  [TranslationKey.POSSIBLE_SOLUTIONS]: "Verbleibende Lösungen",
 };

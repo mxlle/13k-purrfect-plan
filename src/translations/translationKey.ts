@@ -1,6 +1,6 @@
 import { defineEnum } from "../utils/enums";
 
-export type TranslationKey = defineEnum<typeof TranslationKey>
+export type TranslationKey = defineEnum<typeof TranslationKey>;
 export const TranslationKey = defineEnum({
   START_GAME: 0,
   NEW_GAME: 1,
@@ -16,4 +16,5 @@ export const TranslationKey = defineEnum({
   HIGHSCORE: 11,
   AVERAGE: 12,
   RESTART_GAME: 13,
-})
+  POSSIBLE_SOLUTIONS: 14,
+});

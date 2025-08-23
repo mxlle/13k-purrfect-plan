@@ -1,6 +1,6 @@
 import styles from "./game-field.module.scss";
 import { getControlsComponent, styles as controlsStyles } from "../controls/controls-component";
-import { styles as arrowStyles } from "../arrow-component/arrow-component";
+import { cssClassByDirection, styles as arrowStyles } from "../arrow-component/arrow-component";
 import { getCatIdClass, styles as catStyles } from "../cat-component/cat-component";
 
 import { createButton, createElement } from "../../utils/html-utils";
@@ -201,7 +201,7 @@ function addOnboardingSuggestionIfApplicable() {
     } else {
       const directionComponent = isTool(onboardingData.highlightedAction)
         ? undefined
-        : (document.querySelector(`.${arrowStyles.arrow}.${onboardingData?.highlightedAction}`) as HTMLElement | null);
+        : (document.querySelector(`.${arrowStyles.arrow}.${cssClassByDirection[onboardingData?.highlightedAction]}`) as HTMLElement | null);
       actionComponent = directionComponent.parentNode as HTMLElement | null;
     }
 

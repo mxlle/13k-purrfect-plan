@@ -88,6 +88,23 @@
   }
 }
 
+.solutions {
+  font-size: 0.8rem;
+  color: $text-tertiary;
+  display: flex;
+  gap: 0.4rem;
+
+  &::before {
+    content: "💡 ";
+  }
+
+  a {
+    color: $main-color;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+}
+
 .toolControls {
   display: flex;
   gap: 1rem;

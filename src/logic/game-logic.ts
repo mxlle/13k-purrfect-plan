@@ -324,3 +324,11 @@ function newCellPositionFromDirection(fromCell: CellPosition, direction: Directi
       return { ...fromCell, column: fromCell.column + 1 };
   }
 }
+
+export function getPossibleSolutionsCount(gameState: GameState | null): number | undefined {
+  if (!gameState) {
+    return undefined;
+  }
+
+  return gameState.setup.possibleSolutions.filter((solution) => gameState.moves.every((move, index) => solution[index] === move)).length;
+}

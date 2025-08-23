@@ -4,7 +4,7 @@ import { Direction, isTool, RECOVERY_TIME_MAP, Tool, TurnMove } from "../../type
 
 import styles from "./controls-component.module.scss";
 import { styles as catStyles } from "../cat-component/cat-component";
-import { isWinConditionMet, performMove } from "../../logic/game-logic";
+import { getPossibleSolutionsCount, isWinConditionMet, performMove } from "../../logic/game-logic";
 import { getArrowComponent } from "../arrow-component/arrow-component";
 import {
   ActiveRecording,
@@ -28,6 +28,7 @@ export { styles };
 let hasSetupEventListeners = false;
 let controlsComponent: HTMLElement | undefined;
 let turnMovesComponent: HTMLElement | undefined;
+let solutionsComponent: HTMLElement | undefined;
 let toolContainer: HTMLElement | undefined;
 let recoveryInfoComponent: HTMLElement | undefined;
 let activeRecording: ActiveRecording | undefined;
@@ -43,9 +44,15 @@ export function getControlsComponent(): HTMLElement {
   turnMovesComponent = createElement({
     cssClass: styles.moves,
   });
+
+  solutionsComponent = createElement({
+    cssClass: styles.solutions,
+  });
+
   updateTurnMovesComponent();
 
   controlsComponent.appendChild(turnMovesComponent);
+  controlsComponent.appendChild(solutionsComponent);
 
   const movementContainer = createElement({
     cssClass: styles.movementControls,
@@ -199,18 +206,22 @@ export function addContinueButtons() {
   });
   hasAchievedGoal && continueButton.classList.add(CssClass.PRM);
 
-  const restartButton = createButton({
-    text: getTranslation(TranslationKey.RESTART_GAME),
-    onClick: () => {
-      pubSubService.publish(PubSubEvent.START_NEW_GAME, { shouldIncreaseLevel: false });
-      newGameContainer.remove();
-    },
-  });
-
-  !hasAchievedGoal && restartButton.classList.add(CssClass.PRM);
-
   newGameContainer.appendChild(continueButton);
-  newGameContainer.appendChild(restartButton);
+
+  if (!isOnboarding()) {
+    const restartButton = createButton({
+      text: getTranslation(TranslationKey.RESTART_GAME),
+      onClick: () => {
+        pubSubService.publish(PubSubEvent.START_NEW_GAME, { shouldIncreaseLevel: false });
+        newGameContainer.remove();
+      },
+    });
+
+    !hasAchievedGoal && restartButton.classList.add(CssClass.PRM);
+    newGameContainer.appendChild(restartButton);
+  } else {
+    continueButton.classList.toggle(CssClass.PRM, true);
+  }
 
   return newGameContainer;
 }
@@ -233,9 +244,27 @@ async function handleMove(turnMove: TurnMove) {
 function updateTurnMovesComponent() {
   if (!turnMovesComponent) return;
 
+  turnMovesComponent.style.display = isOnboarding() ? "none" : "block";
   const par = getParFromGameState(globals.gameState);
   const parString = par ? ` / ${par < FALLBACK_PAR ? par : "?"}` : "";
   turnMovesComponent.innerHTML = `${getTranslation(TranslationKey.MOVES)}: ${globals.gameState?.moves.length ?? 0}${parString}`;
+
+  if (!solutionsComponent) return;
+  solutionsComponent.style.display = isOnboarding() ? "none" : "flex";
+  const solutionsCount = getPossibleSolutionsCount(globals.gameState);
+  solutionsComponent.innerHTML = `${getTranslation(TranslationKey.POSSIBLE_SOLUTIONS)}: ${solutionsCount ?? "?"}`;
+
+  if (solutionsCount === 0) {
+    const redoButton = createElement({
+      tag: "a",
+      text: getTranslation(TranslationKey.RESTART_GAME),
+      onClick: () => {
+        pubSubService.publish(PubSubEvent.START_NEW_GAME, { shouldIncreaseLevel: false });
+      },
+    });
+
+    solutionsComponent.appendChild(redoButton);
+  }
 }
 
 function updateRecoveryInfoComponent() {

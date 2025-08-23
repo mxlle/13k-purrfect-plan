@@ -5,7 +5,7 @@ import styles from "./arrow-component.module.scss";
 import arrowIcon from "./arrow-fat.svg";
 import { Direction } from "../../types";
 
-const cssClassByDirection: Record<Direction, string> = {
+export const cssClassByDirection: Record<Direction, string> = {
   [Direction.UP]: styles.up,
   [Direction.DOWN]: styles.down,
   [Direction.LEFT]: styles.left,

@@ -18,7 +18,7 @@ export const FALLBACK_PAR = 42; // Fallback value for par when no solution is fo
 export function calculatePar(gameSetup: GameSetup): ParInfo {
   const performanceStart = performance.now();
   const gameState = getInitialGameState(gameSetup);
-  console.info("Starting par calculation...", gameSetup, gameState);
+  console.debug("Starting par calculation...");
   const parInfo = calculateParInner(gameState);
   const performanceEnd = performance.now();
   const performanceTime = performanceEnd - performanceStart;
