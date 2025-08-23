@@ -59,6 +59,6 @@ function randomlyPlaceCatsOnField(gameSetup: GameSetup, iteration: number = 0): 
   return {
     ...copiedGameSetup,
     elementPositions: copiedGameSetup.elementPositions,
-    possibleSolutions: [parInfo.moves],
+    possibleSolutions: parInfo.possibleSolutions,
   };
 }

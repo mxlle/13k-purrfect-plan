@@ -29,3 +29,7 @@ export function getCatElement(id: CatId): HTMLElement {
 export function isMom(catId: CatId): boolean {
   return catId === CatId.MOTHER;
 }
+
+export function isCatId(value: any): value is CatId {
+  return Object.values(CatId).includes(value);
+}

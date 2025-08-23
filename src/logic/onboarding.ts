@@ -1,7 +1,7 @@
 import { Direction, Tool, TurnMove } from "../types";
 import { globals } from "../globals";
 import { LocalStorageKey, setLocalStorageItem } from "../utils/local-storage";
-import { CatId } from "./data/catId";
+import { ALL_CAT_IDS, CatId, isCatId } from "./data/catId";
 import { CellPosition, containsCell, EMPTY_CELL, getCellTypePlaceholders } from "./data/cell";
 import { allInConfig, ConfigCategory, emptyConfig } from "./config";
 import { ObjectId } from "./data/objects";
@@ -75,7 +75,7 @@ export function getOnboardingData(): OnboardingData | undefined {
       return {
         gameSetup: {
           ...gameSetupIntro,
-          possibleSolutions: [calculatePar(gameSetupIntro).moves],
+          possibleSolutions: calculatePar(gameSetupIntro).possibleSolutions,
         },
         highlightedAction: isFirstStep ? Direction.DOWN : undefined,
       };
@@ -118,7 +118,7 @@ export function getOnboardingData(): OnboardingData | undefined {
       };
 
       return {
-        gameSetup: { ...gameSetupIntermediate, possibleSolutions: [calculatePar(gameSetupIntermediate).moves] },
+        gameSetup: { ...gameSetupIntermediate, possibleSolutions: calculatePar(gameSetupIntermediate).possibleSolutions },
         highlightedAction: step === OnboardingStep.INTERMEDIATE_MEOW ? Tool.MEOW : undefined,
       };
     case OnboardingStep.LAST_SETUP:
@@ -132,7 +132,7 @@ export function getOnboardingData(): OnboardingData | undefined {
       return {
         gameSetup: {
           ...gameSetupLast,
-          possibleSolutions: [calculatePar(gameSetupLast).moves],
+          possibleSolutions: calculatePar(gameSetupLast).possibleSolutions,
         },
       };
     default:
@@ -166,6 +166,7 @@ function getFieldSizeFromInitialSetup(initialSetup: InitialSetup): FieldSize {
 
 function getElementPositionsFormInitialSetup(initialSetup: InitialSetup, skipPositions: CellPosition[] = []): GameElementPositions {
   const elementPositions: GameElementPositions = EMPTY_ELEMENT_MAP();
+  let lastCatPosition: CellPosition | null = null;
 
   initialSetup.forEach((row, rowIndex) => {
     row.forEach((cell, columnIndex) => {
@@ -173,8 +174,18 @@ function getElementPositionsFormInitialSetup(initialSetup: InitialSetup, skipPos
       if (cell === EMPTY_CELL) return;
 
       elementPositions[cell] = { row: rowIndex, column: columnIndex };
+
+      if (isCatId(cell)) {
+        lastCatPosition = { row: rowIndex, column: columnIndex };
+      }
     });
   });
+
+  for (const catId of ALL_CAT_IDS) {
+    if (elementPositions[catId] === null) {
+      elementPositions[catId] = lastCatPosition;
+    }
+  }
 
   return elementPositions;
 }
