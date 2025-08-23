@@ -4,27 +4,22 @@ import { createButton, createElement } from "../../utils/html-utils";
 import { getTranslation, TranslationKey } from "../../translations/i18n";
 import { globals } from "../../globals";
 import { requestAnimationFrameWithTimeout } from "../../utils/promise-utils";
-import { initializeGameField, placeCatsInitially } from "../../logic/initialize";
+import { generateRandomGameSetup } from "../../logic/initialize";
 import { handlePokiCommercial } from "../../poki-integration";
-import {
-  defaultPlacedObjects,
-  getOnboardingData,
-  increaseOnboardingStepIfApplicable,
-  isSameLevel,
-  OnboardingData,
-} from "../../logic/onboarding";
+import { getOnboardingData, increaseOnboardingStepIfApplicable, isSameLevel, OnboardingData } from "../../logic/onboarding";
 import { CssClass } from "../../utils/css-class";
 import { getControlsComponent } from "../controls/controls-component";
-import { isMother, PlacedCat } from "../../logic/data/cats";
+import { ALL_CAT_IDS, CAT_COLOR_IDS } from "../../logic/data/cats";
 import { CellPosition, getCellDifference } from "../../logic/data/cell";
 import { PubSubEvent, pubSubService } from "../../utils/pub-sub-service";
 import { isTool } from "../../types";
-import { allInConfig, shouldApplyKittenBehavior } from "../../logic/config";
+import { ConfigCategory } from "../../logic/config";
 import { FieldSize } from "../../logic/data/field-size";
-import { isMoon, PlacedObject } from "../../logic/data/objects";
+import { ALL_OBJECT_IDS, ObjectId } from "../../logic/data/objects";
 import { isValidCellPosition } from "../../logic/checks";
-import { calculatePar, copyObjects } from "../../logic/par";
 import { deserializeGame, serializeGame } from "../../logic/serializer";
+import { GameElementId, GameSetup, GameState, getInitialGameState, isValidGameSetup } from "../../logic/data/game-elements";
+import { isWinConditionMet } from "../../logic/game-logic";
 
 let mainContainer: HTMLElement | undefined;
 let gameFieldElem: HTMLElement | undefined;
@@ -36,7 +31,7 @@ const cellElements: HTMLElement[][] = [];
 const TIMEOUT_BETWEEN_GAMES = 300;
 const TIMEOUT_CELL_APPEAR = -1;
 
-export async function initializeEmptyGameField() {
+export async function initializeEmptyGameField(fieldSize: FieldSize) {
   document.body.classList.remove(CssClass.SELECTING);
 
   if (gameFieldElem) {
@@ -44,7 +39,7 @@ export async function initializeEmptyGameField() {
     return;
   }
 
-  gameFieldElem = generateGameFieldElement(globals.fieldSize);
+  gameFieldElem = generateGameFieldElement(fieldSize);
 
   addStartButton(TranslationKey.NEW_GAME, gameFieldElem);
 
@@ -64,25 +59,15 @@ function addStartButton(buttonLabelKey: TranslationKey, elementToAttachTo: HTMLE
 }
 
 export async function startNewGame(options: { shouldIncreaseLevel: boolean } = { shouldIncreaseLevel: true }) {
-  const isInitialStart = !globals.placedCats.length;
+  const isInitialStart = !globals.gameState;
 
-  if (globals.isWon && options.shouldIncreaseLevel) {
+  if (isWinConditionMet(globals.gameState) && options.shouldIncreaseLevel) {
     increaseOnboardingStepIfApplicable();
   }
 
-  document.body.classList.remove(CssClass.SELECTING, CssClass.WON);
-  globals.isWon = false;
-  globals.moves.length = 0;
+  document.body.classList.remove(CssClass.WON);
 
   startButton?.remove();
-
-  let onboardingData: OnboardingData | undefined = getOnboardingData();
-
-  if (onboardingData) {
-    globals.config = onboardingData.config;
-  } else {
-    globals.config = allInConfig;
-  }
 
   if (gameFieldElem) {
     // reset old game field
@@ -101,61 +86,55 @@ export async function startNewGame(options: { shouldIncreaseLevel: boolean } = {
 
   console.debug("Starting new game, onboarding step", globals.onboardingStep);
 
-  initializeGameField();
-
+  const onboardingData: OnboardingData | undefined = getOnboardingData();
   const gameSetupFromHash = location.hash.replace("#", "");
 
-  if (gameSetupFromHash && !onboardingData && !options.shouldIncreaseLevel) {
+  let gameSetupFromUrl: GameSetup | undefined;
+  if (isInitialStart && gameSetupFromHash && !onboardingData) {
     try {
-      const parsedGameSetup = deserializeGame(decodeURI(gameSetupFromHash));
-      globals.fieldSize = parsedGameSetup.fieldSize;
-      globals.placedCats = parsedGameSetup.placedCats;
-      globals.placedObjects = parsedGameSetup.placedObjects;
-      console.debug("Loaded game setup from hash:", parsedGameSetup);
+      gameSetupFromUrl = deserializeGame(decodeURI(gameSetupFromHash));
+      console.debug("Loaded game setup from hash:", gameSetupFromUrl);
+
+      if (!isValidGameSetup(gameSetupFromUrl)) {
+        console.warn("Invalid game setup in URL hash, ignoring it.");
+        gameSetupFromUrl = undefined;
+      }
     } catch (error) {
       console.error("Failed to parse game setup from hash:", error);
     }
-  } else {
-    globals.placedObjects =
-      options.shouldIncreaseLevel || globals.previouslyPlacedObjects.length === 0
-        ? onboardingData?.objects || copyObjects(defaultPlacedObjects)
-        : globals.previouslyPlacedObjects;
-    globals.placedCats =
-      options.shouldIncreaseLevel || globals.previouslyPlacedCats.length === 0
-        ? placeCatsInitially(globals.fieldSize, globals.placedObjects)
-        : [...globals.previouslyPlacedCats];
-
-    const serializedGameSetup = serializeGame({
-      fieldSize: globals.fieldSize,
-      placedCats: globals.placedCats,
-      placedObjects: globals.placedObjects,
-    });
-    location.hash = onboardingData ? "" : `#${serializedGameSetup}`;
   }
 
-  globals.previouslyPlacedObjects = copyObjects(globals.placedObjects);
-  globals.previouslyPlacedCats = copyObjects(globals.placedCats);
+  let gameSetup: GameSetup;
+  if (gameSetupFromUrl) {
+    gameSetup = gameSetupFromUrl;
+  } else {
+    if (!options.shouldIncreaseLevel && globals.gameState) {
+      gameSetup = globals.gameState.setup;
+    } else {
+      gameSetup = onboardingData ? onboardingData.gameSetup : generateRandomGameSetup();
+    }
+  }
 
-  globals.motherCat = globals.placedCats.find(isMother);
+  if (!isValidGameSetup(gameSetup)) {
+    throw new Error("Generated or provided game setup is invalid, cannot start game.", { cause: gameSetup });
+  }
 
-  const performanceStart = performance.now();
-  const parInfo = calculatePar(globals.placedCats, globals.placedObjects, []);
-  globals.par = parInfo.par;
-  const performanceEnd = performance.now();
-  const performanceTime = performanceEnd - performanceStart;
-  console.debug("Calculated par:", parInfo.moves.join(" > "), parInfo.par, "Time taken:", Math.round(performanceTime), "ms");
+  globals.gameState = getInitialGameState(gameSetup);
+  const serializedGameSetup = serializeGame(gameSetup);
+  location.hash = onboardingData ? "" : `#${serializedGameSetup}`;
+  document.body.style.setProperty("--s-cnt", globals.gameState.setup.fieldSize.toString());
 
   pubSubService.publish(PubSubEvent.GAME_START);
 
   if (!gameFieldElem) {
-    gameFieldElem = generateGameFieldElement(globals.fieldSize);
+    gameFieldElem = generateGameFieldElement(globals.gameState.setup.fieldSize);
     appendGameField();
     await requestAnimationFrameWithTimeout(TIMEOUT_BETWEEN_GAMES);
   }
 
-  await initializeObjectsOnGameField(globals.placedObjects);
+  await initializeObjectsOnGameField(globals.gameState);
 
-  await initializeCatsOnGameField(globals.placedCats, isInitialStart);
+  await initializeCatsOnGameField(globals.gameState, isInitialStart);
 
   addOnboardingSuggestionIfApplicable();
 }
@@ -184,35 +163,20 @@ export function getCellElement(cell: CellPosition): HTMLElement {
   return cellElements[cell.row]?.[cell.column];
 }
 
-function getMiddleCoordinates(): CellPosition | undefined {
-  if (!gameFieldElem) {
-    console.warn("No game field element to get middle cell from");
-    return undefined;
-  }
-
-  const rowCount = globals.fieldSize.height;
-  const columnCount = globals.fieldSize.width;
-
-  const middleRow = Math.floor((rowCount - 1) / 2);
-  const middleColumn = Math.floor((columnCount - 1) / 2);
-
-  return { row: middleRow, column: middleColumn };
-}
-
 export function generateGameFieldElement(fieldSize: FieldSize) {
   const gameField = createElement({
     cssClass: CssClass.FIELD,
   });
   cellElements.length = 0;
 
-  for (let rowIndex = 0; rowIndex < fieldSize.height; rowIndex++) {
+  for (let rowIndex = 0; rowIndex < fieldSize; rowIndex++) {
     const rowElements: HTMLElement[] = [];
     const rowElem = createElement({
       cssClass: "row",
     });
     gameField.append(rowElem);
 
-    for (let columnIndex = 0; columnIndex < fieldSize.width; columnIndex++) {
+    for (let columnIndex = 0; columnIndex < fieldSize; columnIndex++) {
       const cellElement = createElement({ cssClass: CssClass.CELL });
 
       rowElem.append(cellElement);
@@ -251,18 +215,17 @@ function addOnboardingSuggestionIfApplicable() {
   }
 }
 
-export async function initializeCatsOnGameField(cats: PlacedCat[], isInitialStart: boolean) {
-  const middleCellPosition = getMiddleCoordinates();
-  const middleCellElement = getCellElement(middleCellPosition);
-  const sortedCats = [...cats].sort((a, b) => a.id - b.id);
+export async function initializeCatsOnGameField(gameState: GameState, isInitialStart: boolean) {
+  for (const catId of ALL_CAT_IDS) {
+    const representation = gameState.representations[catId];
 
-  for (let i = 0; i < sortedCats.length; i++) {
-    const cat = sortedCats[i];
-    middleCellElement.append(cat.catElement);
-    cat.initialPosition = { ...middleCellPosition };
-
-    if (shouldApplyKittenBehavior(cat)) {
-      cat.catElement.classList.add(`${CssClass.CAT_COLOR}${cat.id}`);
+    if (representation) {
+      const cellElement = getCellElement(representation.initialPosition);
+      cellElement.append(representation.htmlElement);
+      representation.htmlElement.classList.toggle(
+        `${CssClass.CAT_COLOR}${CAT_COLOR_IDS[catId]}`,
+        gameState.setup.config[ConfigCategory.KITTEN_BEHAVIOR][catId],
+      );
     }
   }
 
@@ -270,36 +233,37 @@ export async function initializeCatsOnGameField(cats: PlacedCat[], isInitialStar
     await requestAnimationFrameWithTimeout(TIMEOUT_BETWEEN_GAMES);
   }
 
-  updateAllPositions();
+  updateAllPositions(gameState);
 }
 
-export async function initializeObjectsOnGameField(placedObjects: PlacedObject[]) {
-  for (let i = 0; i < placedObjects.length; i++) {
-    const gameObject = placedObjects[i];
-    gameObject.initialPosition = { row: gameObject.row, column: gameObject.column };
-    const cellElement = getCellElement(gameObject);
-    cellElement.append(gameObject.objectElement);
+export async function initializeObjectsOnGameField(gameState: GameState) {
+  for (const objId of ALL_OBJECT_IDS) {
+    const representation = gameState.representations[objId];
+
+    if (representation) {
+      const cellElement = getCellElement(representation.initialPosition);
+      cellElement.append(representation.htmlElement);
+    }
   }
 }
 
-export function updateAllPositions() {
-  globals.placedCats.forEach((cat) => {
-    const diff = getCellDifference(cat, cat.initialPosition);
-    cat.catElement.style.transform = `translate(${diff.column * 100}%, ${diff.row * 100}%)`;
-  });
+export function updateAllPositions(gameState: GameState) {
+  for (const gameElementId in gameState.representations) {
+    const representation = gameState.representations[gameElementId as GameElementId];
+    const position = gameState.currentPositions[gameElementId as GameElementId];
+    if (representation === null || position === null) continue;
 
-  globals.placedObjects.forEach((obj) => {
-    const diff = getCellDifference(obj, obj.initialPosition);
-    obj.objectElement.style.transform = `translate(${diff.column * 100}%, ${diff.row * 100}%)`;
+    const diff = getCellDifference(position, representation.initialPosition);
+    representation.htmlElement.style.transform = `translate(${diff.column * 100}%, ${diff.row * 100}%)`;
 
-    if (isMoon(obj)) {
-      if (!isValidCellPosition(globals.fieldSize, obj, [])) {
-        obj.objectElement.style.opacity = "0";
+    if (gameElementId === ObjectId.MOON) {
+      if (!isValidCellPosition(gameState, position)) {
+        representation.htmlElement.style.opacity = "0";
         document.body.classList.toggle(CssClass.DARKNESS, true);
       } else {
-        obj.objectElement.style.opacity = "1";
+        representation.htmlElement.style.opacity = "1";
         document.body.classList.toggle(CssClass.DARKNESS, false);
       }
     }
-  });
+  }
 }

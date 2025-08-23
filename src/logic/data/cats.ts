@@ -1,15 +1,14 @@
-import { CellPosition } from "./cell";
 import { createCatElement } from "../../components/cat-component/cat-component";
 
 export enum CatId {
-  MOTHER,
-  MOONY,
-  IVY,
-  SPLASHY,
+  MOTHER = "🟣",
+  MOONY = "🟡",
+  IVY = "🟢",
+  SPLASHY = "🔵",
 }
 
-export const ALL_CAT_IDS = Object.values(CatId).filter((id) => typeof id === "number") as CatId[];
-export const ALL_KITTEN_IDS = ALL_CAT_IDS.filter((id) => id !== CatId.MOTHER);
+export const ALL_CAT_IDS = Object.values(CatId) as CatId[];
+export const ALL_KITTEN_IDS = ALL_CAT_IDS.filter((id) => !isMom(id)) as KittenId[];
 
 export type KittenId = Exclude<CatId, CatId.MOTHER>;
 
@@ -20,64 +19,24 @@ export const CAT_NAMES: Record<CatId, string> = {
   [CatId.SPLASHY]: "Splashy",
 };
 
-export const CAT_IDENTIFIER: Record<CatId, string> = {
-  [CatId.MOTHER]: "🟣",
-  [CatId.MOONY]: "🟡",
-  [CatId.IVY]: "🟢",
-  [CatId.SPLASHY]: "🔵",
+export const CAT_COLOR_IDS: Record<CatId, number> = {
+  [CatId.MOTHER]: 0,
+  [CatId.MOONY]: 1,
+  [CatId.IVY]: 2,
+  [CatId.SPLASHY]: 3,
 };
 
-const cachedCats: Record<CatId, Cat> = {
-  [CatId.MOTHER]: createCat(CatId.MOTHER),
-  [CatId.MOONY]: createCat(CatId.MOONY),
-  [CatId.IVY]: createCat(CatId.IVY),
-  [CatId.SPLASHY]: createCat(CatId.SPLASHY),
+const cachedCatElements: Record<CatId, HTMLElement> = {
+  [CatId.MOTHER]: createCatElement(CatId.MOTHER),
+  [CatId.MOONY]: createCatElement(CatId.MOONY),
+  [CatId.IVY]: createCatElement(CatId.IVY),
+  [CatId.SPLASHY]: createCatElement(CatId.SPLASHY),
 };
 
-type CatName = (typeof CAT_NAMES)[CatId];
-
-export interface BaseCat {
-  readonly id: CatId;
-  readonly name: CatName;
-  awake: boolean;
+export function getCatElement(id: CatId): HTMLElement {
+  return cachedCatElements[id];
 }
 
-export interface Cat extends BaseCat {
-  catElement: HTMLElement;
-  inventory?: InventoryItem;
-}
-
-export interface PlacedCat extends Cat, CellPosition {
-  initialPosition?: CellPosition;
-}
-
-export type InventoryItem = PlacedCat;
-
-export const INITIAL_MOTHER_CAT: PlacedCat = {
-  ...getCat(CatId.MOTHER),
-  row: 0,
-  column: 0,
-};
-
-function createCat(id: CatId): Cat {
-  const name = CAT_NAMES[id];
-
-  const baseCat: BaseCat = {
-    id,
-    name,
-    awake: true,
-  };
-
-  return {
-    ...baseCat,
-    catElement: createCatElement(baseCat),
-  };
-}
-
-export function getCat(id: CatId): Cat {
-  return cachedCats[id];
-}
-
-export function isMother(cat: BaseCat): boolean {
-  return cat.id === CatId.MOTHER;
+export function isMom(catId: CatId): boolean {
+  return catId === CatId.MOTHER;
 }

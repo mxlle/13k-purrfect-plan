@@ -3,7 +3,7 @@ import { CssClass } from "../../utils/css-class";
 import { Direction, isTool, RECOVERY_TIME_MAP, Tool, TurnMove } from "../../types";
 
 import "./controls-component.scss";
-import { performMove } from "../../logic/game-logic";
+import { isWinConditionMet, performMove } from "../../logic/game-logic";
 import { getArrowComponent } from "../arrow-component/arrow-component";
 import {
   ActiveRecording,
@@ -19,6 +19,7 @@ import { isOnboarding } from "../../logic/onboarding";
 
 import { ConfigCategory } from "../../logic/config";
 import { FALLBACK_PAR } from "../../logic/par";
+import { getParFromGameState } from "../../logic/data/game-elements";
 
 let hasSetupEventListeners = false;
 let controlsComponent: HTMLElement | undefined;
@@ -181,7 +182,7 @@ function setupEventListeners() {
 }
 
 export function addContinueButtons() {
-  const hasAchievedGoal = globals.isWon && globals.moves.length <= globals.par;
+  const hasAchievedGoal = isWinConditionMet(globals.gameState) && globals.gameState.moves.length <= getParFromGameState(globals.gameState);
 
   const newGameContainer = createElement({ cssClass: CssClass.NEW_GAME_CONTAINER });
 
@@ -215,11 +216,11 @@ async function handleMove(turnMove: TurnMove) {
     return;
   }
 
-  await performMove(turnMove);
+  await performMove(globals.gameState, turnMove);
   updateTurnMovesComponent();
 
   if (isTool(turnMove)) {
-    toolsFrozenUntilTurn = globals.moves.length + RECOVERY_TIME_MAP[turnMove];
+    toolsFrozenUntilTurn = globals.gameState.moves.length + RECOVERY_TIME_MAP[turnMove];
   }
 
   updateRecoveryInfoComponent();
@@ -228,8 +229,9 @@ async function handleMove(turnMove: TurnMove) {
 function updateTurnMovesComponent() {
   if (!turnMovesComponent) return;
 
-  const parString = globals.par ? ` / ${globals.par < FALLBACK_PAR ? globals.par : "?"}` : "";
-  turnMovesComponent.innerHTML = `${getTranslation(TranslationKey.MOVES)}: ${globals.moves.length}${parString}`;
+  const par = getParFromGameState(globals.gameState);
+  const parString = par ? ` / ${par < FALLBACK_PAR ? par : "?"}` : "";
+  turnMovesComponent.innerHTML = `${getTranslation(TranslationKey.MOVES)}: ${globals.gameState.moves.length}${parString}`;
 }
 
 function updateRecoveryInfoComponent() {
@@ -241,7 +243,7 @@ function updateRecoveryInfoComponent() {
     return;
   }
 
-  const turnsLeft = toolsFrozenUntilTurn - globals.moves.length;
+  const turnsLeft = toolsFrozenUntilTurn - globals.gameState.moves.length;
   recoveryInfoComponent.innerHTML = `${turnsLeft}`;
   toolContainer.classList.toggle(CssClass.DISABLED, turnsLeft > 0);
 
@@ -254,7 +256,7 @@ function updateRecoveryInfoComponent() {
 function updateToolContainer() {
   if (!toolContainer) return;
 
-  const shouldHaveTools = Object.values(globals.config[ConfigCategory.TOOLS]).some(Boolean);
+  const shouldHaveTools = Object.values(globals.gameState.setup.config[ConfigCategory.TOOLS]).some(Boolean);
 
   toolContainer.classList.toggle(CssClass.HIDDEN, !shouldHaveTools);
 }

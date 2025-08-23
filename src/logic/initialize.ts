@@ -1,76 +1,64 @@
-import { getOnboardingData, OnboardingData } from "./onboarding";
-import { globals } from "../globals";
+import { defaultPlacedObjects } from "./onboarding";
 import { shuffleArray } from "../utils/random-utils";
 import { getEmptyFields } from "./checks";
-import { ALL_CAT_IDS, Cat, getCat, PlacedCat } from "./data/cats";
+import { ALL_CAT_IDS } from "./data/cats";
 import { CellPosition } from "./data/cell";
-import { shouldIncludeCat } from "./config";
+import { allInConfig, Config } from "./config";
 import { DEFAULT_FIELD_SIZE, FieldSize } from "./data/field-size";
-import { PlacedObject } from "./data/objects";
+import { copyGameSetup, EMPTY_ELEMENT_MAP, GameElementPositions, GameSetup, isValidGameSetup } from "./data/game-elements";
 import { calculatePar, MAX_PAR, MIN_PAR } from "./par";
+import { ALL_OBJECT_IDS } from "./data/objects";
 
-export function placeCatsInitially(fieldSize: FieldSize, placedObjects: PlacedObject[]): PlacedCat[] {
-  let onboardingData: OnboardingData | undefined = getOnboardingData();
+export function generateRandomGameSetup(fieldSize: FieldSize = DEFAULT_FIELD_SIZE, config: Config = allInConfig): GameSetup {
+  const placedObjects = defaultPlacedObjects;
+  const elementPositions: GameElementPositions = EMPTY_ELEMENT_MAP();
 
-  let placedCats: PlacedCat[];
-
-  if (onboardingData) {
-    placedCats = applyPredefinedPositionsOfCats(onboardingData);
-  } else {
-    const time = performance.now();
-    placedCats = randomlyApplyCatsOnBoard(fieldSize, ALL_CAT_IDS.map(getCat), placedObjects);
-    console.info("Randomly applying cats took: ", Math.round(performance.now() - time) + "ms");
+  for (const obj of ALL_OBJECT_IDS) {
+    elementPositions[obj] = { ...placedObjects[obj] };
   }
 
-  return placedCats;
+  const tempGameSetup: GameSetup = {
+    fieldSize,
+    elementPositions,
+    config,
+    possibleSolutions: [],
+  };
+
+  const finalGameSetup = randomlyPlaceCatsOnField(tempGameSetup);
+
+  return { ...finalGameSetup };
 }
 
-export function initializeGameField() {
-  let onboardingData: OnboardingData | undefined = getOnboardingData();
-
-  globals.fieldSize = onboardingData ? onboardingData.field : DEFAULT_FIELD_SIZE;
-
-  document.body.style.setProperty("--s-cnt", globals.fieldSize.width.toString());
-}
-
-function randomlyApplyCatsOnBoard(
-  fieldSize: FieldSize,
-  characters: Cat[],
-  placedObjects: PlacedObject[],
-  iteration: number = 0,
-): PlacedCat[] {
-  const placedCats: PlacedCat[] = [];
-  const copyOfCharacters = [...characters];
-  const emptyFields = getEmptyFields(fieldSize, [], placedObjects);
-  const shuffledRequiredFields = shuffleArray(emptyFields).slice(0, copyOfCharacters.length);
+function randomlyPlaceCatsOnField(gameSetup: GameSetup, iteration: number = 0): GameSetup {
+  const copiedGameSetup = copyGameSetup(gameSetup);
+  const cats = [...ALL_CAT_IDS];
+  const emptyFields = getEmptyFields(copiedGameSetup);
+  const shuffledRequiredFields = shuffleArray(emptyFields).slice(0, cats.length);
   shuffledRequiredFields.forEach((cell: CellPosition) => {
-    const cat = copyOfCharacters.pop();
+    const cat = cats.pop();
 
     if (!cat) {
       return;
     }
 
-    const { row, column } = cell;
-    placedCats.push({ ...cat, row, column });
+    copiedGameSetup.elementPositions[cat] = cell;
   });
 
-  const parInfo = calculatePar(placedCats, placedObjects, []);
+  if (!isValidGameSetup(copiedGameSetup) && iteration === 0) {
+    console.error("not all cats placed");
+  }
+
+  const parInfo = calculatePar(copiedGameSetup);
 
   if ((parInfo.par > MAX_PAR || parInfo.par < MIN_PAR) && iteration < 10) {
     console.info("not a good setup");
 
-    return randomlyApplyCatsOnBoard(fieldSize, characters, placedObjects, iteration + 1);
+    return randomlyPlaceCatsOnField(copiedGameSetup, iteration + 1);
   }
 
-  if (iteration >= 10) {
-    console.warn("Failed to find a good setup after 10 iterations, returning current setup");
-  }
-
-  return placedCats;
-}
-
-function applyPredefinedPositionsOfCats(onboardingData: OnboardingData): PlacedCat[] {
-  const { cats } = onboardingData;
-
-  return cats.filter(shouldIncludeCat);
+  return {
+    ...copiedGameSetup,
+    elementPositions: copiedGameSetup.elementPositions,
+    possibleSolutions: [parInfo.moves],
+  };
 }

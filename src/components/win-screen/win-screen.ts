@@ -14,6 +14,7 @@ import {
 } from "../../logic/difficulty";
 import { globals } from "../../globals";
 import { PubSubEvent, pubSubService } from "../../utils/pub-sub-service";
+import { isWinConditionMet } from "../../logic/game-logic";
 
 let winDialog: Dialog | undefined;
 let difficultyElement: HTMLElement | undefined;
@@ -43,7 +44,9 @@ function updateConfirmText(isComplete: boolean) {
 
 function getConfirmText(isComplete: boolean) {
   if (getOnboardingData()) {
-    return isComplete || globals.isWon ? getTranslation(TranslationKey.CONTINUE) : getTranslation(TranslationKey.NEW_GAME);
+    return isComplete || isWinConditionMet(globals.gameState)
+      ? getTranslation(TranslationKey.CONTINUE)
+      : getTranslation(TranslationKey.NEW_GAME);
   }
 
   return getTranslation(TranslationKey.NEW_GAME) + " " + difficultyEmoji[globals.difficulty];
@@ -58,7 +61,7 @@ function getWinScreenContent(score: number, isComplete: boolean) {
     cssClass: "menu",
   });
 
-  if (isComplete || globals.isWon) {
+  if (isComplete || isWinConditionMet(globals.gameState)) {
     const scoreText = isOnboarding() ? "" : "<br/>" + score + "⭐️";
 
     winContentElem.innerHTML = getTranslation(TranslationKey.WIN) + scoreText;

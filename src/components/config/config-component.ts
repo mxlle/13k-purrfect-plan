@@ -2,7 +2,7 @@ import { createElement } from "../../utils/html-utils";
 import { CssClass } from "../../utils/css-class";
 
 import "./config-component.scss";
-import { ALL_CAT_IDS, getCat, isMother } from "../../logic/data/cats";
+import { ALL_KITTEN_IDS, getCatElement } from "../../logic/data/cats";
 import { globals } from "../../globals";
 import { createObjectElement } from "../object-component/object-component";
 import { allCategories, ConfigCategory, ConfigItemId } from "../../logic/config";
@@ -38,10 +38,9 @@ function getConfigCategoryElement(category: ConfigCategory): HTMLElement {
 
   switch (category) {
     case ConfigCategory.CATS:
-      const allCats = ALL_CAT_IDS.map(getCat).filter((cat) => !isMother(cat));
-      for (const cat of allCats) {
-        const catElem = cat.catElement.cloneNode(true);
-        transformToConfigItemElement(category, cat.id, catElem as HTMLElement);
+      for (const kittenId of ALL_KITTEN_IDS) {
+        const catElem = getCatElement(kittenId).cloneNode(true);
+        transformToConfigItemElement(category, kittenId, catElem as HTMLElement);
         contentElem.appendChild(catElem);
       }
       break;
@@ -63,13 +62,13 @@ function getConfigCategoryElement(category: ConfigCategory): HTMLElement {
 }
 
 function transformToConfigItemElement(category: ConfigCategory, id: ConfigItemId, itemElement: HTMLElement) {
-  if (globals.config[category][id]) {
+  if (globals.gameState.setup.config[category][id]) {
     itemElement.classList.add(CssClass.SELECTED);
   }
 
   itemElement.onclick = () => {
-    const newValue = !globals.config[category][id];
-    globals.config[category][id] = newValue;
+    const newValue = !globals.gameState.setup.config[category][id];
+    globals.gameState.setup.config[category][id] = newValue;
     itemElement.classList.toggle(CssClass.SELECTED, newValue);
   };
 }

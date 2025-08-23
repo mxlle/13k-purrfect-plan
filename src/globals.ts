@@ -1,28 +1,16 @@
-import { GameMetaData, Settings, TurnMove } from "./types";
+import { Settings } from "./types";
 import { getLocalStorageItem, LocalStorageKey } from "./utils/local-storage";
 import { Difficulty, difficultySettings } from "./logic/difficulty";
-import { INITIAL_MOTHER_CAT, PlacedCat } from "./logic/data/cats";
-import { allInConfig, Config } from "./logic/config";
-import { PlacedObject } from "./logic/data/objects";
-import { DEFAULT_FIELD_SIZE, FieldSize } from "./logic/data/field-size";
+import { GameState } from "./logic/data/game-elements";
+import { isWinConditionMet } from "./logic/game-logic";
 
 interface GameGlobals {
-  config: Config;
   previousOnboardingStep: number | undefined;
   onboardingStep: number;
-  fieldSize: FieldSize;
-  motherCat: PlacedCat;
-  placedCats: PlacedCat[];
-  previouslyPlacedCats: PlacedCat[];
-  placedObjects: PlacedObject[];
-  previouslyPlacedObjects: PlacedObject[];
+  gameState: GameState | undefined;
   language: string;
   difficulty: Difficulty;
   settings: Settings;
-  isWon: boolean;
-  metaData?: GameMetaData;
-  moves: TurnMove[];
-  par?: number;
 }
 
 const onboardingStepSetting = getLocalStorageItem(LocalStorageKey.ONBOARDING_STEP);
@@ -32,20 +20,12 @@ const initialDifficulty: Difficulty = difficultySetting ? Number(difficultySetti
 const initialSettings = difficultySettings[initialDifficulty];
 
 const defaultGlobals: GameGlobals = {
-  config: allInConfig,
   previousOnboardingStep: undefined,
   onboardingStep: onboardingStepSetting ? Number(onboardingStepSetting) : 0,
-  fieldSize: DEFAULT_FIELD_SIZE,
-  motherCat: INITIAL_MOTHER_CAT,
-  placedCats: [],
-  previouslyPlacedCats: [],
-  placedObjects: [],
-  previouslyPlacedObjects: [],
+  gameState: undefined,
   language: "en",
   difficulty: initialDifficulty,
   settings: initialSettings,
-  isWon: false,
-  moves: [],
 };
 
 export const globals: GameGlobals = { ...defaultGlobals };
@@ -65,5 +45,5 @@ function getNumFromParam(param: string, fallback: number) {
 }
 
 export function isGameInProgress(): boolean {
-  return !globals.isWon && globals.placedCats.length > 0;
+  return globals.gameState !== undefined && !isWinConditionMet(globals.gameState);
 }

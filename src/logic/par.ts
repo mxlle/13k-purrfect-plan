@@ -1,8 +1,7 @@
-import { PlacedCat } from "./data/cats";
-import { PlacedObject } from "./data/objects";
 import { ALL_TURN_MOVES, TurnMove } from "../types";
 import { calculateNewPositions, isValidMove, isWinConditionMet } from "./game-logic";
 import { shuffleArray } from "../utils/random-utils";
+import { copyGameState, GameSetup, GameState, getInitialGameState } from "./data/game-elements";
 
 interface ParInfo {
   par: number;
@@ -16,14 +15,27 @@ export const MIN_PAR = 3;
 
 export const FALLBACK_PAR = 42; // Fallback value for par when no solution is found
 
-export function calculatePar(placedCats: PlacedCat[], placedObjects: PlacedObject[], previousMoves: TurnMove[]): ParInfo {
+export function calculatePar(gameSetup: GameSetup): ParInfo {
+  const performanceStart = performance.now();
+  const gameState = getInitialGameState(gameSetup);
+  const parInfo = calculateParInner(gameState);
+  const performanceEnd = performance.now();
+  const performanceTime = performanceEnd - performanceStart;
+  console.info("Calculated par:", parInfo.moves.join(" > "), parInfo.par, "Time taken:", Math.round(performanceTime), "ms");
+
+  return parInfo;
+}
+
+function calculateParInner(gameState: GameState): ParInfo {
+  const previousMoves = gameState.moves;
+
   if (previousMoves.length === 0) {
     iterationCount = 1; // Reset iteration count for a new calculation
   } else {
     iterationCount++;
   }
 
-  if (isWinConditionMet(placedCats)) {
+  if (isWinConditionMet(gameState)) {
     return { par: 0, moves: previousMoves }; // Already won, no moves needed
   }
 
@@ -37,18 +49,17 @@ export function calculatePar(placedCats: PlacedCat[], placedObjects: PlacedObjec
   const shuffledMoves = shuffleArray([...ALL_TURN_MOVES]);
 
   for (const move of shuffledMoves) {
-    if (!isValidMove(move, placedCats, placedObjects, previousMoves)) {
+    if (!isValidMove(gameState, move)) {
       continue; // Tool is still in recovery, skip this move
     }
 
-    const newMoves = [...previousMoves, move];
-    const newPlacedCats = copyObjects(placedCats);
-    const newPlacedObjects = copyObjects(placedObjects);
+    const copiedGameState = copyGameState(gameState);
+    copiedGameState.moves.push(move);
 
-    calculateNewPositions(move, newPlacedCats, newPlacedObjects);
+    calculateNewPositions(copiedGameState, move);
 
     // Recursively calculate par for the next moves
-    const parInfo = calculatePar(newPlacedCats, newPlacedObjects, newMoves);
+    const parInfo = calculateParInner(copiedGameState);
     const newPar = parInfo.par + 1;
 
     if (parInfo.par === 0) {
@@ -61,12 +72,8 @@ export function calculatePar(placedCats: PlacedCat[], placedObjects: PlacedObjec
   }
 
   if (previousMoves.length === 0) {
-    console.debug(`Par calculation completed after ${iterationCount} iterations.`);
+    console.info(`Par calculation completed after ${iterationCount} iterations.`);
   }
 
   return bestParInfo;
-}
-
-export function copyObjects<T>(objects: T[]): T[] {
-  return objects.map((obj) => ({ ...obj })); // Shallow copy for simplicity
 }

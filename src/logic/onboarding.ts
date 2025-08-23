@@ -1,11 +1,13 @@
 import { Direction, Tool, TurnMove } from "../types";
 import { globals } from "../globals";
 import { LocalStorageKey, setLocalStorageItem } from "../utils/local-storage";
-import { ALL_CAT_IDS, CatId, getCat, PlacedCat } from "./data/cats";
+import { CatId } from "./data/cats";
 import { CellPosition, containsCell, EMPTY_CELL, getCellTypePlaceholders } from "./data/cell";
-import { allInConfig, Config, ConfigCategory, emptyConfig } from "./config";
-import { getObject, ObjectId, PlacedObject } from "./data/objects";
+import { allInConfig, ConfigCategory, emptyConfig } from "./config";
+import { ObjectId } from "./data/objects";
 import { FieldSize } from "./data/field-size";
+import { EMPTY_ELEMENT_MAP, GameElementPositions, GameSetup } from "./data/game-elements";
+import { calculatePar } from "./par";
 
 export const enum OnboardingStep {
   INTRO = 0,
@@ -24,11 +26,8 @@ export function isSameLevel() {
 }
 
 export interface OnboardingData {
-  field: FieldSize;
-  cats: PlacedCat[];
-  objects: PlacedObject[];
+  gameSetup: GameSetup;
   highlightedAction?: TurnMove;
-  config: Config;
 }
 
 const lastSetup: InitialSetup = (() => {
@@ -42,7 +41,7 @@ const lastSetup: InitialSetup = (() => {
   ];
 })();
 
-export const defaultPlacedObjects = getPlacedGameElementsFromInitialSetup(lastSetup).objects;
+export const defaultPlacedObjects = getElementPositionsFormInitialSetup(lastSetup);
 
 export function getOnboardingData(): OnboardingData | undefined {
   const step = globals.onboardingStep;
@@ -62,13 +61,21 @@ export function getOnboardingData(): OnboardingData | undefined {
       const isFirstStep = step === OnboardingStep.INTRO;
       skipPositions = isFirstStep ? [{ row: 2, column: 2 }] : [];
 
-      return {
-        field: getFieldSizeFromInitialSetup(introSetup),
-        ...getPlacedGameElementsFromInitialSetup(introSetup, skipPositions),
-        highlightedAction: isFirstStep ? Direction.DOWN : undefined,
+      const gameSetupIntro: GameSetup = {
+        fieldSize: getFieldSizeFromInitialSetup(introSetup),
+        elementPositions: getElementPositionsFormInitialSetup(introSetup, skipPositions),
         config: {
           ...emptyConfig,
         },
+        possibleSolutions: [],
+      };
+
+      return {
+        gameSetup: {
+          ...gameSetupIntro,
+          possibleSolutions: [calculatePar(gameSetupIntro).moves],
+        },
+        highlightedAction: isFirstStep ? Direction.DOWN : undefined,
       };
     case OnboardingStep.INTERMEDIATE_MEOW:
     case OnboardingStep.INTERMEDIATE_OBJECTS:
@@ -89,10 +96,9 @@ export function getOnboardingData(): OnboardingData | undefined {
           ]
         : [];
 
-      return {
-        field: getFieldSizeFromInitialSetup(intermediateSetup),
-        ...getPlacedGameElementsFromInitialSetup(intermediateSetup, skipPositions),
-        highlightedAction: step === OnboardingStep.INTERMEDIATE_MEOW ? Tool.MEOW : undefined,
+      const gameSetupIntermediate: GameSetup = {
+        fieldSize: getFieldSizeFromInitialSetup(intermediateSetup),
+        elementPositions: getElementPositionsFormInitialSetup(intermediateSetup, skipPositions),
         config: {
           ...emptyConfig,
           [ConfigCategory.CATS]: { ...emptyConfig[ConfigCategory.CATS], [CatId.MOONY]: true, [CatId.IVY]: true },
@@ -106,12 +112,26 @@ export function getOnboardingData(): OnboardingData | undefined {
             [Tool.MEOW]: true,
           },
         },
+        possibleSolutions: [],
+      };
+
+      return {
+        gameSetup: { ...gameSetupIntermediate, possibleSolutions: [calculatePar(gameSetupIntermediate).moves] },
+        highlightedAction: step === OnboardingStep.INTERMEDIATE_MEOW ? Tool.MEOW : undefined,
       };
     case OnboardingStep.LAST_SETUP:
-      return {
-        field: getFieldSizeFromInitialSetup(lastSetup),
-        ...getPlacedGameElementsFromInitialSetup(lastSetup),
+      const gameSetupLast: GameSetup = {
+        fieldSize: getFieldSizeFromInitialSetup(lastSetup),
+        elementPositions: getElementPositionsFormInitialSetup(lastSetup),
         config: allInConfig,
+        possibleSolutions: [],
+      };
+
+      return {
+        gameSetup: {
+          ...gameSetupLast,
+          possibleSolutions: [calculatePar(gameSetupLast).moves],
+        },
       };
     default:
       return undefined;
@@ -139,75 +159,20 @@ export function increaseOnboardingStepIfApplicable() {
 type InitialSetup = (ObjectId | CatId | typeof EMPTY_CELL)[][];
 
 function getFieldSizeFromInitialSetup(initialSetup: InitialSetup): FieldSize {
-  const height = initialSetup.length;
-  const width = initialSetup[0]?.length || 1;
-  return { width, height };
+  return initialSetup.length as FieldSize;
 }
 
-interface PlacedGameElements {
-  cats: PlacedCat[];
-  objects: PlacedObject[];
-}
+function getElementPositionsFormInitialSetup(initialSetup: InitialSetup, skipPositions: CellPosition[] = []): GameElementPositions {
+  const elementPositions: GameElementPositions = EMPTY_ELEMENT_MAP();
 
-function getPlacedGameElementsFromInitialSetup(initialSetup: InitialSetup, skipPositions: CellPosition[] = []): PlacedGameElements {
-  const cats: PlacedCat[] = [];
-  const objects: PlacedObject[] = [];
-  let lastKitten: PlacedCat | undefined;
   initialSetup.forEach((row, rowIndex) => {
     row.forEach((cell, columnIndex) => {
       if (containsCell(skipPositions, { row: rowIndex, column: columnIndex })) return;
+      if (cell === EMPTY_CELL) return;
 
-      if (typeof cell === "number") {
-        const catId = cell as CatId;
-        const cat = getCat(catId);
-
-        if (cats.some((c) => c.id === catId)) {
-          // TODO - remove after development phase
-          throw new Error(`Duplicate cat ID found: ${catId}`);
-        }
-
-        const placedCat: PlacedCat = {
-          ...cat,
-          row: rowIndex,
-          column: columnIndex,
-        };
-
-        cats.push(placedCat);
-
-        lastKitten = placedCat;
-      } else if (typeof cell === "string" && cell !== EMPTY_CELL) {
-        const gameObject = getObject(cell);
-
-        if (objects.some((o) => o.id === gameObject.id)) {
-          // TODO - remove after development phase
-          throw new Error(`Duplicate object ID found: ${gameObject.id}`);
-        }
-
-        const placedObject: PlacedObject = {
-          ...gameObject,
-          row: rowIndex,
-          column: columnIndex,
-        };
-
-        objects.push(placedObject);
-      }
+      elementPositions[cell] = { row: rowIndex, column: columnIndex };
     });
   });
 
-  if (cats.length !== ALL_CAT_IDS.length && lastKitten) {
-    ALL_CAT_IDS.forEach((catId) => {
-      if (!cats.some((c) => c.id === catId)) {
-        const cat = getCat(catId);
-        cats.push({
-          ...cat,
-          row: lastKitten.row,
-          column: lastKitten.column,
-        });
-      }
-    });
-  }
-
-  cats.sort((a, b) => a.id - b.id); // Sort cats by their ID for consistency
-
-  return { cats, objects };
+  return elementPositions;
 }

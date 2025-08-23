@@ -1,72 +1,38 @@
-import { DEFAULT_FIELD_SIZE, FieldSize } from "./data/field-size";
-import { getObject, isMoon, ObjectId, PlacedObject } from "./data/objects";
-import { ALL_CAT_IDS, CAT_IDENTIFIER, CatId, getCat, PlacedCat } from "./data/cats";
-
-interface GameSetup {
-  fieldSize: FieldSize;
-  placedObjects: PlacedObject[];
-  placedCats: PlacedCat[];
-}
+import { DEFAULT_FIELD_SIZE } from "./data/field-size";
+import { DEFAULT_MOON_POSITION, ObjectId } from "./data/objects";
+import { EMPTY_ELEMENT_MAP, GameElementId, GameElementPositions, GameSetup } from "./data/game-elements";
+import { allInConfig } from "./config";
+import { calculatePar } from "./par";
 
 export function serializeGame(gameSetup: GameSetup): string {
-  const { placedObjects, placedCats } = gameSetup;
+  return Object.entries(gameSetup.elementPositions)
+    .map(([stringId, pos]) => {
+      const id = stringId as GameElementId;
 
-  const filteredObjects = placedObjects.filter((obj) => !isMoon(obj));
-  const sortedCats = [...placedCats].sort((a, b) => a.id - b.id);
+      if (id === ObjectId.MOON) {
+        return "";
+      }
 
-  // const serializedFieldSize = `${fieldSize.width}x${fieldSize.height}`;
-  const serializedPlacedObjects = filteredObjects.map((obj) => `${obj.id}${obj.row}${obj.column}`).join("");
-  const serializedPlacedCats = sortedCats.map((cat) => `${getCatIdentifier(cat.id)}${cat.row}${cat.column}`).join("");
-
-  return `${serializedPlacedObjects}-${serializedPlacedCats}`;
-}
-
-function getCatIdentifier(catId: CatId): string {
-  return CAT_IDENTIFIER[catId];
-}
-
-function getCatIdFromIdentifier(identifier: string): CatId {
-  const catId = ALL_CAT_IDS.find((catId) => CAT_IDENTIFIER[catId] === identifier);
-  if (catId === undefined) {
-    throw new Error(`Invalid cat identifier: ${identifier}`);
-  }
-
-  return catId;
+      return pos ? `${id}${pos.row}${pos.column}` : "";
+    })
+    .join("");
 }
 
 export function deserializeGame(serializedGame: string): GameSetup {
-  console.debug("Deserializing game:", serializedGame);
+  console.info("Deserializing game:", serializedGame);
 
-  const [objectsPart, catsPart] = serializedGame.split("-");
+  const elementPositions: GameElementPositions = EMPTY_ELEMENT_MAP();
+  elementPositions[ObjectId.MOON] = { ...DEFAULT_MOON_POSITION };
 
-  const placedObjects: PlacedObject[] = [{ ...getObject(ObjectId.MOON), row: 0, column: 0 }];
-  const placedCats: PlacedCat[] = [];
-
-  if (objectsPart) {
-    for (let i = 0; i < objectsPart.length; i += 4) {
-      const id = objectsPart.slice(i, i + 2) as ObjectId;
-      const row = parseInt(objectsPart[i + 2], 10);
-      const column = parseInt(objectsPart[i + 3], 10);
-      const gameObject = getObject(id);
-      placedObjects.push({ ...gameObject, row, column });
-    }
+  for (let i = 0; i < serializedGame.length; i += 4) {
+    const id = serializedGame.slice(i, i + 2) as GameElementId;
+    elementPositions[id] = {
+      row: parseInt(serializedGame.charAt(i + 2), 10),
+      column: parseInt(serializedGame.charAt(i + 3), 10),
+    };
   }
 
-  if (catsPart) {
-    for (let i = 0; i < catsPart.length; i += 4) {
-      const identifier = catsPart.slice(i, i + 2);
-      const row = parseInt(catsPart[i + 2], 10);
-      const column = parseInt(catsPart[i + 3], 10);
-      const catId = getCatIdFromIdentifier(identifier);
-      const cat = getCat(catId);
+  const gameSetup: GameSetup = { fieldSize: DEFAULT_FIELD_SIZE, elementPositions, config: allInConfig, possibleSolutions: [] };
 
-      if (cat) {
-        placedCats.push({ ...cat, row, column });
-      } else {
-        console.warn(`Cat with identifier ${identifier} not found.`);
-      }
-    }
-  }
-
-  return { fieldSize: DEFAULT_FIELD_SIZE, placedObjects, placedCats };
+  return { ...gameSetup, possibleSolutions: [calculatePar(gameSetup).moves] };
 }

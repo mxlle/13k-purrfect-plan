@@ -6,9 +6,10 @@ import { initializeEmptyGameField, startNewGame } from "./components/game-field/
 import { initPoki } from "./poki-integration";
 import { isOnboarding } from "./logic/onboarding";
 import { isGameInProgress } from "./globals";
+import { DEFAULT_FIELD_SIZE } from "./logic/data/field-size";
+import { CssClass } from "./utils/css-class";
 
 let titleElement: HTMLElement;
-let currentScore = 0;
 
 // const initializeMuted = getLocalStorageItem(LocalStorageKey.MUTED) === "true";
 
@@ -47,7 +48,7 @@ function init() {
   if (isOnboarding() || location.hash.length > 1) {
     void startNewGame({ shouldIncreaseLevel: false });
   } else {
-    void initializeEmptyGameField();
+    void initializeEmptyGameField(DEFAULT_FIELD_SIZE);
   }
 
   document.addEventListener("keydown", (event) => {
@@ -64,6 +65,10 @@ function init() {
 
   pubSubService.subscribe(PubSubEvent.START_NEW_GAME, (options) => {
     void startNewGame(options);
+  });
+
+  pubSubService.subscribe(PubSubEvent.GAME_END, () => {
+    document.body.classList.add(CssClass.WON);
   });
 }
 

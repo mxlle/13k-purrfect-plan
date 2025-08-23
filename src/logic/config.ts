@@ -1,7 +1,7 @@
-import { ALL_CAT_IDS, ALL_KITTEN_IDS, Cat, CatId, KittenId } from "./data/cats";
+import { ALL_CAT_IDS, ALL_KITTEN_IDS, CatId, KittenId } from "./data/cats";
 import { Tool } from "../types";
-import { globals } from "../globals";
 import { ObjectId } from "./data/objects";
+import { GameSetup } from "./data/game-elements";
 
 export enum ConfigCategory {
   CATS = "Cats",
@@ -32,14 +32,6 @@ export const allInConfig: Config = {
 };
 export const allCategories: ConfigCategory[] = Object.values(ConfigCategory);
 
-export function shouldIncludeCat(catOrCatId: Cat | CatId): boolean {
-  return globals.config[ConfigCategory.CATS][getCatId(catOrCatId)];
-}
-
-export function shouldApplyKittenBehavior(catOrCatId: Cat | CatId): boolean {
-  return globals.config[ConfigCategory.KITTEN_BEHAVIOR][getCatId(catOrCatId)];
-}
-
-export function getCatId(catOrCatId: Cat | CatId): CatId {
-  return typeof catOrCatId === "object" ? catOrCatId.id : catOrCatId;
+export function shouldApplyKittenBehavior(gameSetup: GameSetup, catId: CatId): boolean {
+  return gameSetup.config[ConfigCategory.KITTEN_BEHAVIOR][catId];
 }

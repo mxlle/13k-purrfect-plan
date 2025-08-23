@@ -1,10 +1,5 @@
 import { CssClass } from "./utils/css-class";
 
-export interface GameMetaData {
-  minMoves: number;
-  maxMoves: number;
-}
-
 export interface Settings {
   minAmount: number;
   maxAmount: number;

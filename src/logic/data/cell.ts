@@ -1,5 +1,6 @@
-import { CatId, PlacedCat } from "./cats";
-import { ObjectId, PlacedObject } from "./objects";
+import { CatId } from "./cats";
+import { ObjectId } from "./objects";
+import { GameSetup } from "./game-elements";
 
 export interface CellPosition {
   row: number;
@@ -8,20 +9,11 @@ export interface CellPosition {
 
 export const EMPTY_CELL = " " as const;
 
-export function isEmptyField(cell: CellPosition, placedCats: PlacedCat[], placedObjects: PlacedObject[]): boolean {
-  return !hasCat(placedCats, cell) && !hasObject(placedObjects, cell);
-}
+export function isEmptyField(cell: CellPosition, gameSetup: GameSetup): boolean {
+  const occupiedPositions = Object.values(gameSetup.elementPositions).filter(Boolean) as CellPosition[];
+  console.debug("Occupied positions:", occupiedPositions);
 
-export function hasCat(placedCats: PlacedCat[], cell: CellPosition): boolean {
-  return placedCats.some((p) => isSameCell(p, cell));
-}
-
-export function hasObject(placedObjects: PlacedObject[], cell: CellPosition): boolean {
-  return placedObjects.some((p) => isSameCell(p, cell));
-}
-
-export function findCat(placedCats: PlacedCat[], cell: CellPosition): PlacedCat | undefined {
-  return placedCats.find((p) => isSameCell(p, cell));
+  return occupiedPositions.every((pos: CellPosition) => !isSameCell(pos, cell));
 }
 
 export function isSameCell(cell1: CellPosition, cell2: CellPosition) {

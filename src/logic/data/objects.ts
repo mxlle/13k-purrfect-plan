@@ -7,45 +7,20 @@ export enum ObjectId {
   PUDDLE = "💧",
 }
 
-export interface BaseObject {
-  id: ObjectId;
-}
+export const ALL_OBJECT_IDS: ObjectId[] = [ObjectId.MOON, ObjectId.TREE, ObjectId.PUDDLE];
 
-interface ObjectWithElement extends BaseObject {
-  objectElement: HTMLElement;
-}
+export const DEFAULT_MOON_POSITION: CellPosition = { row: 0, column: 0 };
 
-export interface PlacedObject extends ObjectWithElement, CellPosition {
-  initialPosition?: CellPosition;
-}
-
-export const OBJECTS: Record<ObjectId, ObjectWithElement> = {
-  [ObjectId.MOON]: {
-    id: ObjectId.MOON,
-    objectElement: createObjectElement(ObjectId.MOON),
-  },
-  [ObjectId.TREE]: {
-    id: ObjectId.TREE,
-    objectElement: createObjectElement(ObjectId.TREE),
-  },
-  [ObjectId.PUDDLE]: {
-    id: ObjectId.PUDDLE,
-    objectElement: createObjectElement(ObjectId.PUDDLE),
-  },
+const OBJECT_ELEMENTS: Record<ObjectId, HTMLElement> = {
+  [ObjectId.MOON]: createObjectElement(ObjectId.MOON),
+  [ObjectId.TREE]: createObjectElement(ObjectId.TREE),
+  [ObjectId.PUDDLE]: createObjectElement(ObjectId.PUDDLE),
 };
 
-export function getObject(id: ObjectId): ObjectWithElement {
-  return OBJECTS[id];
+export function isObjectId(value: any): value is ObjectId {
+  return ALL_OBJECT_IDS.includes(value);
 }
 
-export function isMoon(object: BaseObject): boolean {
-  return object.id === ObjectId.MOON;
-}
-
-export function isTree(object: BaseObject): boolean {
-  return object.id === ObjectId.TREE;
-}
-
-export function isPuddle(object: BaseObject): boolean {
-  return object.id === ObjectId.PUDDLE;
+export function getObjectElement(id: ObjectId): HTMLElement {
+  return OBJECT_ELEMENTS[id];
 }
