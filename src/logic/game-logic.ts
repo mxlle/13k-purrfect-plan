@@ -9,7 +9,7 @@ import { updateAllPositions } from "../components/game-field/game-field";
 import { sleep } from "../utils/promise-utils";
 import { ConfigCategory, shouldApplyKittenBehavior } from "./config";
 import { ObjectId } from "./data/objects";
-import { GameState } from "./data/game-elements";
+import { deepCopyElementsMap, GameElementPositions, GameState } from "./data/game-elements";
 
 import { styles as catStyles } from "../components/cat-component/cat-component";
 
@@ -37,7 +37,7 @@ export async function performMove(gameState: GameState, turnMove: TurnMove) {
   await playSoundForAction(turnMove);
   isTool(turnMove) && (await preToolAction(turnMove));
 
-  calculateNewPositions(gameState, turnMove);
+  gameState.currentPositions = calculateNewPositions(gameState, turnMove);
 
   isTool(turnMove) && (await postToolAction(turnMove));
 
@@ -75,12 +75,12 @@ export function isValidMove(gameState: GameState, turnMove: TurnMove): boolean {
   return isValidCellPosition(gameState, newPosition);
 }
 
-export function calculateNewPositions(gameState: GameState, turnMove: TurnMove) {
+export function calculateNewPositions(gameState: GameState, turnMove: TurnMove): GameElementPositions {
   const previousMotherPosition = gameState.currentPositions[CatId.MOTHER];
 
   if (!previousMotherPosition) {
     console.error("Mother cat not found, cannot perform move.");
-    return false;
+    return gameState.currentPositions;
   }
 
   doMoonMove(gameState);
@@ -88,19 +88,30 @@ export function calculateNewPositions(gameState: GameState, turnMove: TurnMove) 
   const kittensOnCell = getKittensOnCell(gameState, previousMotherPosition);
   const freeKittens = getKittensElsewhere(gameState, previousMotherPosition);
 
+  let newElementPositions: GameElementPositions;
+
   if (isTool(turnMove)) {
-    executeTool(gameState, turnMove);
+    newElementPositions = executeTool(gameState, turnMove);
   } else {
-    moveCat(gameState, CatId.MOTHER, turnMove);
+    newElementPositions = deepCopyElementsMap(gameState.currentPositions);
+
+    newElementPositions[CatId.MOTHER] = moveCat(gameState, CatId.MOTHER, turnMove);
 
     for (const kitten of kittensOnCell) {
-      moveCat(gameState, kitten, turnMove);
+      newElementPositions[kitten] = moveCat(gameState, kitten, turnMove);
     }
 
     for (const kitten of freeKittens) {
-      handleKittenBehavior(gameState, kitten, previousMotherPosition, gameState.currentPositions[CatId.MOTHER]);
+      newElementPositions[kitten] = handleKittenBehavior(
+        gameState,
+        kitten,
+        previousMotherPosition,
+        gameState.currentPositions[CatId.MOTHER],
+      );
     }
   }
+
+  return newElementPositions;
 }
 
 function doMoonMove(gameState: GameState) {
@@ -133,7 +144,8 @@ async function postToolAction(tool: Tool) {
   }
 }
 
-function executeTool(gameState: GameState, tool: Tool) {
+function executeTool(gameState: GameState, tool: Tool): GameElementPositions {
+  const newGameElementPositions: GameElementPositions = deepCopyElementsMap(gameState.currentPositions);
   const momPosition = gameState.currentPositions[CatId.MOTHER];
 
   switch (tool) {
@@ -142,49 +154,60 @@ function executeTool(gameState: GameState, tool: Tool) {
       const freeKittens = getKittensElsewhere(gameState, momPosition);
 
       for (const kitten of freeKittens) {
-        moveCatTowardsCell(gameState, kitten, momPosition);
+        newGameElementPositions[kitten] = moveCatTowardsCell(gameState, kitten, momPosition);
       }
   }
+
+  return newGameElementPositions;
 }
 
-function handleKittenBehavior(gameState: GameState, kitten: CatId, previousMotherPosition: CellPosition, newMotherPosition: CellPosition) {
+function handleKittenBehavior(
+  gameState: GameState,
+  kitten: CatId,
+  previousMotherPosition: CellPosition,
+  newMotherPosition: CellPosition,
+): CellPosition {
   if (!shouldApplyKittenBehavior(gameState.setup, kitten)) {
     return;
   }
 
   const previousPosition = { ...gameState.currentPositions[kitten] };
+  let newPosition: CellPosition = { ...previousPosition };
 
   switch (kitten) {
     case CatId.MOONY:
-      doMoonyMove(gameState);
+      newPosition = doMoonyMove(gameState);
       break;
     case CatId.IVY:
-      doIvyMove(gameState);
+      newPosition = doIvyMove(gameState);
       break;
     case CatId.SPLASHY:
-      doSplashyMove(gameState);
+      newPosition = doSplashyMove(gameState);
       break;
   }
-
-  const newPosition = gameState.currentPositions[kitten];
 
   // on swap, revert kitten to previous position
   if (isSameCell(newPosition, previousMotherPosition) && isSameCell(previousPosition, newMotherPosition)) {
     console.debug(`Reverting ${CAT_NAMES[kitten]} to previous position:`, previousPosition);
-    moveCatToCell(gameState, kitten, previousPosition);
+    newPosition = previousPosition;
   }
+
+  return newPosition;
 }
 
-function doMoonyMove(gameState: GameState) {
+function doMoonyMove(gameState: GameState): CellPosition {
   // Moony moves towards the moon
+  const catId = CatId.MOONY;
   const moonPosition = gameState.currentPositions[ObjectId.MOON];
 
   if (moonPosition) {
-    moveCatTowardsCell(gameState, CatId.MOONY, moonPosition);
+    return moveCatTowardsCell(gameState, catId, moonPosition);
   }
+
+  return gameState.currentPositions[catId];
 }
 
-function doIvyMove(gameState: GameState) {
+function doIvyMove(gameState: GameState): CellPosition {
   // if next to a tree, then move clockwise around it
   const catId = CatId.IVY;
   const { row, column } = gameState.currentPositions[catId];
@@ -206,8 +229,7 @@ function doIvyMove(gameState: GameState) {
           newColumn = column + 1; // move right
         }
 
-        moveCatToCell(gameState, catId, { row: newRow, column: newColumn });
-        return;
+        return { row: newRow, column: newColumn };
       }
 
       if (rowDiff === -1) {
@@ -218,80 +240,80 @@ function doIvyMove(gameState: GameState) {
           newColumn = column - 1; // move left
         }
 
-        moveCatToCell(gameState, catId, { row: newRow, column: newColumn });
-        return;
+        return { row: newRow, column: newColumn };
       }
 
       if (columnDiff === 1) {
         // cat to the left of tree
         newRow = row - 1; // move up
-        moveCatToCell(gameState, catId, { row: newRow, column });
-        return;
+        return { row: newRow, column };
       }
 
       if (columnDiff === -1) {
         // cat to the right of tree
         newRow = row + 1; // move down
-        moveCatToCell(gameState, catId, { row: newRow, column });
-        return;
+        return { row: newRow, column };
       }
     } else {
       // If not next to a tree, just move towards the tree
-      moveCatTowardsCell(gameState, catId, treePosition);
+      return moveCatTowardsCell(gameState, catId, treePosition);
     }
   }
 }
 
 function doSplashyMove(gameState: GameState) {
   // Splashy moves towards the puddle
+  const catId = CatId.SPLASHY;
   const waterPosition = gameState.currentPositions[ObjectId.PUDDLE];
 
   if (waterPosition) {
-    moveCatTowardsCell(gameState, CatId.SPLASHY, waterPosition);
+    return moveCatTowardsCell(gameState, catId, waterPosition);
   }
+
+  return gameState.currentPositions[catId];
 }
 
-function moveCatTowardsCell(gameState: GameState, catId: CatId, targetCell: CellPosition) {
-  const cat = gameState.currentPositions[catId];
-  const rowDiff = targetCell.row - cat.row;
-  const columnDiff = targetCell.column - cat.column;
+function moveCatTowardsCell(gameState: GameState, catId: CatId, targetCell: CellPosition): CellPosition {
+  const catPosition = gameState.currentPositions[catId];
+  const rowDiff = targetCell.row - catPosition.row;
+  const columnDiff = targetCell.column - catPosition.column;
 
   if (rowDiff === 0 && columnDiff === 0) {
-    return;
+    return catPosition;
   }
 
   if (Math.abs(rowDiff) >= Math.abs(columnDiff)) {
     // Move vertically firsts
-    const newRow = cat.row + (rowDiff > 0 ? 1 : -1);
+    const newRow = catPosition.row + (rowDiff > 0 ? 1 : -1);
 
-    if (isValidCellPosition(gameState, { row: newRow, column: cat.column })) {
-      moveCatToCell(gameState, catId, { row: newRow, column: cat.column });
-      return;
+    if (isValidCellPosition(gameState, { row: newRow, column: catPosition.column })) {
+      return { row: newRow, column: catPosition.column };
     }
   }
 
-  const newColumn = cat.column + (columnDiff > 0 ? 1 : -1);
+  const newColumn = catPosition.column + (columnDiff > 0 ? 1 : -1);
 
-  if (isValidCellPosition(gameState, { row: cat.row, column: newColumn })) {
-    moveCatToCell(gameState, catId, { row: cat.row, column: newColumn });
-    return;
+  if (isValidCellPosition(gameState, { row: catPosition.row, column: newColumn })) {
+    return { row: catPosition.row, column: newColumn };
   }
+
+  return catPosition;
 }
 
-export function moveCat(gameState: GameState, catId: CatId, direction: Direction) {
+export function moveCat(gameState: GameState, catId: CatId, direction: Direction): CellPosition {
   const newPosition = newCellPositionFromDirection(gameState.currentPositions[catId], direction);
-  moveCatToCell(gameState, catId, newPosition);
+  return moveCatToCell(gameState, catId, newPosition);
 }
 
-export function moveCatToCell(gameState: GameState, catId: CatId, cell: CellPosition) {
+export function moveCatToCell(gameState: GameState, catId: CatId, cell: CellPosition): CellPosition {
   const isValidMove = isValidCellPosition(gameState, cell);
 
   if (!isValidMove) {
     console.warn(`Invalid move for cat ${CAT_NAMES[catId]} to cell (${cell.row}, ${cell.column})`);
-    return;
+    return gameState.currentPositions[catId];
   }
 
-  gameState.currentPositions[catId] = { ...cell };
+  return { ...cell };
 }
 
 export function isWinConditionMet(gameState: GameState | null): boolean {

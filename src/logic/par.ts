@@ -67,7 +67,7 @@ function calculateParInner(gameState: GameState): ParInfo {
     const newMoves = [...previousMoves, move];
     copiedGameState.moves = newMoves;
 
-    calculateNewPositions(copiedGameState, move);
+    copiedGameState.currentPositions = calculateNewPositions(copiedGameState, move);
 
     // Recursively calculate par for the next moves
     const parInfo = calculateParInner(copiedGameState);
