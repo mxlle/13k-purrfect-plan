@@ -5,7 +5,7 @@
 
 $border-style: outset;
 
-.#{$FIELD} {
+.field {
   --t: #{$tile-color-1};
   position: relative;
   margin: 0 auto;
@@ -28,7 +28,7 @@ $border-style: outset;
   }
 }
 
-.#{$START_BUTTON} {
+.startButton {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -36,53 +36,31 @@ $border-style: outset;
   z-index: 6;
 }
 
-.#{$CELL} {
+:global(.#{$CELL}) {
   background-color: var(--t);
   display: grid;
   place-items: center;
   position: relative;
   transition: background-color 0.3s;
 
-  .#{$CAT_BOX} {
+  :global(.#{$CAT_BOX}) {
     z-index: 3;
     transition: transform 0.3s;
 
-    .#{$WON} & {
+    :global(.#{$WON}) & {
       animation: hueRotation 1s 0.5s linear 3;
     }
   }
 
-  .#{$OBJECT_BOX} {
+  :global(.#{$OBJECT_BOX}) {
     z-index: 2;
     transition:
       transform 0.3s,
       opacity 0.3s;
   }
 
-  .#{$CAT} {
-    &:not(.#{$IS_MOM}) {
-      transform: scale(0.7) translate(var(--t-x, 0), 22%);
-    }
-
-    svg {
-      ellipse {
-        transform-box: fill-box;
-        transform-origin: center;
-        animation: eye-blink 8s 4s infinite;
-
-        .#{$WON} & {
-          animation: none;
-        }
-      }
-    }
-  }
-
-  .#{$IS_MOM} {
-    transform: scale(0.95);
-  }
-
-  > .#{$CAT_BOX},
-  > .#{$OBJECT_BOX} {
+  > :global(.#{$CAT_BOX}),
+  > :global(.#{$OBJECT_BOX}) {
     grid-area: 1 / 1;
   }
 }

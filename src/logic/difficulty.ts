@@ -1,14 +1,16 @@
-import { getTranslation, TranslationKey } from "../translations/i18n";
+import { getTranslation } from "../translations/i18n";
 import { Settings } from "../types";
 import { globals } from "../globals";
 import { getLocalStorageItem, LocalStorageKey, setLocalStorageItem } from "../utils/local-storage";
+import { TranslationKey } from "../translations/translationKey";
 
-export const enum Difficulty {
-  EASY,
-  MEDIUM,
-  HARD,
-  EXTREME,
-}
+export type Difficulty = typeof Difficulty[keyof typeof Difficulty];
+export const Difficulty = Object.freeze({
+  EASY: 0,
+  MEDIUM: 1,
+  HARD: 2,
+  EXTREME: 3,
+})
 
 export interface DifficultyStats {
   highscore: number;

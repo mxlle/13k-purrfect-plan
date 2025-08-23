@@ -1,7 +1,7 @@
 @import "../../theme";
 @import "../../names";
 
-.#{$CAT_BOX} {
+:global(.#{$CAT_BOX}) {
   position: relative;
   width: 100%;
   height: 100%;
@@ -20,7 +20,7 @@
   }
 }
 
-.#{$CAT} {
+.cat {
   position: relative;
   display: grid;
   place-items: center;
@@ -34,7 +34,7 @@
   }
 }
 
-.#{$IS_MOM} {
+.isMom {
   color: #ff2ea6;
 
   // speech bubble
@@ -51,8 +51,8 @@
       transform 0.1s,
       opacity 0.1s;
 
-    .#{$WON} &,
-    .#{$MEOW} & {
+    :global(.#{$WON}) &,
+    .meow & {
       opacity: 1;
       transform: translateX(-50%) translateY(-100%);
       transition:
@@ -60,20 +60,12 @@
         opacity 0.3s 0.3s;
     }
 
-    .#{$MEOW} & {
+    .meow & {
       transition-delay: 0s;
     }
   }
 
   &:after {
-    .#{$MEOW} & {
-      content: "Meow!";
-    }
-
-    .#{$WON} & {
-      content: "United!";
-    }
-
     content: "!";
     top: 0;
     font-family: monospace;
@@ -81,6 +73,14 @@
     padding: 0.5rem;
     border-radius: 0.8rem;
     background: white;
+
+    .meow & {
+      content: "Meow!";
+    }
+
+    :global(.#{$WON}) & {
+      content: "United!";
+    }
   }
 
   &:before {
@@ -93,18 +93,42 @@
   }
 }
 
-.#{$CAT_COLOR} {
-  &1 {
-    color: #c09402;
+.moony {
+  color: #c09402;
+}
+
+.ivy {
+  --t-x: -35%;
+  color: #009e28;
+}
+
+.splashy {
+  --t-x: 35%;
+  color: #106dff;
+}
+
+:global(.#{$CELL}) {
+
+  .cat {
+    &:not(.isMom) {
+      transform: scale(0.7) translate(var(--t-x, 0), 22%);
+    }
+
+    svg {
+      ellipse {
+        transform-box: fill-box;
+        transform-origin: center;
+        animation: eye-blink 8s 4s infinite;
+
+        :global(.#{$WON}) & {
+          animation: none;
+        }
+      }
+    }
   }
 
-  &2 {
-    --t-x: -35%;
-    color: #009e28;
+  .isMom {
+    transform: scale(0.95);
   }
 
-  &3 {
-    --t-x: 35%;
-    color: #106dff;
-  }
 }

@@ -1,7 +1,7 @@
 import { defaultPlacedObjects } from "./onboarding";
 import { shuffleArray } from "../utils/random-utils";
 import { getEmptyFields } from "./checks";
-import { ALL_CAT_IDS } from "./data/cats";
+import { ALL_CAT_IDS } from "./data/catId";
 import { CellPosition } from "./data/cell";
 import { allInConfig, Config } from "./config";
 import { DEFAULT_FIELD_SIZE, FieldSize } from "./data/field-size";

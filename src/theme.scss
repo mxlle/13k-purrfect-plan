@@ -1,3 +1,5 @@
+@use "./names";
+
 $main-color: #e02890;
 $danger-color: #bd2751;
 $danger-color-contrast: var(--d-clr, #e06d80);
@@ -46,7 +48,7 @@ $tile-color-alpha: $tile-color-1-dark-alpha;
     }
   }
 
-  &.touching {
+  &.#{$TOUCHING} {
     @content;
   }
 }

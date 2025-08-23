@@ -1,7 +1,10 @@
-import "./game-field.scss";
+import styles from "./game-field.module.scss";
+import { styles as controlsStyles } from "../controls/controls-component";
+import { styles as arrowStyles } from "../arrow-component/arrow-component";
+import { styles as catStyles } from "../cat-component/cat-component";
 
 import { createButton, createElement } from "../../utils/html-utils";
-import { getTranslation, TranslationKey } from "../../translations/i18n";
+import { getTranslation } from "../../translations/i18n";
 import { globals } from "../../globals";
 import { requestAnimationFrameWithTimeout } from "../../utils/promise-utils";
 import { generateRandomGameSetup } from "../../logic/initialize";
@@ -9,7 +12,8 @@ import { handlePokiCommercial } from "../../poki-integration";
 import { getOnboardingData, increaseOnboardingStepIfApplicable, isSameLevel, OnboardingData } from "../../logic/onboarding";
 import { CssClass } from "../../utils/css-class";
 import { getControlsComponent } from "../controls/controls-component";
-import { ALL_CAT_IDS, CAT_COLOR_IDS } from "../../logic/data/cats";
+import { ALL_CAT_IDS } from "../../logic/data/catId";
+import { CAT_COLOR_IDS } from "../../logic/data/cats";
 import { CellPosition, getCellDifference } from "../../logic/data/cell";
 import { PubSubEvent, pubSubService } from "../../utils/pub-sub-service";
 import { isTool } from "../../types";
@@ -20,6 +24,7 @@ import { isValidCellPosition } from "../../logic/checks";
 import { deserializeGame, serializeGame } from "../../logic/serializer";
 import { GameElementId, GameSetup, GameState, getInitialGameState, isValidGameSetup } from "../../logic/data/game-elements";
 import { isWinConditionMet } from "../../logic/game-logic";
+import { TranslationKey } from "../../translations/translationKey";
 
 let mainContainer: HTMLElement | undefined;
 let gameFieldElem: HTMLElement | undefined;
@@ -32,7 +37,6 @@ const TIMEOUT_BETWEEN_GAMES = 300;
 const TIMEOUT_CELL_APPEAR = -1;
 
 export async function initializeEmptyGameField(fieldSize: FieldSize) {
-  document.body.classList.remove(CssClass.SELECTING);
 
   if (gameFieldElem) {
     console.error("initialize function should only be called once");
@@ -54,7 +58,7 @@ function addStartButton(buttonLabelKey: TranslationKey, elementToAttachTo: HTMLE
       (event.target as HTMLElement)?.remove();
     },
   });
-  startButton.classList.add(CssClass.START_BUTTON, "prm");
+  startButton.classList.add(styles.startButton, CssClass.PRM);
   elementToAttachTo.append(startButton);
 }
 
@@ -72,7 +76,7 @@ export async function startNewGame(options: { shouldIncreaseLevel: boolean } = {
   if (gameFieldElem) {
     // reset old game field
     // await cleanGameField(globals.gameFieldData);
-    if (process.env.POKI_ENABLED === "true") await handlePokiCommercial();
+    if (import.meta.env.POKI_ENABLED === "true") await handlePokiCommercial();
     // await requestAnimationFrameWithTimeout(TIMEOUT_BETWEEN_GAMES);
 
     if (!isSameLevel()) {
@@ -165,14 +169,14 @@ export function getCellElement(cell: CellPosition): HTMLElement {
 
 export function generateGameFieldElement(fieldSize: FieldSize) {
   const gameField = createElement({
-    cssClass: CssClass.FIELD,
+    cssClass: styles.field,
   });
   cellElements.length = 0;
 
   for (let rowIndex = 0; rowIndex < fieldSize; rowIndex++) {
     const rowElements: HTMLElement[] = [];
     const rowElem = createElement({
-      cssClass: "row",
+      cssClass: styles.row,
     });
     gameField.append(rowElem);
 
@@ -196,18 +200,18 @@ function addOnboardingSuggestionIfApplicable() {
     let actionComponent: HTMLElement | null = null;
 
     if (isTool(onboardingData.highlightedAction)) {
-      actionComponent = document.querySelector(`.${CssClass.MEOW}`) as HTMLElement | null;
+      actionComponent = document.querySelector(`.${catStyles.meow}`) as HTMLElement | null;
     } else {
       const directionComponent = isTool(onboardingData.highlightedAction)
         ? undefined
-        : (document.querySelector(`.${CssClass.ARROW}.${onboardingData?.highlightedAction}`) as HTMLElement | null);
+        : (document.querySelector(`.${arrowStyles.arrow}.${onboardingData?.highlightedAction}`) as HTMLElement | null);
       actionComponent = directionComponent.parentNode as HTMLElement | null;
     }
 
     if (actionComponent) {
-      actionComponent.classList.add(CssClass.ONBOARDING_HIGHLIGHT);
+      actionComponent.classList.add(controlsStyles.onboardingHighlight);
       let listener = () => {
-        actionComponent.classList.remove(CssClass.ONBOARDING_HIGHLIGHT);
+        actionComponent.classList.remove(controlsStyles.onboardingHighlight);
         actionComponent.removeEventListener("click", listener);
       };
       actionComponent.addEventListener("click", listener);
@@ -223,7 +227,7 @@ export async function initializeCatsOnGameField(gameState: GameState, isInitialS
       const cellElement = getCellElement(representation.initialPosition);
       cellElement.append(representation.htmlElement);
       representation.htmlElement.classList.toggle(
-        `${CssClass.CAT_COLOR}${CAT_COLOR_IDS[catId]}`,
+        `${catStyles.catColor}${CAT_COLOR_IDS[catId]}`,
         gameState.setup.config[ConfigCategory.KITTEN_BEHAVIOR][catId],
       );
     }

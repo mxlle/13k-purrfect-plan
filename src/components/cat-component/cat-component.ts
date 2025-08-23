@@ -1,20 +1,28 @@
-import { CatId, isMom } from "../../logic/data/cats";
+import { CatId } from "../../logic/data/catId";
 import { createElement } from "../../utils/html-utils";
 import { CssClass } from "../../utils/css-class";
 import catSvg from "./black-cat-pink-eyes.svg";
 
-import "./cat-component.scss";
+import styles from "./cat-component.module.scss";
+export { styles }
 
 export function createCatElement(catId: CatId): HTMLElement {
   const catBox = createElement({
     cssClass: CssClass.CAT_BOX,
   });
 
+  const catIdClass = {
+    [CatId.MOTHER]: styles.isMom,
+    [CatId.MOONY]: styles.moony,
+    [CatId.IVY]: styles.ivy,
+    [CatId.SPLASHY]: styles.splashy,
+  }[catId];
+
   const catElem = createElement({
-    cssClass: `${CssClass.CAT} ${isMom(catId) ? CssClass.IS_MOM : ""}`,
+    cssClass: `${styles.cat} ${catIdClass}`,
   });
 
-  catElem.append(catSvg());
+  catElem.innerHTML = catSvg;
 
   catBox.append(catElem);
 

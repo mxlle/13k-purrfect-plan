@@ -1,21 +1,23 @@
 import { Direction, Tool, TurnMove } from "../types";
 import { globals } from "../globals";
 import { LocalStorageKey, setLocalStorageItem } from "../utils/local-storage";
-import { CatId } from "./data/cats";
+import { CatId } from "./data/catId";
 import { CellPosition, containsCell, EMPTY_CELL, getCellTypePlaceholders } from "./data/cell";
 import { allInConfig, ConfigCategory, emptyConfig } from "./config";
 import { ObjectId } from "./data/objects";
 import { FieldSize } from "./data/field-size";
 import { EMPTY_ELEMENT_MAP, GameElementPositions, GameSetup } from "./data/game-elements";
 import { calculatePar } from "./par";
+import { defineEnum } from "../utils/enums";
 
-export const enum OnboardingStep {
-  INTRO = 0,
-  INTRO_SECOND_CAT = 1,
-  INTERMEDIATE_MEOW = 2,
-  INTERMEDIATE_OBJECTS = 3,
-  LAST_SETUP = 4,
-}
+export type OnboardingStep = defineEnum<typeof OnboardingStep>
+export const OnboardingStep = defineEnum({
+  INTRO: 0,
+  INTRO_SECOND_CAT: 1,
+  INTERMEDIATE_MEOW: 2,
+  INTERMEDIATE_OBJECTS: 3,
+  LAST_SETUP: 4,
+})
 
 export function isOnboarding() {
   return globals.onboardingStep !== -1;

@@ -1,4 +1,5 @@
-import { ALL_CAT_IDS, CatId, getCatElement } from "./cats";
+import { ALL_CAT_IDS, CatId } from "./catId";
+import { getCatElement } from "./cats";
 import { getObjectElement, isObjectId, ObjectId } from "./objects";
 import { CellPosition } from "./cell";
 import { FieldSize, getMiddleCoordinates } from "./field-size";

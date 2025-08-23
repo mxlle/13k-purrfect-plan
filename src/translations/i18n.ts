@@ -1,26 +1,10 @@
 import { getShortLanguageName } from "../utils/language-util";
 import { enTranslations } from "./en";
 import { getDeTranslationMap } from "./de";
-
-export const enum TranslationKey {
-  START_GAME,
-  NEW_GAME,
-  RESTART_GAME,
-  WIN,
-  CONTINUE,
-  BACK,
-  DIFFICULTY,
-  DIFFICULTY_EASY,
-  DIFFICULTY_MEDIUM,
-  DIFFICULTY_HARD,
-  DIFFICULTY_EXTREME,
-  MOVES,
-  HIGHSCORE,
-  AVERAGE,
-}
+import { TranslationKey } from "./translationKey";
 
 function getTranslationRecords(): Record<TranslationKey, string> {
-  if (process.env.GERMAN_ENABLED === "true") {
+  if (import.meta.env.GERMAN_ENABLED === "true") {
     if (isGermanLanguage()) {
       return getDeTranslationMap();
     }
@@ -36,7 +20,7 @@ export function isGermanLanguage() {
 export function getTranslation(key, ...args) {
   let language = "en";
 
-  if (process.env.GERMAN_ENABLED === "true") {
+  if (import.meta.env.GERMAN_ENABLED === "true") {
     if (isGermanLanguage()) {
       language = "de";
     }

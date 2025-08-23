@@ -2,6 +2,9 @@
   "compilerOptions": {
     "target": "ESNext",
     "module": "ESNext",
+    "moduleResolution": "bundler",
     "esModuleInterop": true,
+    "allowJs": true,
+    "isolatedModules": true
   }
 }

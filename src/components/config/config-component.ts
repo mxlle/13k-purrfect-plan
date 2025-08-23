@@ -1,18 +1,17 @@
 import { createElement } from "../../utils/html-utils";
-import { CssClass } from "../../utils/css-class";
 
-import "./config-component.scss";
-import { ALL_KITTEN_IDS, getCatElement } from "../../logic/data/cats";
+import styles from "./config-component.module.scss";
+import { getCatElement } from "../../logic/data/cats";
+import { ALL_KITTEN_IDS } from "../../logic/data/catId";
 import { globals } from "../../globals";
 import { createObjectElement } from "../object-component/object-component";
 import { allCategories, ConfigCategory, ConfigItemId } from "../../logic/config";
 import { ObjectId } from "../../logic/data/objects";
-
 let configComponent: HTMLElement | undefined;
 
 export function getConfigComponent(): HTMLElement {
   configComponent = createElement({
-    cssClass: CssClass.CONFIG,
+    cssClass: styles.config,
   });
 
   for (const category of allCategories) {
@@ -25,7 +24,7 @@ export function getConfigComponent(): HTMLElement {
 
 function getConfigCategoryElement(category: ConfigCategory): HTMLElement {
   const categoryElem = createElement({
-    cssClass: CssClass.CONFIG_CATEGORY,
+    cssClass: styles.configCategory,
   });
 
   const titleElem = createElement({
@@ -63,12 +62,12 @@ function getConfigCategoryElement(category: ConfigCategory): HTMLElement {
 
 function transformToConfigItemElement(category: ConfigCategory, id: ConfigItemId, itemElement: HTMLElement) {
   if (globals.gameState.setup.config[category][id]) {
-    itemElement.classList.add(CssClass.SELECTED);
+    itemElement.classList.add(styles.selected);
   }
 
   itemElement.onclick = () => {
     const newValue = !globals.gameState.setup.config[category][id];
     globals.gameState.setup.config[category][id] = newValue;
-    itemElement.classList.toggle(CssClass.SELECTED, newValue);
+    itemElement.classList.toggle(styles.selected, newValue);
   };
 }

@@ -1,4 +1,4 @@
-import { ALL_KITTEN_IDS, CatId } from "./data/cats";
+import { ALL_KITTEN_IDS, CatId } from "./data/catId";
 import { CellPosition, isEmptyField, isSameCell } from "./data/cell";
 import { FieldSize } from "./data/field-size";
 import { ObjectId } from "./data/objects";

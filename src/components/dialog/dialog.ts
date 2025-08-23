@@ -1,8 +1,10 @@
 import { createButton, createElement } from "../../utils/html-utils";
 
-import "./index.scss";
-import { getTranslation, TranslationKey } from "../../translations/i18n";
+import styles from "./dialog.module.scss";
+import { getTranslation } from "../../translations/i18n";
 import { PubSubEvent, pubSubService } from "../../utils/pub-sub-service";
+import { TranslationKey } from "../../translations/translationKey";
+import { CssClass } from "../../utils/css-class";
 
 let zIndexCounter = 50; // start at 50 to be above regular content
 
@@ -16,11 +18,11 @@ export interface Dialog {
 
 export function createDialog(innerElement: HTMLElement, submitButtonText?: string): Dialog {
   const dialog = createElement({
-    cssClass: "dialog",
+    cssClass: styles.dialog,
     onClick: (event) => event.stopPropagation(), // TODO - why?
   });
 
-  const dialogContent = createElement({ cssClass: "content" });
+  const dialogContent = createElement({ cssClass: styles.content });
   dialogContent.appendChild(innerElement);
   dialog.appendChild(dialogContent);
 
@@ -32,7 +34,7 @@ export function createDialog(innerElement: HTMLElement, submitButtonText?: strin
 
   let buttons, cancelButton, submitButton;
   if (submitButtonText !== undefined) {
-    buttons = createElement({ cssClass: "btns" });
+    buttons = createElement({ cssClass: styles.btns });
 
     cancelButton = createButton({
       text: getTranslation(TranslationKey.BACK),
@@ -43,7 +45,7 @@ export function createDialog(innerElement: HTMLElement, submitButtonText?: strin
       text: submitButtonText,
       onClick: () => closeDialog(true),
     });
-    submitButton.classList.add("prm");
+    submitButton.classList.add(CssClass.PRM);
     buttons.appendChild(submitButton);
     dialog.appendChild(buttons);
   }
@@ -65,7 +67,7 @@ export function createDialog(innerElement: HTMLElement, submitButtonText?: strin
         setTimeout(() => dialog.classList.add("open"), 0);
       }
 
-      dialogContent.classList.toggle("ovrflw", dialogContent.scrollHeight > dialogContent.clientHeight);
+      dialogContent.classList.toggle(styles.ovrflw, dialogContent.scrollHeight > dialogContent.clientHeight);
 
       dialogContent.scrollTop = 0;
 

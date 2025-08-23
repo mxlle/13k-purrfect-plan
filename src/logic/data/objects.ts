@@ -1,11 +1,13 @@
 import { CellPosition } from "./cell";
 import { createObjectElement } from "../../components/object-component/object-component";
+import { defineEnum } from "../../utils/enums";
 
-export enum ObjectId {
-  MOON = "🌙",
-  TREE = "🌳",
-  PUDDLE = "💧",
-}
+export type ObjectId = defineEnum<typeof ObjectId>
+export const ObjectId = defineEnum({
+  MOON: "🌙",
+  TREE: "🌳",
+  PUDDLE: "💧",
+})
 
 export const ALL_OBJECT_IDS: ObjectId[] = [ObjectId.MOON, ObjectId.TREE, ObjectId.PUDDLE];
 

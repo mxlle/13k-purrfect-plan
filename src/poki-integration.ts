@@ -16,7 +16,7 @@ const createElement = (tag, props) => Object.assign(document.createElement(tag),
 const loadScript = (src) => new Promise((onload, onerror) => document.head.appendChild(createElement('script', { src, onload, onerror })))
 
 export async function initPoki(continueToGame: () => Promise<void>) {
-  if (process.env.POKI_ENABLED !== 'true') return continueToGame();
+  if (import.meta.env.POKI_ENABLED !== "true") return continueToGame();
 
   try {
     await loadScript('https://game-cdn.poki.com/scripts/v2/poki-sdk.js');
@@ -42,7 +42,7 @@ export async function initPoki(continueToGame: () => Promise<void>) {
 }
 
 export function handlePokiCommercial(): Promise<void> {
-  if (process.env.POKI_ENABLED !== 'true') return;
+  if (import.meta.env.POKI_ENABLED !== "true") return;
   // pause your game here if it isn't already
   return pokiSdk
     .commercialBreak(() => {

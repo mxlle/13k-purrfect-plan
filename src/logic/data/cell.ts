@@ -1,4 +1,4 @@
-import { CatId } from "./cats";
+import { CatId } from "./catId";
 import { ObjectId } from "./objects";
 import { GameSetup } from "./game-elements";
 

@@ -19,7 +19,7 @@ function init() {
   });
 
   titleElement = createElement({
-    cssClass: "title",
+    cssClass: CssClass.TITLE,
     text: "Kittens united - a purrfect plan",
   });
 
@@ -78,5 +78,5 @@ const initApp = async () => {
   // await initAudio(initializeMuted);
 };
 
-if (process.env.POKI_ENABLED === "true") initPoki(initApp);
+if (import.meta.env.POKI_ENABLED === "true") initPoki(initApp);
 else initApp();

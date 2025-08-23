@@ -2,7 +2,8 @@ import { createButton, createElement } from "../../utils/html-utils";
 import { CssClass } from "../../utils/css-class";
 import { Direction, isTool, RECOVERY_TIME_MAP, Tool, TurnMove } from "../../types";
 
-import "./controls-component.scss";
+import styles from "./controls-component.module.scss";
+import { styles as catStyles } from "../cat-component/cat-component";
 import { isWinConditionMet, performMove } from "../../logic/game-logic";
 import { getArrowComponent } from "../arrow-component/arrow-component";
 import {
@@ -13,13 +14,16 @@ import {
   startRecording,
 } from "../../audio/sound-control/sound-control";
 import { PubSubEvent, pubSubService } from "../../utils/pub-sub-service";
-import { getTranslation, TranslationKey } from "../../translations/i18n";
+import { getTranslation } from "../../translations/i18n";
+import { TranslationKey } from "../../translations/translationKey";
 import { globals } from "../../globals";
 import { isOnboarding } from "../../logic/onboarding";
 
 import { ConfigCategory } from "../../logic/config";
 import { FALLBACK_PAR } from "../../logic/par";
 import { getParFromGameState } from "../../logic/data/game-elements";
+
+export { styles }
 
 let hasSetupEventListeners = false;
 let controlsComponent: HTMLElement | undefined;
@@ -33,18 +37,18 @@ export function getControlsComponent(): HTMLElement {
   setupEventListeners();
 
   controlsComponent = createElement({
-    cssClass: CssClass.CONTROLS,
+    cssClass: styles.controls,
   });
 
   turnMovesComponent = createElement({
-    cssClass: CssClass.MOVES,
+    cssClass: styles.moves,
   });
   updateTurnMovesComponent();
 
   controlsComponent.appendChild(turnMovesComponent);
 
   const movementContainer = createElement({
-    cssClass: CssClass.MOVEMENT_CONTROLS,
+    cssClass: styles.movementControls,
   });
 
   const moveButtons = getAllMoveButtons();
@@ -54,14 +58,14 @@ export function getControlsComponent(): HTMLElement {
   controlsComponent.appendChild(movementContainer);
 
   toolContainer = createElement({
-    cssClass: CssClass.TOOL_CONTROLS,
+    cssClass: styles.toolControls,
   });
 
   const meowButton = createButton({
     text: "Meow",
     onClick: () => handleMove(Tool.MEOW),
   });
-  meowButton.classList.add(CssClass.MEOW);
+  meowButton.classList.add(catStyles.meow);
 
   recoveryInfoComponent = createElement();
 
@@ -129,7 +133,7 @@ function getMoveButton(direction: Direction): HTMLElement {
     iconBtn: true,
   });
 
-  const arrow = getArrowComponent(direction, false);
+  const arrow = getArrowComponent(direction);
   button.append(arrow);
 
   return button;
@@ -184,7 +188,7 @@ function setupEventListeners() {
 export function addContinueButtons() {
   const hasAchievedGoal = isWinConditionMet(globals.gameState) && globals.gameState.moves.length <= getParFromGameState(globals.gameState);
 
-  const newGameContainer = createElement({ cssClass: CssClass.NEW_GAME_CONTAINER });
+  const newGameContainer = createElement({ cssClass: styles.newGameContainer });
 
   const continueButton = createButton({
     text: getTranslation(isOnboarding() ? TranslationKey.CONTINUE : TranslationKey.NEW_GAME),
@@ -193,7 +197,7 @@ export function addContinueButtons() {
       newGameContainer.remove();
     },
   });
-  hasAchievedGoal && continueButton.classList.add("prm");
+  hasAchievedGoal && continueButton.classList.add(CssClass.PRM);
 
   const restartButton = createButton({
     text: getTranslation(TranslationKey.RESTART_GAME),
@@ -239,13 +243,13 @@ function updateRecoveryInfoComponent() {
 
   if (!toolsFrozenUntilTurn) {
     recoveryInfoComponent.innerHTML = "";
-    toolContainer.classList.remove(CssClass.DISABLED);
+    toolContainer.classList.remove(styles.disabled);
     return;
   }
 
   const turnsLeft = toolsFrozenUntilTurn - globals.gameState.moves.length;
   recoveryInfoComponent.innerHTML = `${turnsLeft}`;
-  toolContainer.classList.toggle(CssClass.DISABLED, turnsLeft > 0);
+  toolContainer.classList.toggle(styles.disabled, turnsLeft > 0);
 
   if (turnsLeft <= 0) {
     recoveryInfoComponent.innerHTML = "";
@@ -258,5 +262,5 @@ function updateToolContainer() {
 
   const shouldHaveTools = Object.values(globals.gameState.setup.config[ConfigCategory.TOOLS]).some(Boolean);
 
-  toolContainer.classList.toggle(CssClass.HIDDEN, !shouldHaveTools);
+  toolContainer.classList.toggle(styles.hidden, !shouldHaveTools);
 }
