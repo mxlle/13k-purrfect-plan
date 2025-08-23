@@ -1,5 +1,5 @@
-@import "../../theme";
-@import "../../names";
+@use "../../theme" as *;
+@use "../../names" as *;
 
 :global(.#{$OBJECT_BOX}) {
   width: 100%;

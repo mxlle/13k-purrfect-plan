@@ -1,7 +1,8 @@
+@use "sass:color";
 @use "../../grid-mixins";
 
-@import "../../theme";
-@import "../../names";
+@use "../../theme" as *;
+@use "../../names" as *;
 
 $border-style: outset;
 
@@ -23,8 +24,8 @@ $border-style: outset;
   }
 
   .#{$DARKNESS}:not(.#{$WON}) & {
-    --t: #{mix($tile-color-1, $bg-primary, 10%)};
-    border-color: mix($tile-color-1, $bg-primary, 15%);
+    --t: #{color.mix($tile-color-1, $bg-primary, 10%)};
+    border-color: color.mix($tile-color-1, $bg-primary, 15%);
   }
 }
 

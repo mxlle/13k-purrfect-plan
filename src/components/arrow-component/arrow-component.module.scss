@@ -1,5 +1,5 @@
 @use "../../theme";
-@import "../../names";
+@use "../../names" as *;
 
 .arrow {
   width: 100%;

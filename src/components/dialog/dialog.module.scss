@@ -1,5 +1,5 @@
 @use "../../theme";
-@use "../../names";
+@use "../../names" as *;
 
 .dialog {
   position: absolute;

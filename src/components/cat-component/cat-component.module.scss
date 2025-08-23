@@ -1,11 +1,12 @@
-@import "../../theme";
-@import "../../names";
+@use "../../theme" as *;
+@use "../../names" as *;
+@use "sass:color";
 
 :global(.#{$CAT_BOX}) {
   position: relative;
   width: 100%;
   height: 100%;
-  color: mix(#ff2ea6, white, 30%);
+  color: color.mix(#ff2ea6, white, 30%);
 
   &:nth-child(2) {
     z-index: 4;
