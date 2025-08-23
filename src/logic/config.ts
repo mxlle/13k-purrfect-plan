@@ -1,14 +1,16 @@
-import { ALL_CAT_IDS, ALL_KITTEN_IDS, CatId, KittenId } from "./data/cats";
+import { ALL_CAT_IDS, ALL_KITTEN_IDS, CatId, type KittenId } from "./data/catId";
 import { Tool } from "../types";
 import { ObjectId } from "./data/objects";
 import { GameSetup } from "./data/game-elements";
+import { defineEnum } from "../utils/enums";
 
-export enum ConfigCategory {
-  CATS = "Cats",
-  KITTEN_BEHAVIOR = "Kitten Behavior",
-  OBJECTS = "Objects",
-  TOOLS = "Tools",
-}
+export type ConfigCategory = defineEnum<typeof ConfigCategory>;
+export const ConfigCategory = defineEnum({
+  CATS: "Cats",
+  KITTEN_BEHAVIOR: "Kitten Behavior",
+  OBJECTS: "Objects",
+  TOOLS: "Tools",
+})
 
 export interface Config {
   [ConfigCategory.CATS]: Record<CatId, boolean>;

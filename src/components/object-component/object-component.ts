@@ -1,15 +1,17 @@
 import { createElement } from "../../utils/html-utils";
 import { CssClass } from "../../utils/css-class";
 
-import "./object-component.scss";
+import styles from "./object-component.module.scss";
 
 import { ObjectId } from "../../logic/data/objects";
 
+export { styles }
+
 export function createObjectElement(type: ObjectId): HTMLElement {
-  const cellTypeToCssClass: Record<ObjectId, CssClass> = {
-    [ObjectId.TREE]: CssClass.TREE,
-    [ObjectId.PUDDLE]: CssClass.PUDDLE,
-    [ObjectId.MOON]: CssClass.MOON,
+  const cellTypeToCssClass: Record<ObjectId, string> = {
+    [ObjectId.TREE]: styles.tree,
+    [ObjectId.PUDDLE]: styles.puddle,
+    [ObjectId.MOON]: styles.moon,
   };
 
   const objectBox = createElement({

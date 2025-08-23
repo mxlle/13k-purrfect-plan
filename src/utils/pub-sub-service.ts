@@ -1,11 +1,14 @@
-export const enum PubSubEvent {
-  START_NEW_GAME,
-  GAME_START,
-  GAME_END,
-  MUTE_MUSIC,
-  UNMUTE_MUSIC,
-  CLOSE_DIALOG,
-}
+import { defineEnum } from "./enums";
+
+type PubSubEvent = defineEnum<typeof PubSubEvent>
+export const PubSubEvent = defineEnum({
+  START_NEW_GAME: 0,
+  GAME_START: 1,
+  GAME_END: 2,
+  MUTE_MUSIC: 3,
+  UNMUTE_MUSIC: 4,
+  CLOSE_DIALOG: 5,
+})
 
 type EventDataTypes = {
   [PubSubEvent.START_NEW_GAME]: { shouldIncreaseLevel: boolean };

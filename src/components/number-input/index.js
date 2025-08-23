@@ -1,6 +1,6 @@
 import { createButton, createElement } from "../../utils/html-utils";
 
-import "./index.scss";
+import styles from "./index.module.scss";
 
 export function createNumberInputComponent({
   value,
@@ -12,7 +12,7 @@ export function createNumberInputComponent({
   hideButtons,
 }) {
   const numberInputContainer = createElement({
-    cssClass: "number-input",
+    cssClass: styles.numberInput,
   });
   const numberInput = createElement({ tag: "input" });
   numberInput.type = "number";

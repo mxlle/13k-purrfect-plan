@@ -1,16 +1,5 @@
 import { createCatElement } from "../../components/cat-component/cat-component";
-
-export enum CatId {
-  MOTHER = "🟣",
-  MOONY = "🟡",
-  IVY = "🟢",
-  SPLASHY = "🔵",
-}
-
-export const ALL_CAT_IDS = Object.values(CatId) as CatId[];
-export const ALL_KITTEN_IDS = ALL_CAT_IDS.filter((id) => !isMom(id)) as KittenId[];
-
-export type KittenId = Exclude<CatId, CatId.MOTHER>;
+import { CatId } from "./catId";
 
 export const CAT_NAMES: Record<CatId, string> = {
   [CatId.MOTHER]: "Amara",

@@ -16,7 +16,7 @@ interface GameGlobals {
 const onboardingStepSetting = getLocalStorageItem(LocalStorageKey.ONBOARDING_STEP);
 const difficultySetting = getLocalStorageItem(LocalStorageKey.DIFFICULTY);
 
-const initialDifficulty: Difficulty = difficultySetting ? Number(difficultySetting) : Difficulty.EASY;
+const initialDifficulty = difficultySetting ? Number(difficultySetting) as Difficulty : Difficulty.EASY;
 const initialSettings = difficultySettings[initialDifficulty];
 
 const defaultGlobals: GameGlobals = {

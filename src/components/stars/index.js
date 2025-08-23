@@ -1,6 +1,6 @@
 import { createElement } from "../../utils/html-utils";
 
-import "./index.scss";
+import styles from "./index.module.scss";
 
 import { PubSubEvent, pubSubService } from "../../utils/pub-sub-service";
 import { getLocalStorageItem, LocalStorageKey, setLocalStorageItem } from "../../utils/local-storage";
@@ -8,7 +8,7 @@ import { globals } from "../../globals";
 
 const EMPTY_STAR = "☆";
 export const FULL_STAR = "★";
-const zeroClass = "zero";
+const zeroClass = styles.zero;
 export const maxStars = 5;
 let currentStars = maxStars;
 let globalStars = 0;
@@ -16,7 +16,7 @@ let globalStarsElem;
 
 export function createStarComponent(achievedStars) {
   const stars = createElement({
-    cssClass: "stars",
+    cssClass: styles.stars,
   });
 
   for (let i = 0; i < maxStars; i++) {
@@ -57,7 +57,7 @@ export function getStarsForGameField() {
 export function createGlobalStarsComponent() {
   if (!globalStarsElem) {
     globalStarsElem = createElement({
-      cssClass: "global-stars",
+      cssClass: styles.globalStars,
     });
     setCurrentGlobalStars();
   }
@@ -66,9 +66,7 @@ export function createGlobalStarsComponent() {
 }
 
 export function createStarChartComponent() {
-  const starChart = createElement({
-    cssClass: "star-chart",
-  });
+  const starChart = createElement();
 
   const notYetReachedNumbers = [];
 
@@ -77,9 +75,9 @@ export function createStarChartComponent() {
     const achievedStars = starMap[i];
 
     const starContainer = createElement({
-      cssClass: "star-container",
+      cssClass: styles.starContainer,
     });
-    starContainer.appendChild(createElement({ text: i, cssClass: "number" }));
+    starContainer.appendChild(createElement({ text: i }));
     starContainer.appendChild(createStarComponent(achievedStars ?? 0));
 
     if (achievedStars === undefined) {

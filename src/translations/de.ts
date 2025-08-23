@@ -1,7 +1,7 @@
-import { TranslationKey } from "./i18n";
+import { TranslationKey } from "./translationKey";
 
 export function getDeTranslationMap(): Record<TranslationKey, string> {
-  if (process.env.GERMAN_ENABLED === "true") {
+  if (import.meta.env.GERMAN_ENABLED === "true") {
     return deTranslations;
   }
 

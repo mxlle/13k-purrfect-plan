@@ -1,15 +1,17 @@
 import { Direction, isTool, RECOVERY_TIME_MAP, Tool, TurnMove } from "../types";
 import { PubSubEvent, pubSubService } from "../utils/pub-sub-service";
 import { getKittensElsewhere, getKittensOnCell, isValidCellPosition } from "./checks";
-import { ALL_CAT_IDS, CAT_NAMES, CatId } from "./data/cats";
+import { ALL_CAT_IDS, CatId } from "./data/catId";
+import { CAT_NAMES } from "./data/cats";
 import { CellPosition, isSameCell } from "./data/cell";
 import { playSoundForAction } from "../audio/sound-control/sound-control";
-import { CssClass } from "../utils/css-class";
 import { updateAllPositions } from "../components/game-field/game-field";
 import { sleep } from "../utils/promise-utils";
 import { ConfigCategory, shouldApplyKittenBehavior } from "./config";
 import { ObjectId } from "./data/objects";
 import { GameState } from "./data/game-elements";
+
+import { styles as catStyles } from "../components/cat-component/cat-component";
 
 let isPerformingMove = false;
 
@@ -113,7 +115,7 @@ function doMoonMove(gameState: GameState) {
 async function preToolAction(tool: Tool) {
   switch (tool) {
     case Tool.MEOW:
-      document.body.classList.add(CssClass.MEOW);
+      document.body.classList.add(catStyles.meow);
 
       await sleep(300); // Wait for meow speech bubble to appear
 
@@ -125,7 +127,7 @@ async function postToolAction(tool: Tool) {
   switch (tool) {
     case Tool.MEOW:
       setTimeout(() => {
-        document.body.classList.remove(CssClass.MEOW);
+        document.body.classList.remove(catStyles.meow);
       }, MEOW_TIME);
       break;
   }

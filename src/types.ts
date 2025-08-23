@@ -1,20 +1,23 @@
-import { CssClass } from "./utils/css-class";
+import { defineEnum } from "./utils/enums";
+import { styles as arrowStyles } from "./components/arrow-component/arrow-component";
 
 export interface Settings {
   minAmount: number;
   maxAmount: number;
 }
 
-export enum Direction {
-  UP = CssClass.UP,
-  DOWN = CssClass.DOWN,
-  LEFT = CssClass.LEFT,
-  RIGHT = CssClass.RIGHT,
-}
+export type Direction = defineEnum<typeof Direction>;
+export const Direction = defineEnum({
+  UP: arrowStyles.up,
+  DOWN: arrowStyles.down,
+  LEFT: arrowStyles.left,
+  RIGHT: arrowStyles.right,
+});
 
-export enum Tool {
-  MEOW = "meow",
-}
+export type Tool = defineEnum<typeof Tool>;
+export const Tool = defineEnum({
+  MEOW: "meow",
+});
 
 type RecoveryTurnCount = number;
 

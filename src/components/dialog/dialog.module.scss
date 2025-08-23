@@ -1,4 +1,5 @@
 @use "../../theme";
+@use "../../names" as *;
 
 .dialog {
   position: absolute;
@@ -33,7 +34,7 @@
     }
   }
 
-  .icon-btn {
+  :global(.#{$ICON_BTN}) {
     position: absolute;
     top: 1rem;
     right: 1rem;

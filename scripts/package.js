@@ -7,6 +7,7 @@ const rootDir = resolve(fileURLToPath(import.meta.url), "../..");
 const distDir = resolve(rootDir, "dist");
 const zipFile = join(rootDir, "dist.zip");
 
+
 const output = createWriteStream(zipFile);
 const archive = archiver("zip", { zlib: { level: 9 } });
 
@@ -15,4 +16,4 @@ archive.directory(distDir, false);
 await archive.finalize();
 
 console.log(`${relative(rootDir, zipFile)} created`);
-console.log(`${archive.pointer()} / ${13 * 1024} total bytes`);
+console.log(`${(archive.pointer()/1000).toFixed(3)} / ${(13 * 1024 / 1000).toFixed(3)} kB`);

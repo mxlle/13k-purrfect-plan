@@ -1,17 +1,19 @@
 import { createElement } from "../../utils/html-utils";
 
-import "./arrow-component.scss";
+import styles from "./arrow-component.module.scss";
 
 import arrowIcon from "./arrow-fat.svg";
-import { CssClass } from "../../utils/css-class";
 import { Direction } from "../../types";
 
-export function getArrowComponent(direction: Direction, shouldAnimate: boolean): HTMLElement {
+export function getArrowComponent(direction: Direction): HTMLElement {
+
   const arrow = createElement({
-    cssClass: `${CssClass.ARROW} ${direction} ${shouldAnimate && CssClass.ANIMATED}`,
+    cssClass: `${styles.arrow} ${direction}`,
   });
 
-  arrow.append(arrowIcon());
+  arrow.innerHTML = arrowIcon;
 
   return arrow;
 }
+
+export { styles }

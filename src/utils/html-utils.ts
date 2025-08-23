@@ -1,4 +1,5 @@
 import { sleep } from "./promise-utils";
+import { CssClass } from "./css-class";
 
 export function addCanvasToBody() {
   const canvas = createElement({
@@ -54,7 +55,7 @@ export function createButton({
 }) {
   const button = createElement({
     tag: "button",
-    cssClass: iconBtn ? "icon-btn" : "",
+    cssClass: iconBtn ? CssClass.ICON_BTN : "",
     onClick,
   });
   if (text) {

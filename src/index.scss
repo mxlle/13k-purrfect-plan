@@ -1,5 +1,5 @@
-@import "theme";
-@import "names";
+@use "theme" as *;
+@use "names" as *;
 
 html,
 body {
@@ -18,17 +18,13 @@ body {
   }
 }
 
-.title {
+.#{$TITLE} {
   color: $main-color;
   font-family: monospace;
 
   @media (max-width: 640px) {
     font-size: 0.8rem;
   }
-}
-
-.#{$HIDDEN} {
-  display: none !important;
 }
 
 html {
@@ -80,10 +76,10 @@ header {
   align-items: center;
   gap: 1rem;
 
-  .h-btns {
-    display: flex;
-    gap: 0.5rem;
-  }
+  //.h-btns {
+  //  display: flex;
+  //  gap: 0.5rem;
+  //}
 }
 
 button {
@@ -100,7 +96,7 @@ button {
     background-color: $bg-alpha-10;
   }
 
-  &.prm {
+  &.#{$PRM} {
     border-color: $main-color;
     background-color: $main-color;
 
@@ -115,7 +111,7 @@ button {
   }
 }
 
-button.icon-btn {
+button.#{$ICON_BTN} {
   width: 2rem;
   height: 2rem;
   display: grid;
@@ -129,7 +125,13 @@ button.icon-btn {
   transform: scale(1);
   transition: transform 0.3s;
 
-  @include hover {
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      transform: scale(1.2);
+    }
+  }
+
+  &.#{$TOUCHING} {
     transform: scale(1.2);
   }
 }
@@ -141,10 +143,6 @@ h3 {
 p {
   margin: 0;
   margin-bottom: 0.5rem;
-}
-
-.hidden {
-  display: none !important;
 }
 
 ul {

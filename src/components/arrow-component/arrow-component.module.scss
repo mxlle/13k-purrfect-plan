@@ -1,0 +1,40 @@
+@use "../../theme";
+@use "../../names" as *;
+
+.arrow {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+
+  svg {
+    color: theme.$main-color;
+    width: 75%;
+    height: 75%;
+  }
+
+  &.right {}
+  &.left {
+    transform: rotate(180deg);
+  }
+
+  &.up {
+    transform: rotate(270deg);
+  }
+
+  &.down {
+    transform: rotate(90deg);
+  }
+}
+
+@keyframes point {
+  0% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(10%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}

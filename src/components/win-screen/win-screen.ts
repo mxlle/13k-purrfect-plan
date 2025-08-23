@@ -2,7 +2,7 @@ import "./win-screen.scss";
 
 import { createDialog, Dialog } from "../dialog/dialog";
 import { createButton, createElement } from "../../utils/html-utils";
-import { getTranslation, TranslationKey } from "../../translations/i18n";
+import { getTranslation } from "../../translations/i18n";
 import { getOnboardingData, isOnboarding } from "../../logic/onboarding";
 import {
   difficulties,
@@ -13,6 +13,7 @@ import {
   setDifficultyStats,
 } from "../../logic/difficulty";
 import { globals } from "../../globals";
+import { TranslationKey } from "../../translations/translationKey";
 import { PubSubEvent, pubSubService } from "../../utils/pub-sub-service";
 import { isWinConditionMet } from "../../logic/game-logic";
 
