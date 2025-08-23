@@ -1,5 +1,4 @@
 import { defineEnum } from "./utils/enums";
-import { styles as arrowStyles } from "./components/arrow-component/arrow-component";
 
 export interface Settings {
   minAmount: number;
@@ -8,10 +7,10 @@ export interface Settings {
 
 export type Direction = defineEnum<typeof Direction>;
 export const Direction = defineEnum({
-  UP: arrowStyles.up,
-  DOWN: arrowStyles.down,
-  LEFT: arrowStyles.left,
-  RIGHT: arrowStyles.right,
+  UP: "up",
+  DOWN: "down",
+  LEFT: "left",
+  RIGHT: "right",
 });
 
 export type Tool = defineEnum<typeof Tool>;

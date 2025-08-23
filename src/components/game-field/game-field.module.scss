@@ -23,7 +23,7 @@ $border-style: outset;
     display: contents;
   }
 
-  .#{$DARKNESS}:not(.#{$WON}) & {
+  :global(.#{$DARKNESS}):not(:global(.#{$WON})) & {
     --t: #{color.mix($tile-color-1, $bg-primary, 10%)};
     border-color: color.mix($tile-color-1, $bg-primary, 15%);
   }

@@ -7,7 +7,7 @@
   position: relative;
   transition: opacity 0.3s;
 
-  .#{$DARKNESS}:not(.#{$WON}) & {
+  :global(.#{$DARKNESS}):not(:global(.#{$WON})) & {
     opacity: 0.2;
   }
 
@@ -47,7 +47,8 @@
     top: 10%;
     left: 10%;
 
-    background: radial-gradient(120px 90px at 62% 38%, rgba(170, 210, 255, 0.25), rgba(170, 210, 255, 0) 60%),
+    background:
+      radial-gradient(120px 90px at 62% 38%, rgba(170, 210, 255, 0.25), rgba(170, 210, 255, 0) 60%),
       radial-gradient(80px 60px at 34% 68%, rgba(140, 190, 255, 0.2), rgba(140, 190, 255, 0) 60%), $water;
   }
 
