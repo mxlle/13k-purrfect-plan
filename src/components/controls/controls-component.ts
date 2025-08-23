@@ -23,7 +23,7 @@ import { ConfigCategory } from "../../logic/config";
 import { FALLBACK_PAR } from "../../logic/par";
 import { getParFromGameState } from "../../logic/data/game-elements";
 
-export { styles }
+export { styles };
 
 let hasSetupEventListeners = false;
 let controlsComponent: HTMLElement | undefined;
@@ -207,7 +207,7 @@ export function addContinueButtons() {
     },
   });
 
-  !hasAchievedGoal && restartButton.classList.add("prm");
+  !hasAchievedGoal && restartButton.classList.add(CssClass.PRM);
 
   newGameContainer.appendChild(continueButton);
   newGameContainer.appendChild(restartButton);

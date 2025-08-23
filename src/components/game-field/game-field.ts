@@ -1,7 +1,7 @@
 import styles from "./game-field.module.scss";
-import { styles as controlsStyles } from "../controls/controls-component";
+import { getControlsComponent, styles as controlsStyles } from "../controls/controls-component";
 import { styles as arrowStyles } from "../arrow-component/arrow-component";
-import { styles as catStyles } from "../cat-component/cat-component";
+import { getCatIdClass, styles as catStyles } from "../cat-component/cat-component";
 
 import { createButton, createElement } from "../../utils/html-utils";
 import { getTranslation } from "../../translations/i18n";
@@ -11,9 +11,7 @@ import { generateRandomGameSetup } from "../../logic/initialize";
 import { handlePokiCommercial } from "../../poki-integration";
 import { getOnboardingData, increaseOnboardingStepIfApplicable, isSameLevel, OnboardingData } from "../../logic/onboarding";
 import { CssClass } from "../../utils/css-class";
-import { getControlsComponent } from "../controls/controls-component";
 import { ALL_CAT_IDS } from "../../logic/data/catId";
-import { CAT_COLOR_IDS } from "../../logic/data/cats";
 import { CellPosition, getCellDifference } from "../../logic/data/cell";
 import { PubSubEvent, pubSubService } from "../../utils/pub-sub-service";
 import { isTool } from "../../types";
@@ -37,7 +35,6 @@ const TIMEOUT_BETWEEN_GAMES = 300;
 const TIMEOUT_CELL_APPEAR = -1;
 
 export async function initializeEmptyGameField(fieldSize: FieldSize) {
-
   if (gameFieldElem) {
     console.error("initialize function should only be called once");
     return;
@@ -226,10 +223,7 @@ export async function initializeCatsOnGameField(gameState: GameState, isInitialS
     if (representation) {
       const cellElement = getCellElement(representation.initialPosition);
       cellElement.append(representation.htmlElement);
-      representation.htmlElement.classList.toggle(
-        `${catStyles.catColor}${CAT_COLOR_IDS[catId]}`,
-        gameState.setup.config[ConfigCategory.KITTEN_BEHAVIOR][catId],
-      );
+      representation.htmlElement.classList.toggle(getCatIdClass(catId), gameState.setup.config[ConfigCategory.KITTEN_BEHAVIOR][catId]);
     }
   }
 

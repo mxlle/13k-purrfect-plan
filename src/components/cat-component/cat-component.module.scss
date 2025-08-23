@@ -99,17 +99,14 @@
 }
 
 .ivy {
-  --t-x: -35%;
   color: #009e28;
 }
 
 .splashy {
-  --t-x: 35%;
   color: #106dff;
 }
 
 :global(.#{$CELL}) {
-
   .cat {
     &:not(.isMom) {
       transform: scale(0.7) translate(var(--t-x, 0), 22%);
@@ -131,5 +128,4 @@
   .isMom {
     transform: scale(0.95);
   }
-
 }
