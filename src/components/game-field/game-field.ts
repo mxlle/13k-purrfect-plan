@@ -14,10 +14,10 @@ import { CssClass } from "../../utils/css-class";
 import { ALL_CAT_IDS, ALL_KITTEN_IDS } from "../../logic/data/catId";
 import { CellPosition, getCellDifference, getDirection } from "../../logic/data/cell";
 import { PubSubEvent, pubSubService } from "../../utils/pub-sub-service";
-import { isTool, SpecialAction } from "../../types";
+import { isTool, ObjectId, SpecialAction } from "../../types";
 import { ConfigCategory } from "../../logic/config/config";
 import { FieldSize } from "../../logic/data/field-size";
-import { ALL_OBJECT_IDS, ObjectId } from "../../logic/data/objects";
+import { ALL_OBJECT_IDS } from "../../logic/data/objects";
 import { isValidCellPosition } from "../../logic/checks";
 import { deserializeGame, serializeGame } from "../../logic/serializer";
 import {

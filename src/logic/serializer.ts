@@ -1,5 +1,6 @@
 import { DEFAULT_FIELD_SIZE } from "./data/field-size";
-import { DEFAULT_MOON_POSITION, ObjectId } from "./data/objects";
+import { DEFAULT_MOON_POSITION } from "./data/objects";
+import { ObjectId } from "../types";
 import { EMPTY_ELEMENT_MAP, GameElementId, GameElementPositions, GameSetup } from "./data/game-elements";
 import { allInConfig } from "./config/config";
 import { calculatePar } from "./par";

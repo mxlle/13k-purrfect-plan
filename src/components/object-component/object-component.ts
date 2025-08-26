@@ -1,9 +1,8 @@
 import { createElement } from "../../utils/html-utils";
 import { CssClass } from "../../utils/css-class";
+import { ObjectId } from "../../types";
 
 import styles from "./object-component.module.scss";
-
-import { ObjectId } from "../../logic/data/objects";
 
 export { styles }
 
