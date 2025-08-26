@@ -39,7 +39,9 @@ export default defineConfig(({ mode, command }) => {
       cssMinify: production ? "lightningcss" : false,
       terserOptions: {
         mangle: {
-          properties: true,
+          properties: {
+            keep_quoted: true,
+          },
         },
         compress: {
           booleans_as_integers: true,
