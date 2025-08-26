@@ -1,12 +1,24 @@
-import { CatId } from "../../logic/data/catId";
+import { CatId, KittenId } from "../../logic/data/catId";
 import { createElement } from "../../utils/html-utils";
 import { CssClass } from "../../utils/css-class";
 import catSvg from "./black-cat-pink-eyes.svg";
 
 import styles from "./cat-component.module.scss";
 import { isMom } from "../../logic/data/cats";
+import { hasSoundForAction, playSoundForAction } from "../../audio/sound-control/sound-control";
+import { Tool } from "../../types";
+import { sleep } from "../../utils/promise-utils";
 
 export { styles };
+
+const MOM_PLAYBACK_RATE = 1.2;
+
+const playbackRateMap: Record<CatId, number> = {
+  [CatId.MOTHER]: MOM_PLAYBACK_RATE,
+  [CatId.MOONY]: MOM_PLAYBACK_RATE * 1.6,
+  [CatId.IVY]: MOM_PLAYBACK_RATE * 1.2,
+  [CatId.SPLASHY]: MOM_PLAYBACK_RATE * 1.4,
+};
 
 export function createCatElement(catId: CatId): HTMLElement {
   const catBox = createElement({
@@ -15,6 +27,9 @@ export function createCatElement(catId: CatId): HTMLElement {
 
   const catElem = createElement({
     cssClass: `${styles.cat} ${isMom(catId) ? styles.isMom : ""} ''`,
+    onClick: () => {
+      void meow(catId);
+    },
   });
 
   catElem.innerHTML = catSvg;
@@ -22,6 +37,19 @@ export function createCatElement(catId: CatId): HTMLElement {
   catBox.append(catElem);
 
   return catBox;
+}
+
+export function meow(catId: CatId): Promise<void> {
+  return playSoundForAction(Tool.MEOW, playbackRateMap[catId]);
+}
+
+export async function kittenMeows(kittens: KittenId[], doubleMeow?: boolean): Promise<void> {
+  if (!hasSoundForAction(Tool.MEOW)) return;
+
+  for (const kitten of kittens) {
+    await sleep(50);
+    void meow(kitten).then(() => doubleMeow && meow(kitten));
+  }
 }
 
 export function getCatIdClass(catId: CatId): string {

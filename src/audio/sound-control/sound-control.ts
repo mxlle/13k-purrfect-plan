@@ -1,24 +1,42 @@
 import { TurnMove } from "../../types";
+import { getLocalStorageItem, LocalStorageKey, setLocalStorageItem } from "../../utils/local-storage";
 
 const soundMap: Partial<Record<TurnMove, string>> = {};
 
 export function hasSoundForAction(action: TurnMove): boolean {
-  return Boolean(soundMap[action]);
+  return Boolean(getSoundForAction(action));
 }
 
-export async function playSoundForAction(action: TurnMove) {
-  const soundSrc = soundMap[action];
+export async function playSoundForAction(action: TurnMove, playbackRate: number = 1) {
+  const soundSrc = getSoundForAction(action);
   if (!soundSrc) return;
 
   const audio = new Audio(soundSrc);
   audio.preload = "auto";
+  audio.preservesPitch = false;
+  audio.playbackRate = playbackRate;
   audio.play().catch((error) => {
     console.error("Error playing sound:", error);
   });
+
+  return new Promise<void>((resolve) => {
+    audio.addEventListener("ended", () => resolve());
+    audio.addEventListener("error", () => resolve());
+  });
+}
+
+function getSoundForAction(action: TurnMove): string | undefined {
+  if (!soundMap[action]) {
+    soundMap[action] = getLocalStorageItem(LocalStorageKey.SOUND, action);
+  }
+
+  return soundMap[action];
 }
 
 export function saveRecording(action: TurnMove, audioSrc: string) {
   soundMap[action] = audioSrc;
+
+  setLocalStorageItem(LocalStorageKey.SOUND, audioSrc, action);
 }
 
 export type ActiveRecording = {

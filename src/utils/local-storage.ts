@@ -2,7 +2,7 @@ import { defineEnum } from "./enums";
 
 const LOCAL_STORAGE_PREFIX = "mxlle13";
 
-export type LocalStorageKey = defineEnum<typeof LocalStorageKey>
+export type LocalStorageKey = defineEnum<typeof LocalStorageKey>;
 export const LocalStorageKey = defineEnum({
   MUTED: "muted",
   ONBOARDING_STEP: "onbStep",
@@ -11,23 +11,24 @@ export const LocalStorageKey = defineEnum({
   DIFFICULTY_MEDIUM: "d8y1",
   DIFFICULTY_HARD: "d8y2",
   DIFFICULTY_EXTREME: "d8y3",
+  SOUND: "sound",
 });
 
-export function setLocalStorageItem(key: LocalStorageKey, value: string | false) {
+export function setLocalStorageItem(key: LocalStorageKey, value: string | false, postfix?: string) {
   if (value === false) {
     removeLocalStorageItem(key);
     return;
   }
 
-  localStorage.setItem(LOCAL_STORAGE_PREFIX + "." + key, value);
+  localStorage.setItem(LOCAL_STORAGE_PREFIX + "." + key + (postfix ? "." + postfix : ""), value);
 }
 
-export function getLocalStorageItem(key: LocalStorageKey) {
-  return localStorage.getItem(LOCAL_STORAGE_PREFIX + "." + key);
+export function getLocalStorageItem(key: LocalStorageKey, postfix?: string) {
+  return localStorage.getItem(LOCAL_STORAGE_PREFIX + "." + key + (postfix ? "." + postfix : ""));
 }
 
-export function removeLocalStorageItem(key: LocalStorageKey) {
-  localStorage.removeItem(LOCAL_STORAGE_PREFIX + "." + key);
+export function removeLocalStorageItem(key: LocalStorageKey, postfix?: string) {
+  localStorage.removeItem(LOCAL_STORAGE_PREFIX + "." + key + (postfix ? "." + postfix : ""));
 }
 
 export function getArrayFromStorage(key: LocalStorageKey) {

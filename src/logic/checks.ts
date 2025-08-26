@@ -1,14 +1,14 @@
-import { ALL_KITTEN_IDS, CatId } from "./data/catId";
+import { ALL_KITTEN_IDS, KittenId } from "./data/catId";
 import { CellPosition, isEmptyField, isSameCell } from "./data/cell";
 import { FieldSize } from "./data/field-size";
 import { ObjectId } from "./data/objects";
 import { GameSetup, GameState } from "./data/game-elements";
 
-export function getKittensOnCell(gameState: GameState, cell: CellPosition): CatId[] {
+export function getKittensOnCell(gameState: GameState, cell: CellPosition): KittenId[] {
   return ALL_KITTEN_IDS.filter((catId) => isSameCell(gameState.currentPositions[catId], cell));
 }
 
-export function getKittensElsewhere(gameState: GameState, cell: CellPosition): CatId[] {
+export function getKittensElsewhere(gameState: GameState, cell: CellPosition): KittenId[] {
   return ALL_KITTEN_IDS.filter((catId) => !isSameCell(gameState.currentPositions[catId], cell));
 }
 

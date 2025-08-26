@@ -1,17 +1,16 @@
 import { Direction, isDirection, isSpecialAction, isTool, RECOVERY_TIME_MAP, SpecialAction, Tool, TurnMove } from "../types";
 import { PubSubEvent, pubSubService } from "../utils/pub-sub-service";
 import { getKittensElsewhere, getKittensOnCell, isValidCellPosition } from "./checks";
-import { ALL_CAT_IDS, CatId } from "./data/catId";
+import { ALL_CAT_IDS, ALL_KITTEN_IDS, CatId } from "./data/catId";
 import { CAT_NAMES } from "./data/cats";
 import { CellPosition, isSameCell } from "./data/cell";
-import { playSoundForAction } from "../audio/sound-control/sound-control";
 import { updateAllPositions } from "../components/game-field/game-field";
 import { sleep } from "../utils/promise-utils";
 import { ConfigCategory, shouldApplyKittenBehavior } from "./config";
 import { ObjectId } from "./data/objects";
 import { deepCopyElementsMap, GameElementPositions, GameState } from "./data/game-elements";
 
-import { styles as catStyles } from "../components/cat-component/cat-component";
+import { kittenMeows, meow, styles as catStyles } from "../components/cat-component/cat-component";
 import { globals } from "../globals";
 
 let isPerformingMove = false;
@@ -33,21 +32,33 @@ export async function performMove(gameState: GameState, turnMove: TurnMove) {
 
   isPerformingMove = true;
 
-  gameState.moves.push(turnMove);
+  try {
+    gameState.moves.push(turnMove);
 
-  await playSoundForAction(turnMove);
-  isTool(turnMove) && (await preToolAction(turnMove));
+    const toolStartPromise = isTool(turnMove) ? preToolAction(turnMove) : Promise.resolve();
 
-  gameState.currentPositions = calculateNewPositions(gameState, turnMove);
+    const kittensOnCellBefore = getKittensOnCell(gameState, gameState.currentPositions[CatId.MOTHER]);
+    gameState.currentPositions = calculateNewPositions(gameState, turnMove);
+    const kittensOnCellAfter = getKittensOnCell(gameState, gameState.currentPositions[CatId.MOTHER]);
 
-  isTool(turnMove) && (await postToolAction(turnMove));
+    await toolStartPromise;
 
-  globals.nextPositionsIfWait = calculateNewPositions(gameState, SpecialAction.WAIT);
+    globals.nextPositionsIfWait = calculateNewPositions(gameState, SpecialAction.WAIT);
 
-  updateAllPositions(gameState, globals.nextPositionsIfWait);
+    updateAllPositions(gameState, globals.nextPositionsIfWait);
 
-  if (isWinConditionMet(gameState)) {
-    pubSubService.publish(PubSubEvent.GAME_END);
+    isTool(turnMove) && (await postToolAction(turnMove));
+
+    const newKittensOnCell = kittensOnCellAfter.filter((kitten) => !kittensOnCellBefore.includes(kitten));
+    await kittenMeows(newKittensOnCell);
+
+    if (isWinConditionMet(gameState)) {
+      pubSubService.publish(PubSubEvent.GAME_END);
+
+      await kittenMeows(ALL_KITTEN_IDS, true);
+    }
+  } catch (error) {
+    console.error("Error performing move:", error);
   }
 
   isPerformingMove = false;
@@ -136,7 +147,7 @@ async function preToolAction(tool: Tool) {
     case Tool.MEOW:
       document.body.classList.add(catStyles.meow);
 
-      await sleep(300); // Wait for meow speech bubble to appear
+      await Promise.all([meow(CatId.MOTHER), sleep(300)]); // Wait for meow speech bubble to appear
 
       break;
   }
@@ -197,7 +208,7 @@ function handleKittenBehavior(
 
   // on swap, revert kitten to previous position
   if (isSameCell(newPosition, previousMotherPosition) && isSameCell(previousPosition, newMotherPosition)) {
-    console.debug(`Reverting ${CAT_NAMES[kitten]} to previous position:`, previousPosition);
+    // console.debug(`Reverting ${CAT_NAMES[kitten]} to previous position:`, previousPosition);
     newPosition = previousPosition;
   }
 
