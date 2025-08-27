@@ -48,3 +48,12 @@ export function shouldApplyKittenBehavior(gameSetup: GameSetup, catId: CatId): b
 export function hasMoveLimit(gameSetup: GameSetup): boolean {
   return Object.values(gameSetup.config[ConfigCategory.CONSTRAINTS]).some((enabled) => enabled);
 }
+
+export function copyConfig(config: Config): Config {
+  return {
+    [ConfigCategory.KITTEN_BEHAVIOR]: { ...config[ConfigCategory.KITTEN_BEHAVIOR] },
+    [ConfigCategory.OBJECTS]: { ...config[ConfigCategory.OBJECTS] },
+    [ConfigCategory.TOOLS]: { ...config[ConfigCategory.TOOLS] },
+    [ConfigCategory.CONSTRAINTS]: { ...config[ConfigCategory.CONSTRAINTS] },
+  };
+}

@@ -1,8 +1,8 @@
 import "./index.scss";
 
-import { createElement } from "./utils/html-utils";
+import { createButton, createElement } from "./utils/html-utils";
 import { PubSubEvent, pubSubService } from "./utils/pub-sub-service";
-import { initializeEmptyGameField, startNewGame } from "./components/game-field/game-field";
+import { initializeEmptyGameField, startNewGame, toggleConfig } from "./components/game-field/game-field";
 import { initPoki } from "./poki-integration";
 import { isOnboarding } from "./logic/onboarding";
 import { isGameInProgress } from "./globals";
@@ -25,9 +25,9 @@ function init() {
 
   header.append(titleElement);
 
-  // const btnContainer = createElement({
-  //   cssClass: "h-btns",
-  // });
+  const btnContainer = createElement({
+    cssClass: "h-btns",
+  });
   // const muteButton = createButton({
   //   text: initializeMuted ? "🔇" : "🔊",
   //   onClick: (event: MouseEvent) => {
@@ -38,10 +38,12 @@ function init() {
   // });
   //
   // btnContainer.append(muteButton);
-  //
-  // header.append(btnContainer);
-  //
-  // btnContainer.append(createButton({ text: "⚙️", onClick: () => createWinScreen(currentScore, false), iconBtn: true }));
+
+  if (import.meta.env.DEV) {
+    header.append(btnContainer);
+  }
+
+  btnContainer.append(createButton({ text: "⚙️", onClick: () => toggleConfig(), iconBtn: true }));
 
   document.body.append(header);
 

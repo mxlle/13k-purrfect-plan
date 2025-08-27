@@ -244,13 +244,15 @@ async function handleMove(turnMove: TurnMove) {
 function updateTurnMovesComponent() {
   if (!turnMovesComponent) return;
 
-  turnMovesComponent.style.display = hasMoveLimit(globals.gameState.setup) ? "block" : "none";
+  const showMoves = globals.gameState && hasMoveLimit(globals.gameState.setup);
+
+  turnMovesComponent.style.display = showMoves ? "block" : "none";
   const par = getParFromGameState(globals.gameState);
   const parString = par ? ` / ${par < FALLBACK_PAR ? par : "?"}` : "";
   turnMovesComponent.innerHTML = `${getTranslation(TranslationKey.MOVES)}: ${globals.gameState?.moves.length ?? 0}${parString}`;
 
   if (!solutionsComponent) return;
-  solutionsComponent.style.display = hasMoveLimit(globals.gameState.setup) ? "flex" : "none";
+  solutionsComponent.style.display = showMoves ? "flex" : "none";
   const solutionsCount = getPossibleSolutionsCount(globals.gameState);
   solutionsComponent.innerHTML = `${getTranslation(TranslationKey.POSSIBLE_SOLUTIONS)}: ${solutionsCount ?? "?"}`;
 

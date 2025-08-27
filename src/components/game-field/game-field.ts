@@ -30,16 +30,21 @@ import {
 } from "../../logic/data/game-elements";
 import { calculateNewPositions, isWinConditionMet } from "../../logic/game-logic";
 import { TranslationKey } from "../../translations/translationKey";
+import { getConfigComponent } from "../config/config-component";
 
 let mainContainer: HTMLElement | undefined;
 let gameFieldElem: HTMLElement | undefined;
 let controlsElem: HTMLElement | undefined;
+let configElem: HTMLElement | undefined;
 let startButton: HTMLElement | undefined;
-let onboardingArrow: HTMLElement | undefined;
 const cellElements: HTMLElement[][] = [];
 
 const TIMEOUT_BETWEEN_GAMES = 300;
 const TIMEOUT_CELL_APPEAR = -1;
+
+export function toggleConfig() {
+  configElem?.classList.toggle(CssClass.HIDDEN);
+}
 
 export async function initializeEmptyGameField(fieldSize: FieldSize) {
   if (gameFieldElem) {
@@ -89,6 +94,8 @@ export async function startNewGame(options: { shouldIncreaseLevel: boolean } = {
       gameFieldElem = undefined;
       controlsElem?.remove();
       controlsElem = undefined;
+      configElem?.remove();
+      configElem = undefined;
     }
   }
 
@@ -127,6 +134,12 @@ export async function startNewGame(options: { shouldIncreaseLevel: boolean } = {
     throw new Error("Generated or provided game setup is invalid, cannot start game.", { cause: gameSetup });
   }
 
+  await refreshFieldWithSetup(gameSetup, onboardingData, isInitialStart);
+
+  addOnboardingSuggestionIfApplicable(onboardingData);
+}
+
+export async function refreshFieldWithSetup(gameSetup: GameSetup, onboardingData: OnboardingData | undefined, isInitialStart: boolean) {
   globals.gameState = getInitialGameState(gameSetup);
   globals.nextPositionsIfWait = calculateNewPositions(globals.gameState, SpecialAction.WAIT);
   const serializedGameSetup = serializeGame(gameSetup);
@@ -144,8 +157,6 @@ export async function startNewGame(options: { shouldIncreaseLevel: boolean } = {
   await initializeObjectsOnGameField(globals.gameState);
 
   await initializeCatsOnGameField(globals.gameState, globals.nextPositionsIfWait, isInitialStart);
-
-  addOnboardingSuggestionIfApplicable(onboardingData);
 }
 
 function appendGameField() {
@@ -162,6 +173,11 @@ function appendGameField() {
   }
 
   mainContainer.append(gameFieldElem);
+
+  configElem = getConfigComponent();
+  configElem.classList.add(CssClass.HIDDEN);
+
+  mainContainer.append(configElem);
 
   controlsElem = getControlsComponent();
 

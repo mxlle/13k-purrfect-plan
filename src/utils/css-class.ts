@@ -11,4 +11,5 @@ export const CssClass = defineEnum({
   WON: "global__won",
   TOUCHING: "global__touching",
   ICON_BTN: "global__icon-btn",
-})
+  HIDDEN: "global__hidden",
+});

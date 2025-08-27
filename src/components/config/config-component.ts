@@ -1,14 +1,21 @@
-import { createElement } from "../../utils/html-utils";
+import { createButton, createElement } from "../../utils/html-utils";
 
 import styles from "./config-component.module.scss";
-import { getCatElement } from "../../logic/data/cats";
-import { ALL_KITTEN_IDS } from "../../logic/data/catId";
-import { globals } from "../../globals";
+import { getCatElement, isCatId } from "../../logic/data/cats";
+import { ALL_KITTEN_IDS, CatId } from "../../logic/data/catId";
 import { createObjectElement } from "../object-component/object-component";
-import { allCategories, ConfigCategory, ConfigItemId } from "../../logic/config/config";
-import { ObjectId } from "../../logic/data/objects";
+import { allCategories, allInConfig, ConfigCategory, ConfigItemId, copyConfig } from "../../logic/config/config";
+import { ALL_OBJECT_IDS } from "../../logic/data/objects";
+import { getCatIdClass, meow } from "../cat-component/cat-component";
+import { Tool } from "../../types";
+import { Constraint } from "../../logic/config/constraint";
+import { globals } from "../../globals";
+import { copyGameSetup, GameSetup, GameState } from "../../logic/data/game-elements";
+import { refreshFieldWithSetup } from "../game-field/game-field";
+import { calculatePar } from "../../logic/par";
 
 let configComponent: HTMLElement | undefined;
+let configObject = copyConfig({ ...allInConfig });
 
 export function getConfigComponent(): HTMLElement {
   configComponent = createElement({
@@ -16,11 +23,40 @@ export function getConfigComponent(): HTMLElement {
   });
 
   for (const category of allCategories) {
+    if (category === ConfigCategory.OBJECTS) continue;
     const categoryElem = getConfigCategoryElement(category);
     configComponent.appendChild(categoryElem);
   }
 
+  configComponent.append(
+    createButton({
+      text: "Check possible solutions",
+      onClick: checkPossibleSolutions,
+    }),
+  );
+
   return configComponent;
+}
+
+function getNewSetupWithConfig(gameState: GameState): GameSetup {
+  const newSetup = copyGameSetup(gameState.setup);
+  newSetup.config = copyConfig(configObject);
+  return newSetup;
+}
+
+function refreshField() {
+  if (globals.gameState) {
+    void refreshFieldWithSetup(getNewSetupWithConfig(globals.gameState), undefined, true);
+  }
+}
+
+function checkPossibleSolutions() {
+  if (globals.gameState) {
+    const newSetup = getNewSetupWithConfig(globals.gameState);
+    const parInfo = calculatePar(newSetup);
+    newSetup.possibleSolutions = parInfo.possibleSolutions;
+    void refreshFieldWithSetup(newSetup, undefined, false);
+  }
 }
 
 function getConfigCategoryElement(category: ConfigCategory): HTMLElement {
@@ -40,19 +76,31 @@ function getConfigCategoryElement(category: ConfigCategory): HTMLElement {
     case ConfigCategory.KITTEN_BEHAVIOR:
       for (const kittenId of ALL_KITTEN_IDS) {
         const catElem = getCatElement(kittenId).cloneNode(true);
+        // catElem.appendChild(getArrowComponent(Direction.UP));
         transformToConfigItemElement(category, kittenId, catElem as HTMLElement);
         contentElem.appendChild(catElem);
       }
       break;
     case ConfigCategory.OBJECTS:
-      const allObjects = Object.values(ObjectId).filter(Boolean);
-      for (const objectType of allObjects) {
+      for (const objectType of ALL_OBJECT_IDS) {
         const objectElem = createObjectElement(objectType);
         transformToConfigItemElement(category, objectType, objectElem as HTMLElement);
         contentElem.appendChild(objectElem);
       }
       break;
     case ConfigCategory.TOOLS:
+      for (const tool of Object.values(Tool)) {
+        const toolElem = createElement({ text: "Meow" });
+        transformToConfigItemElement(category, tool, toolElem);
+        contentElem.appendChild(toolElem);
+      }
+      break;
+    case ConfigCategory.CONSTRAINTS:
+      for (const constraint of Object.values(Constraint)) {
+        const constraintElem = createElement({ text: constraint });
+        transformToConfigItemElement(category, constraint, constraintElem);
+        contentElem.appendChild(constraintElem);
+      }
       break;
   }
 
@@ -62,13 +110,27 @@ function getConfigCategoryElement(category: ConfigCategory): HTMLElement {
 }
 
 function transformToConfigItemElement(category: ConfigCategory, id: ConfigItemId, itemElement: HTMLElement) {
-  if (globals.gameState.setup.config[category][id]) {
+  itemElement.classList.add(styles.configItem);
+
+  if (configObject[category][id]) {
     itemElement.classList.add(styles.selected);
+
+    if (isCatId(id)) {
+      itemElement.classList.add(getCatIdClass(id));
+    }
   }
 
   itemElement.onclick = () => {
-    const newValue = !globals.gameState.setup.config[category][id];
-    globals.gameState.setup.config[category][id] = newValue;
-    itemElement.classList.toggle(styles.selected, newValue);
+    const newValue = !configObject[category][id];
+    configObject[category][id] = newValue;
+    itemElement.classList.toggle(isCatId(id) ? getCatIdClass(id) : styles.selected, newValue);
+
+    if (id === Tool.MEOW && newValue) {
+      void meow(CatId.MOTHER);
+    }
+
+    if (isCatId(id)) {
+      refreshField();
+    }
   };
 }
