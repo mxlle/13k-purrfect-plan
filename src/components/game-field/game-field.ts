@@ -174,10 +174,12 @@ function appendGameField() {
 
   mainContainer.append(gameFieldElem);
 
-  configElem = getConfigComponent();
-  configElem.classList.add(CssClass.HIDDEN);
+  if (import.meta.env.DEV) {
+    configElem = getConfigComponent();
+    configElem.classList.add(CssClass.HIDDEN);
 
-  mainContainer.append(configElem);
+    mainContainer.append(configElem);
+  }
 
   controlsElem = getControlsComponent();
 
