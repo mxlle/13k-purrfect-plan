@@ -8,6 +8,10 @@ import { CssClass } from "./src/utils/css-class";
 import { PubSubEvent } from "./src/utils/pub-sub-service";
 import { LocalStorageKey } from "./src/utils/local-storage";
 import { mapEntries, memoize } from "./src/utils/utils";
+import { Direction, ObjectId, OnboardingStep, SpecialAction, Tool } from "./src/types";
+import { ConfigCategory } from "./src/logic/config/config";
+import { CatId } from "./src/logic/data/catId";
+import { Constraint } from "./src/logic/config/constraint";
 
 const replaceEnum = (name: string, object: object) => mapEntries(object, ([key, value]) => [`${name}.${key}`, JSON.stringify(value)]);
 
@@ -32,9 +36,7 @@ export default defineConfig(({ mode, command }) => {
 
   return {
     envPrefix: ["GERMAN_ENABLED", "POKI_ENABLED"],
-    define: {},
     build: {
-      outDir: "dist",
       minify: production ? "terser" : false,
       cssMinify: production ? "lightningcss" : false,
       terserOptions: {
@@ -56,6 +58,10 @@ export default defineConfig(({ mode, command }) => {
         treeshake: {
           preset: "smallest",
         },
+        output: {
+          assetFileNames: "[hash][extname]",
+          entryFileNames: "[hash].js",
+        },
       },
     },
     css: {
@@ -65,18 +71,24 @@ export default defineConfig(({ mode, command }) => {
       },
     },
     plugins: [
-      replace({
-        preventAssignment: true,
-        delimiters: ["\\b", "\\b"],
-        ...replaceEnum("CssClass", CssClass),
-        ...replaceEnum("TranslationKey", TranslationKey),
-        ...replaceEnum("PubSubEvent", PubSubEvent),
-        ...replaceEnum("LocalStorageKey", LocalStorageKey),
-        // ...replaceEnum("ConfigCategory", ConfigCategory),
-        // ...replaceEnum("Direction", Direction),
-        // ...replaceEnum("Tool", Tool),
-        ...(production && mapEntries(CssClass, ([, name]) => [name, getCssIdentifier(name)])),
-      }),
+      production &&
+        replace({
+          preventAssignment: true,
+          delimiters: ["\\b", "\\b"],
+          ...replaceEnum("CssClass", CssClass),
+          ...replaceEnum("TranslationKey", TranslationKey),
+          ...replaceEnum("PubSubEvent", PubSubEvent),
+          ...replaceEnum("LocalStorageKey", LocalStorageKey),
+          ...replaceEnum("Direction", Direction),
+          ...replaceEnum("Tool", Tool),
+          ...replaceEnum("SpecialAction", SpecialAction),
+          ...replaceEnum("CatId", CatId),
+          ...replaceEnum("ObjectId", ObjectId),
+          ...replaceEnum("ConfigCategory", ConfigCategory),
+          ...replaceEnum("OnboardingStep", OnboardingStep),
+          ...replaceEnum("Constraint", Constraint),
+          ...mapEntries(CssClass, ([, name]) => [name, getCssIdentifier(name)]),
+        }),
       viteAwesomeSvgLoader(),
       createHtmlPlugin({
         minify: true,

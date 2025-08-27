@@ -1,7 +1,7 @@
 import { ALL_KITTEN_IDS, KittenId } from "./data/catId";
 import { CellPosition, isEmptyField, isSameCell } from "./data/cell";
 import { FieldSize } from "./data/field-size";
-import { ObjectId } from "./data/objects";
+import { ObjectId } from "../types";
 import { GameSetup, GameState } from "./data/game-elements";
 
 export function getKittensOnCell(gameState: GameState, cell: CellPosition): KittenId[] {

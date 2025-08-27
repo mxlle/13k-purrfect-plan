@@ -1,10 +1,10 @@
 import { ALL_CAT_IDS, CatId } from "./catId";
 import { getCatElement } from "./cats";
-import { getObjectElement, isObjectId, ObjectId } from "./objects";
+import { getObjectElement, isObjectId } from "./objects";
 import { CellPosition } from "./cell";
 import { FieldSize, getMiddleCoordinates } from "./field-size";
 import { Config } from "../config/config";
-import { TurnMove } from "../../types";
+import { ObjectId, TurnMove } from "../../types";
 import { FALLBACK_PAR } from "../par";
 
 export type GameElementId = CatId | ObjectId;
@@ -76,13 +76,8 @@ export function getParFromGameState(gameState: GameState | null): number | null 
 }
 
 const ALL_GAME_ELEMENT_IDS: GameElementId[] = [
-  CatId.MOTHER,
-  CatId.MOONY,
-  CatId.IVY,
-  CatId.SPLASHY,
-  ObjectId.MOON,
-  ObjectId.TREE,
-  ObjectId.PUDDLE,
+    ...Object.values(CatId),
+    ...Object.values(ObjectId),
 ];
 
 export function EMPTY_ELEMENT_MAP<T extends GameElementPositions | GameElementRepresentations>(): T {

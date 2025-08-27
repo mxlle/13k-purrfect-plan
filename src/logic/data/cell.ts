@@ -1,7 +1,6 @@
 import { CatId } from "./catId";
-import { ObjectId } from "./objects";
 import { GameSetup } from "./game-elements";
-import { Direction } from "../../types";
+import { Direction, ObjectId } from "../../types";
 
 export interface CellPosition {
   row: number;
