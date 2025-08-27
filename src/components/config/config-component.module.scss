@@ -38,3 +38,13 @@
     }
   }
 }
+
+.btnContainer {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.8em;
+
+  button {
+    padding: 0.2rem;
+  }
+}

@@ -13,6 +13,8 @@ import { globals } from "../../globals";
 import { copyGameSetup, GameSetup, GameState } from "../../logic/data/game-elements";
 import { refreshFieldWithSetup } from "../game-field/game-field";
 import { calculatePar } from "../../logic/par";
+import { generateRandomGameSetup } from "../../logic/initialize";
+import { DEFAULT_FIELD_SIZE } from "../../logic/data/field-size";
 
 let configComponent: HTMLElement | undefined;
 let configObject = copyConfig({ ...allInConfig });
@@ -28,12 +30,29 @@ export function getConfigComponent(): HTMLElement {
     configComponent.appendChild(categoryElem);
   }
 
-  configComponent.append(
+  const btns = createElement({ cssClass: styles.btnContainer });
+
+  btns.append(
     createButton({
       text: "Check possible solutions",
       onClick: checkPossibleSolutions,
     }),
   );
+
+  btns.append(
+    createButton({
+      text: "Reshuffle field",
+      onClick: reshuffleField,
+    }),
+  );
+
+  const btnsTitleElem = createElement({
+    text: "Solutions / Positions",
+  });
+
+  configComponent.appendChild(btnsTitleElem);
+
+  configComponent.appendChild(btns);
 
   return configComponent;
 }
@@ -57,6 +76,11 @@ function checkPossibleSolutions() {
     newSetup.possibleSolutions = parInfo.possibleSolutions;
     void refreshFieldWithSetup(newSetup, undefined, false);
   }
+}
+
+function reshuffleField() {
+  const newSetup = generateRandomGameSetup(DEFAULT_FIELD_SIZE, configObject);
+  void refreshFieldWithSetup(newSetup, undefined, false);
 }
 
 function getConfigCategoryElement(category: ConfigCategory): HTMLElement {
