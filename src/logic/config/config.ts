@@ -1,6 +1,5 @@
 import { ALL_KITTEN_IDS, CatId, type KittenId } from "../data/catId";
-import { Tool } from "../../types";
-import { ObjectId } from "../data/objects";
+import { ObjectId, Tool } from "../../types";
 import { GameSetup } from "../data/game-elements";
 import { defineEnum } from "../../utils/enums";
 import { Constraint } from "./constraint";

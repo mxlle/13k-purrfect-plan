@@ -44,3 +44,18 @@ export function isSpecialAction(move: TurnMove): move is SpecialAction {
 }
 
 export const ALL_TURN_MOVES = [...Object.values(Direction), ...Object.values(Tool)] as const;
+
+export type OnboardingStep = defineEnum<typeof OnboardingStep>;
+export const OnboardingStep = defineEnum({
+  INTRO: 0,
+  INTRO_SECOND_CAT: 1,
+  INTERMEDIATE_MEOW: 2,
+  INTERMEDIATE_OBJECTS: 3,
+  LAST_SETUP: 4,
+});
+export type ObjectId = defineEnum<typeof ObjectId>;
+export const ObjectId = defineEnum({
+  MOON: "🌙",
+  TREE: "🌳",
+  PUDDLE: "💧",
+});
