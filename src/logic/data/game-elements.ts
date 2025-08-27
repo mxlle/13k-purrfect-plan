@@ -3,7 +3,7 @@ import { getCatElement } from "./cats";
 import { getObjectElement, isObjectId, ObjectId } from "./objects";
 import { CellPosition } from "./cell";
 import { FieldSize, getMiddleCoordinates } from "./field-size";
-import { Config } from "../config";
+import { Config } from "../config/config";
 import { TurnMove } from "../../types";
 import { FALLBACK_PAR } from "../par";
 

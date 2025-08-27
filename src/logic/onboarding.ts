@@ -3,7 +3,7 @@ import { globals } from "../globals";
 import { LocalStorageKey, setLocalStorageItem } from "../utils/local-storage";
 import { ALL_CAT_IDS, CatId } from "./data/catId";
 import { CellPosition, containsCell, EMPTY_CELL, getCellTypePlaceholders } from "./data/cell";
-import { allInConfig, ConfigCategory, emptyConfig } from "./config";
+import { allInConfig, ConfigCategory, emptyConfig } from "./config/config";
 import { ObjectId } from "./data/objects";
 import { FieldSize } from "./data/field-size";
 import { EMPTY_ELEMENT_MAP, GameElementPositions, GameSetup } from "./data/game-elements";
@@ -104,7 +104,6 @@ export function getOnboardingData(): OnboardingData | undefined {
         elementPositions: getElementPositionsFormInitialSetup(intermediateSetup, skipPositions),
         config: {
           ...emptyConfig,
-          [ConfigCategory.CATS]: { ...emptyConfig[ConfigCategory.CATS], [CatId.MOONY]: true, [CatId.IVY]: true },
           [ConfigCategory.OBJECTS]: {
             ...emptyConfig[ConfigCategory.OBJECTS],
             [ObjectId.TREE]: step === OnboardingStep.INTERMEDIATE_OBJECTS,
@@ -126,7 +125,7 @@ export function getOnboardingData(): OnboardingData | undefined {
       const gameSetupLast: GameSetup = {
         fieldSize: getFieldSizeFromInitialSetup(lastSetup),
         elementPositions: getElementPositionsFormInitialSetup(lastSetup),
-        config: allInConfig,
+        config: { ...allInConfig, [ConfigCategory.CONSTRAINTS]: emptyConfig[ConfigCategory.CONSTRAINTS] },
         possibleSolutions: [],
       };
 

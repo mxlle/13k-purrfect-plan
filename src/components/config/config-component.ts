@@ -5,8 +5,9 @@ import { getCatElement } from "../../logic/data/cats";
 import { ALL_KITTEN_IDS } from "../../logic/data/catId";
 import { globals } from "../../globals";
 import { createObjectElement } from "../object-component/object-component";
-import { allCategories, ConfigCategory, ConfigItemId } from "../../logic/config";
+import { allCategories, ConfigCategory, ConfigItemId } from "../../logic/config/config";
 import { ObjectId } from "../../logic/data/objects";
+
 let configComponent: HTMLElement | undefined;
 
 export function getConfigComponent(): HTMLElement {
@@ -36,7 +37,7 @@ function getConfigCategoryElement(category: ConfigCategory): HTMLElement {
   const contentElem = createElement();
 
   switch (category) {
-    case ConfigCategory.CATS:
+    case ConfigCategory.KITTEN_BEHAVIOR:
       for (const kittenId of ALL_KITTEN_IDS) {
         const catElem = getCatElement(kittenId).cloneNode(true);
         transformToConfigItemElement(category, kittenId, catElem as HTMLElement);

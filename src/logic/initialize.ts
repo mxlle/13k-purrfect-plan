@@ -3,7 +3,7 @@ import { shuffleArray } from "../utils/random-utils";
 import { getEmptyFields } from "./checks";
 import { ALL_CAT_IDS } from "./data/catId";
 import { CellPosition } from "./data/cell";
-import { allInConfig, Config } from "./config";
+import { allInConfig, Config } from "./config/config";
 import { DEFAULT_FIELD_SIZE, FieldSize } from "./data/field-size";
 import { copyGameSetup, EMPTY_ELEMENT_MAP, GameElementPositions, GameSetup, isValidGameSetup } from "./data/game-elements";
 import { calculatePar, MAX_PAR, MIN_PAR } from "./par";

@@ -15,7 +15,7 @@ import { ALL_CAT_IDS, ALL_KITTEN_IDS } from "../../logic/data/catId";
 import { CellPosition, getCellDifference, getDirection } from "../../logic/data/cell";
 import { PubSubEvent, pubSubService } from "../../utils/pub-sub-service";
 import { isTool, SpecialAction } from "../../types";
-import { ConfigCategory } from "../../logic/config";
+import { ConfigCategory } from "../../logic/config/config";
 import { FieldSize } from "../../logic/data/field-size";
 import { ALL_OBJECT_IDS, ObjectId } from "../../logic/data/objects";
 import { isValidCellPosition } from "../../logic/checks";

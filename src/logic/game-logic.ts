@@ -6,7 +6,7 @@ import { CAT_NAMES } from "./data/cats";
 import { CellPosition, isSameCell } from "./data/cell";
 import { updateAllPositions } from "../components/game-field/game-field";
 import { sleep } from "../utils/promise-utils";
-import { ConfigCategory, shouldApplyKittenBehavior } from "./config";
+import { ConfigCategory, hasMoveLimit, shouldApplyKittenBehavior } from "./config/config";
 import { ObjectId } from "./data/objects";
 import { deepCopyElementsMap, GameElementPositions, GameState } from "./data/game-elements";
 
@@ -101,8 +101,6 @@ export function calculateNewPositions(gameState: GameState, turnMove: TurnMove):
     return gameState.currentPositions;
   }
 
-  const newMoonPosition = doMoonMove(gameState);
-
   const kittensOnCell = getKittensOnCell(gameState, previousMotherPosition);
   const freeKittens = getKittensElsewhere(gameState, previousMotherPosition);
 
@@ -126,13 +124,18 @@ export function calculateNewPositions(gameState: GameState, turnMove: TurnMove):
     }
   }
 
-  newElementPositions[ObjectId.MOON] = newMoonPosition;
+  newElementPositions[ObjectId.MOON] = doMoonMove(gameState);
 
   return newElementPositions;
 }
 
 function doMoonMove(gameState: GameState): CellPosition {
   const moon = gameState.currentPositions[ObjectId.MOON];
+
+  if (!moon || !hasMoveLimit(gameState.setup)) {
+    return moon;
+  }
+
   const width = gameState.setup.fieldSize;
 
   if (moon && moon.column < width) {
