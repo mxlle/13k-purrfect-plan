@@ -25,25 +25,25 @@ function init() {
 
   header.append(titleElement);
 
-  const btnContainer = createElement({
-    cssClass: "h-btns",
-  });
-  // const muteButton = createButton({
-  //   text: initializeMuted ? "🔇" : "🔊",
-  //   onClick: (event: MouseEvent) => {
-  //     const isActive = togglePlayer();
-  //     (event.target as HTMLElement).textContent = isActive ? "🔊" : "🔇";
-  //   },
-  //   iconBtn: true,
-  // });
-  //
-  // btnContainer.append(muteButton);
-
   if (import.meta.env.DEV) {
-    header.append(btnContainer);
-  }
+    const btnContainer = createElement({
+      cssClass: "h-btns",
+    });
 
-  btnContainer.append(createButton({ text: "⚙️", onClick: () => toggleConfig(), iconBtn: true }));
+    // const muteButton = createButton({
+    //   text: initializeMuted ? "🔇" : "🔊",
+    //   onClick: (event: MouseEvent) => {
+    //     const isActive = togglePlayer();
+    //     (event.target as HTMLElement).textContent = isActive ? "🔊" : "🔇";
+    //   },
+    //   iconBtn: true,
+    // });
+    //
+    // btnContainer.append(muteButton);
+    header.append(btnContainer);
+
+    btnContainer.append(createButton({ text: "⚙️", onClick: () => toggleConfig(), iconBtn: true }));
+  }
 
   document.body.append(header);
 
