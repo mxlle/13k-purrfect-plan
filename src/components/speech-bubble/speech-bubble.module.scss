@@ -1,4 +1,3 @@
-@use '../../names' as *;
 @use '../../theme';
 
 .bubble {
@@ -16,24 +15,10 @@
   opacity: 0;
   transition: transform 0.1s, opacity 0.1s;
 
-  :global(.#{$WON}) &,
-  :global(.#{$MEOW}) & {
+  &.show {
     opacity: 1;
     transform: translateX(-50%) translateY(-100%);
-    transition: transform 0.3s 0.3s,
-    opacity 0.3s 0.3s;
-  }
-
-  :global(.#{$MEOW}) & {
-    transition-delay: 0s;
-  }
-
-  :global(.#{$MEOW}) &:after {
-    content: "Meow!";
-  }
-
-  :global(.#{$WON}) &:after {
-    content: "United!";
+    transition: transform 0.3s, opacity 0.3s;
   }
 
   &:before {

@@ -36,6 +36,7 @@ import {
 } from "../../logic/data/game-elements";
 import { calculateNewPositions, isWinConditionMet } from "../../logic/game-logic";
 import { getConfigComponent } from "../config/config-component";
+import { removeSpeechBubble } from "../speech-bubble/speech-bubble";
 
 let mainContainer: HTMLElement | undefined;
 let gameFieldElem: HTMLElement | undefined;
@@ -98,6 +99,7 @@ export async function startNewGame(options: { shouldIncreaseLevel: boolean } = {
     increaseOnboardingStepIfApplicable();
   }
 
+  if (mainContainer) removeSpeechBubble(mainContainer);
   document.body.classList.remove(CssClass.WON);
 
   startButton?.remove();

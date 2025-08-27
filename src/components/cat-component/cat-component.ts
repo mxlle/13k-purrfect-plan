@@ -9,7 +9,6 @@ import { hasSoundForAction, playSoundForAction } from "../../audio/sound-control
 import { Tool } from "../../types";
 import { sleep } from "../../utils/promise-utils";
 import { gameElementClickHandler } from "../../logic/data/game-elements";
-import { createSpeechBubble } from "../speech-bubble/speech-bubble";
 
 export { styles };
 
@@ -41,7 +40,6 @@ export function createCatElement(catId: CatId): HTMLElement {
         cssClass: [styles.cat, isMom(catId) && styles.isMom],
         html: catSvg,
       }),
-      isMom(catId) && createSpeechBubble(),
     ],
   );
 }
