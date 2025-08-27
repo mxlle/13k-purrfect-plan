@@ -1,7 +1,7 @@
 import { Settings } from "./types";
 import { getLocalStorageItem, LocalStorageKey } from "./utils/local-storage";
 import { Difficulty, difficultySettings } from "./logic/difficulty";
-import { GameElementPositions, GameState } from "./logic/data/game-elements";
+import { GameElementId, GameElementPositions, GameState } from "./logic/data/game-elements";
 import { isWinConditionMet } from "./logic/game-logic";
 
 interface GameGlobals {
@@ -12,6 +12,8 @@ interface GameGlobals {
   language: string;
   difficulty: Difficulty;
   settings: Settings;
+  configMode: boolean;
+  selectedGameElement?: GameElementId;
 }
 
 const onboardingStepSetting = getLocalStorageItem(LocalStorageKey.ONBOARDING_STEP);
@@ -28,6 +30,7 @@ const defaultGlobals: GameGlobals = {
   language: "en",
   difficulty: initialDifficulty,
   settings: initialSettings,
+  configMode: false,
 };
 
 export const globals: GameGlobals = { ...defaultGlobals };

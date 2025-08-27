@@ -6,6 +6,7 @@ import { FieldSize, getMiddleCoordinates } from "./field-size";
 import { Config } from "../config/config";
 import { ObjectId, TurnMove } from "../../types";
 import { FALLBACK_PAR } from "../par";
+import { globals } from "../../globals";
 
 export type GameElementId = CatId | ObjectId;
 
@@ -75,10 +76,7 @@ export function getParFromGameState(gameState: GameState | null): number | null 
   return gameState.setup.possibleSolutions[0].length;
 }
 
-const ALL_GAME_ELEMENT_IDS: GameElementId[] = [
-    ...Object.values(CatId),
-    ...Object.values(ObjectId),
-];
+const ALL_GAME_ELEMENT_IDS: GameElementId[] = [...Object.values(CatId), ...Object.values(ObjectId)];
 
 export function EMPTY_ELEMENT_MAP<T extends GameElementPositions | GameElementRepresentations>(): T {
   return ALL_GAME_ELEMENT_IDS.reduce((acc, id) => {
@@ -110,4 +108,11 @@ export function copyGameState(state: GameState): GameState {
     representations: deepCopyElementsMap(state.representations),
     moves: [...state.moves],
   };
+}
+
+export function gameElementClickHandler(gameElementId: GameElementId) {
+  console.log("select game element", gameElementId);
+  if (globals.configMode) {
+    globals.selectedGameElement = gameElementId;
+  }
 }

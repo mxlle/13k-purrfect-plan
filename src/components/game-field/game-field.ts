@@ -21,6 +21,7 @@ import { ALL_OBJECT_IDS } from "../../logic/data/objects";
 import { isValidCellPosition } from "../../logic/checks";
 import { deserializeGame, serializeGame } from "../../logic/serializer";
 import {
+  copyGameSetup,
   GameElementId,
   GameElementPositions,
   GameSetup,
@@ -43,7 +44,12 @@ const TIMEOUT_BETWEEN_GAMES = 300;
 const TIMEOUT_CELL_APPEAR = -1;
 
 export function toggleConfig() {
+  globals.configMode = !globals.configMode;
   configElem?.classList.toggle(CssClass.HIDDEN);
+
+  if (!globals.configMode) {
+    globals.selectedGameElement = undefined;
+  }
 }
 
 export async function initializeEmptyGameField(fieldSize: FieldSize) {
@@ -208,12 +214,26 @@ export function generateGameFieldElement(fieldSize: FieldSize) {
 
       rowElem.append(cellElement);
       rowElements.push(cellElement);
+
+      if (import.meta.env.DEV) {
+        cellElement.addEventListener("click", () => cellClickHandler({ row: rowIndex, column: columnIndex }));
+      }
     }
 
     cellElements.push(rowElements);
   }
 
   return gameField;
+}
+
+function cellClickHandler(cellPosition: CellPosition) {
+  console.debug("Cell clicked", cellPosition);
+  if (globals.configMode && globals.selectedGameElement && globals.gameState) {
+    const newSetup = copyGameSetup(globals.gameState.setup);
+    newSetup.elementPositions[globals.selectedGameElement] = cellPosition;
+    void refreshFieldWithSetup(newSetup, undefined, false);
+    globals.selectedGameElement = undefined;
+  }
 }
 
 function addOnboardingSuggestionIfApplicable(onboardingData: OnboardingData | undefined) {

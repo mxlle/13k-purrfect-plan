@@ -8,6 +8,7 @@ import { isMom } from "../../logic/data/cats";
 import { hasSoundForAction, playSoundForAction } from "../../audio/sound-control/sound-control";
 import { Tool } from "../../types";
 import { sleep } from "../../utils/promise-utils";
+import { gameElementClickHandler } from "../../logic/data/game-elements";
 
 export { styles };
 
@@ -27,8 +28,14 @@ export function createCatElement(catId: CatId): HTMLElement {
 
   const catElem = createElement({
     cssClass: `${styles.cat} ${isMom(catId) ? styles.isMom : ""} ''`,
-    onClick: () => {
+    onClick: (mouseEvent) => {
       void meow(catId);
+
+      if (import.meta.env.DEV) {
+        gameElementClickHandler(catId);
+        mouseEvent.preventDefault();
+        mouseEvent.stopPropagation();
+      }
     },
   });
 
