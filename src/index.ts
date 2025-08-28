@@ -5,7 +5,6 @@ import { PubSubEvent, pubSubService } from "./utils/pub-sub-service";
 import { initializeEmptyGameField, startNewGame, toggleConfig } from "./components/game-field/game-field";
 import { initPoki } from "./poki-integration";
 import { isOnboarding } from "./logic/onboarding";
-import { isGameInProgress } from "./globals";
 import { DEFAULT_FIELD_SIZE } from "./logic/data/field-size";
 import { CssClass } from "./utils/css-class";
 
@@ -52,18 +51,6 @@ function init() {
   } else {
     void initializeEmptyGameField(DEFAULT_FIELD_SIZE);
   }
-
-  document.addEventListener("keydown", (event) => {
-    console.debug("Key pressed:", event);
-
-    if (event.code === "Space") {
-      console.debug("Space key pressed");
-
-      if (!isGameInProgress()) {
-        void startNewGame({ shouldIncreaseLevel: true });
-      }
-    }
-  });
 
   pubSubService.subscribe(PubSubEvent.START_NEW_GAME, (options) => {
     void startNewGame(options);

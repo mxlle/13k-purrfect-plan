@@ -13,7 +13,11 @@
     grid-column: 2;
   }
 
-  &.disabled,
+  > * {
+    transition: opacity 0.3s;
+  }
+
+  &.disabled > *,
   :global(.#{$WON}) & > * {
     &:not(.newGameContainer) {
       pointer-events: none;

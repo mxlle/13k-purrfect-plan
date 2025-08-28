@@ -3,11 +3,10 @@ import { getControlsComponent, styles as controlsStyles } from "../controls/cont
 import { cssClassByDirection, getArrowComponent, styles as arrowStyles } from "../arrow-component/arrow-component";
 import { getCatIdClass, styles as catStyles } from "../cat-component/cat-component";
 
-import { createButton, createElement } from "../../utils/html-utils";
-import { getTranslation } from "../../translations/i18n";
+import { createElement } from "../../utils/html-utils";
 import { globals } from "../../globals";
 import { requestAnimationFrameWithTimeout } from "../../utils/promise-utils";
-import { generateRandomGameSetup } from "../../logic/initialize";
+import { generateInitialGameSetup, generateRandomGameSetup } from "../../logic/initialize";
 import { handlePokiCommercial } from "../../poki-integration";
 import { getOnboardingData, increaseOnboardingStepIfApplicable, isSameLevel, OnboardingData } from "../../logic/onboarding";
 import { CssClass } from "../../utils/css-class";
@@ -30,7 +29,6 @@ import {
   isValidGameSetup,
 } from "../../logic/data/game-elements";
 import { calculateNewPositions, isWinConditionMet } from "../../logic/game-logic";
-import { TranslationKey } from "../../translations/translationKey";
 import { getConfigComponent } from "../config/config-component";
 
 let mainContainer: HTMLElement | undefined;
@@ -60,21 +58,11 @@ export async function initializeEmptyGameField(fieldSize: FieldSize) {
 
   gameFieldElem = generateGameFieldElement(fieldSize);
 
-  addStartButton(TranslationKey.NEW_GAME, gameFieldElem);
+  const tempGameState = getInitialGameState(generateInitialGameSetup());
+  await initializeObjectsOnGameField(tempGameState);
+  await initializeCatsOnGameField(tempGameState, undefined, true);
 
   appendGameField();
-}
-
-function addStartButton(buttonLabelKey: TranslationKey, elementToAttachTo: HTMLElement) {
-  startButton = createButton({
-    text: getTranslation(buttonLabelKey),
-    onClick: (event: MouseEvent) => {
-      pubSubService.publish(PubSubEvent.START_NEW_GAME);
-      (event.target as HTMLElement)?.remove();
-    },
-  });
-  startButton.classList.add(styles.startButton, CssClass.PRM);
-  elementToAttachTo.append(startButton);
 }
 
 export async function startNewGame(options: { shouldIncreaseLevel: boolean } = { shouldIncreaseLevel: true }) {
@@ -140,7 +128,7 @@ export async function startNewGame(options: { shouldIncreaseLevel: boolean } = {
     throw new Error("Generated or provided game setup is invalid, cannot start game.", { cause: gameSetup });
   }
 
-  await refreshFieldWithSetup(gameSetup, onboardingData, isInitialStart);
+  await refreshFieldWithSetup(gameSetup, onboardingData, false);
 
   addOnboardingSuggestionIfApplicable(onboardingData);
 }

@@ -3,13 +3,13 @@ import { shuffleArray } from "../utils/random-utils";
 import { getEmptyFields } from "./checks";
 import { ALL_CAT_IDS } from "./data/catId";
 import { CellPosition } from "./data/cell";
-import { allInConfig, Config } from "./config/config";
-import { DEFAULT_FIELD_SIZE, FieldSize } from "./data/field-size";
+import { allInConfig, Config, emptyConfig } from "./config/config";
+import { DEFAULT_FIELD_SIZE, FieldSize, getMiddleCoordinates } from "./data/field-size";
 import { copyGameSetup, EMPTY_ELEMENT_MAP, GameElementPositions, GameSetup, isValidGameSetup } from "./data/game-elements";
 import { calculatePar, MAX_PAR, MIN_PAR } from "./par";
 import { ALL_OBJECT_IDS } from "./data/objects";
 
-export function generateRandomGameSetup(fieldSize: FieldSize = DEFAULT_FIELD_SIZE, config: Config = allInConfig): GameSetup {
+export function generateInitialGameSetup(fieldSize: FieldSize = DEFAULT_FIELD_SIZE): GameSetup {
   const placedObjects = defaultPlacedObjects;
   const elementPositions: GameElementPositions = EMPTY_ELEMENT_MAP();
 
@@ -17,11 +17,22 @@ export function generateRandomGameSetup(fieldSize: FieldSize = DEFAULT_FIELD_SIZ
     elementPositions[obj] = { ...placedObjects[obj] };
   }
 
-  const tempGameSetup: GameSetup = {
+  for (const cat of ALL_CAT_IDS) {
+    elementPositions[cat] = getMiddleCoordinates(fieldSize);
+  }
+
+  return {
     fieldSize,
     elementPositions,
-    config,
+    config: emptyConfig,
     possibleSolutions: [],
+  };
+}
+
+export function generateRandomGameSetup(fieldSize: FieldSize = DEFAULT_FIELD_SIZE, config: Config = allInConfig): GameSetup {
+  const tempGameSetup = {
+    ...generateInitialGameSetup(fieldSize),
+    config,
   };
 
   const finalGameSetup = randomlyPlaceCatsOnField(tempGameSetup);

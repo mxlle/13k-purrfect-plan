@@ -83,6 +83,11 @@ export function getControlsComponent(): HTMLElement {
 
   updateToolContainer();
 
+  if (!globals.gameState && !isOnboarding()) {
+    controlsComponent.appendChild(addNewGameButtons(true));
+    controlsComponent.classList.add(styles.disabled);
+  }
+
   return controlsComponent;
 }
 
@@ -152,10 +157,11 @@ function setupEventListeners() {
   pubSubService.subscribe(PubSubEvent.GAME_END, () => {
     if (!controlsComponent) return;
 
-    controlsComponent.appendChild(addContinueButtons());
+    controlsComponent.appendChild(addNewGameButtons());
   });
 
   pubSubService.subscribe(PubSubEvent.GAME_START, () => {
+    controlsComponent.classList.remove(styles.disabled);
     toolsFrozenUntilTurn = undefined;
     updateRecoveryInfoComponent();
     updateTurnMovesComponent();
@@ -192,13 +198,13 @@ function setupEventListeners() {
   hasSetupEventListeners = true;
 }
 
-export function addContinueButtons() {
+export function addNewGameButtons(isInitialStart = false) {
   const hasAchievedGoal = isWinConditionMet(globals.gameState) && globals.gameState.moves.length <= getParFromGameState(globals.gameState);
 
   const newGameContainer = createElement({ cssClass: styles.newGameContainer });
 
   const continueButton = createButton({
-    text: getTranslation(isOnboarding() ? TranslationKey.CONTINUE : TranslationKey.NEW_GAME),
+    text: getTranslation(isInitialStart ? TranslationKey.START_GAME : isOnboarding() ? TranslationKey.CONTINUE : TranslationKey.NEW_GAME),
     onClick: () => {
       pubSubService.publish(PubSubEvent.START_NEW_GAME);
       newGameContainer.remove();
@@ -208,7 +214,7 @@ export function addContinueButtons() {
 
   newGameContainer.appendChild(continueButton);
 
-  if (!isOnboarding()) {
+  if (!isOnboarding() && !isInitialStart) {
     const restartButton = createButton({
       text: getTranslation(TranslationKey.RESTART_GAME),
       onClick: () => {
