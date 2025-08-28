@@ -17,6 +17,10 @@ export function isSameLevel() {
   return globals.onboardingStep === globals.previousOnboardingStep || globals.previousOnboardingStep === undefined;
 }
 
+export function wasLastOnboardingStep() {
+  return globals.previousOnboardingStep === OnboardingStep.LAST_SETUP;
+}
+
 export interface OnboardingData {
   gameSetup: GameSetup;
   highlightedAction?: TurnMove;

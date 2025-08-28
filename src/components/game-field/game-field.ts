@@ -6,16 +6,22 @@ import { getCatIdClass, styles as catStyles } from "../cat-component/cat-compone
 import { createElement } from "../../utils/html-utils";
 import { globals } from "../../globals";
 import { requestAnimationFrameWithTimeout } from "../../utils/promise-utils";
-import { generateInitialGameSetup, generateRandomGameSetup } from "../../logic/initialize";
+import { generateRandomGameSetup, getInitialGameSetup, randomlyPlaceCatsOnField } from "../../logic/initialize";
 import { handlePokiCommercial } from "../../poki-integration";
-import { getOnboardingData, increaseOnboardingStepIfApplicable, isSameLevel, OnboardingData } from "../../logic/onboarding";
+import {
+  getOnboardingData,
+  increaseOnboardingStepIfApplicable,
+  isSameLevel,
+  OnboardingData,
+  wasLastOnboardingStep,
+} from "../../logic/onboarding";
 import { CssClass } from "../../utils/css-class";
 import { ALL_CAT_IDS, ALL_KITTEN_IDS } from "../../logic/data/catId";
 import { CellPosition, getCellDifference, getDirection } from "../../logic/data/cell";
 import { PubSubEvent, pubSubService } from "../../utils/pub-sub-service";
 import { isTool, ObjectId, SpecialAction } from "../../types";
-import { ConfigCategory } from "../../logic/config/config";
-import { FieldSize } from "../../logic/data/field-size";
+import { allInConfig, Config, ConfigCategory } from "../../logic/config/config";
+import { DEFAULT_FIELD_SIZE, FieldSize } from "../../logic/data/field-size";
 import { ALL_OBJECT_IDS } from "../../logic/data/objects";
 import { isValidCellPosition } from "../../logic/checks";
 import { deserializeGame, serializeGame } from "../../logic/serializer";
@@ -58,11 +64,31 @@ export async function initializeEmptyGameField(fieldSize: FieldSize) {
 
   gameFieldElem = generateGameFieldElement(fieldSize);
 
-  const tempGameState = getInitialGameState(generateInitialGameSetup());
+  const tempGameState = getInitialGameState(getInitialGameSetup());
   await initializeObjectsOnGameField(tempGameState);
   await initializeCatsOnGameField(tempGameState, undefined, true);
 
   appendGameField();
+}
+
+async function shuffleFieldAnimation(config: Config) {
+  if (!gameFieldElem) {
+    console.error("shuffleFieldAnimation should only be called after gameFieldElem is initialized");
+    return;
+  }
+
+  const loader = createElement({ cssClass: styles.loader, text: "Loading..." });
+
+  gameFieldElem.append(loader);
+
+  for (let i = 0; i < 2; i++) {
+    const randomState = getInitialGameState(randomlyPlaceCatsOnField(getInitialGameSetup(config), false));
+    const nextPositionsIfWait = calculateNewPositions(randomState, SpecialAction.WAIT);
+    await initializeCatsOnGameField(randomState, nextPositionsIfWait, false);
+    await requestAnimationFrameWithTimeout(TIMEOUT_BETWEEN_GAMES);
+  }
+
+  loader.remove();
 }
 
 export async function startNewGame(options: { shouldIncreaseLevel: boolean } = { shouldIncreaseLevel: true }) {
@@ -82,7 +108,7 @@ export async function startNewGame(options: { shouldIncreaseLevel: boolean } = {
     if (import.meta.env.POKI_ENABLED === "true") await handlePokiCommercial();
     // await requestAnimationFrameWithTimeout(TIMEOUT_BETWEEN_GAMES);
 
-    if (!isSameLevel()) {
+    if (!isSameLevel() && !wasLastOnboardingStep()) {
       console.debug("Was different setup, removing game field");
       gameFieldElem.remove();
       gameFieldElem = undefined;
@@ -120,7 +146,7 @@ export async function startNewGame(options: { shouldIncreaseLevel: boolean } = {
     if (!options.shouldIncreaseLevel && globals.gameState) {
       gameSetup = globals.gameState.setup;
     } else {
-      gameSetup = onboardingData ? onboardingData.gameSetup : generateRandomGameSetup();
+      gameSetup = onboardingData ? onboardingData.gameSetup : await generateRandomGameWhileAnimating();
     }
   }
 
@@ -131,6 +157,15 @@ export async function startNewGame(options: { shouldIncreaseLevel: boolean } = {
   await refreshFieldWithSetup(gameSetup, onboardingData, false);
 
   addOnboardingSuggestionIfApplicable(onboardingData);
+}
+
+export async function generateRandomGameWhileAnimating(config: Config = allInConfig, fieldSize: FieldSize = DEFAULT_FIELD_SIZE) {
+  const gameSetupPromise = generateRandomGameSetup(config, fieldSize);
+  const animatePromise = shuffleFieldAnimation(config);
+
+  const [gameSetup] = await Promise.all([gameSetupPromise, animatePromise]);
+
+  return gameSetup;
 }
 
 export async function refreshFieldWithSetup(gameSetup: GameSetup, onboardingData: OnboardingData | undefined, isInitialStart: boolean) {
@@ -258,7 +293,14 @@ export async function initializeCatsOnGameField(
 
     if (representation) {
       const cellElement = getCellElement(representation.initialPosition);
-      cellElement.append(representation.htmlElement);
+
+      // append if not already there
+      if (!cellElement.contains(representation.htmlElement)) {
+        cellElement.append(representation.htmlElement);
+      } else {
+        representation.htmlElement.style.transform = "translate(0, 0)";
+      }
+
       representation.htmlElement.classList.toggle(getCatIdClass(catId), gameState.setup.config[ConfigCategory.KITTEN_BEHAVIOR][catId]);
     }
   }

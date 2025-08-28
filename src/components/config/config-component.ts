@@ -11,10 +11,8 @@ import { Tool } from "../../types";
 import { Constraint } from "../../logic/config/constraint";
 import { globals } from "../../globals";
 import { copyGameSetup, GameSetup, GameState } from "../../logic/data/game-elements";
-import { refreshFieldWithSetup } from "../game-field/game-field";
+import { generateRandomGameWhileAnimating, refreshFieldWithSetup } from "../game-field/game-field";
 import { calculatePar } from "../../logic/par";
-import { generateRandomGameSetup } from "../../logic/initialize";
-import { DEFAULT_FIELD_SIZE } from "../../logic/data/field-size";
 
 let configComponent: HTMLElement | undefined;
 let configObject = copyConfig({ ...allInConfig });
@@ -78,8 +76,8 @@ function checkPossibleSolutions() {
   }
 }
 
-function reshuffleField() {
-  const newSetup = generateRandomGameSetup(DEFAULT_FIELD_SIZE, configObject);
+async function reshuffleField() {
+  const newSetup = await generateRandomGameWhileAnimating(configObject);
   void refreshFieldWithSetup(newSetup, undefined, false);
 }
 

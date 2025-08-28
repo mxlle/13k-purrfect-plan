@@ -8,8 +8,9 @@ import { DEFAULT_FIELD_SIZE, FieldSize, getMiddleCoordinates } from "./data/fiel
 import { copyGameSetup, EMPTY_ELEMENT_MAP, GameElementPositions, GameSetup, isValidGameSetup } from "./data/game-elements";
 import { calculatePar, MAX_PAR, MIN_PAR } from "./par";
 import { ALL_OBJECT_IDS } from "./data/objects";
+import { sleep } from "../utils/promise-utils";
 
-export function generateInitialGameSetup(fieldSize: FieldSize = DEFAULT_FIELD_SIZE): GameSetup {
+export function getInitialGameSetup(config: Config = emptyConfig, fieldSize: FieldSize = DEFAULT_FIELD_SIZE): GameSetup {
   const placedObjects = defaultPlacedObjects;
   const elementPositions: GameElementPositions = EMPTY_ELEMENT_MAP();
 
@@ -24,23 +25,22 @@ export function generateInitialGameSetup(fieldSize: FieldSize = DEFAULT_FIELD_SI
   return {
     fieldSize,
     elementPositions,
-    config: emptyConfig,
+    config,
     possibleSolutions: [],
   };
 }
 
-export function generateRandomGameSetup(fieldSize: FieldSize = DEFAULT_FIELD_SIZE, config: Config = allInConfig): GameSetup {
-  const tempGameSetup = {
-    ...generateInitialGameSetup(fieldSize),
-    config,
-  };
+export async function generateRandomGameSetup(config: Config = allInConfig, fieldSize: FieldSize = DEFAULT_FIELD_SIZE): Promise<GameSetup> {
+  await sleep(0);
 
-  const finalGameSetup = randomlyPlaceCatsOnField(tempGameSetup);
+  const tempGameSetup = getInitialGameSetup(config, fieldSize);
+
+  const finalGameSetup = randomlyPlaceCatsOnField(tempGameSetup, true);
 
   return { ...finalGameSetup };
 }
 
-function randomlyPlaceCatsOnField(gameSetup: GameSetup, iteration: number = 0): GameSetup {
+export function randomlyPlaceCatsOnField(gameSetup: GameSetup, shouldCalculatePar: boolean, iteration: number = 0): GameSetup {
   const copiedGameSetup = copyGameSetup(gameSetup);
   const cats = [...ALL_CAT_IDS];
   const emptyFields = getEmptyFields(copiedGameSetup);
@@ -59,17 +59,23 @@ function randomlyPlaceCatsOnField(gameSetup: GameSetup, iteration: number = 0): 
     console.error("not all cats placed");
   }
 
-  const parInfo = calculatePar(copiedGameSetup);
+  let possibleSolutions = copiedGameSetup.possibleSolutions;
 
-  if ((parInfo.par > MAX_PAR || parInfo.par < MIN_PAR) && iteration < 10) {
-    console.info("not a good setup");
+  if (shouldCalculatePar) {
+    const parInfo = calculatePar(copiedGameSetup);
 
-    return randomlyPlaceCatsOnField(copiedGameSetup, iteration + 1);
+    if ((parInfo.par > MAX_PAR || parInfo.par < MIN_PAR) && iteration < 10) {
+      console.info("not a good setup");
+
+      return randomlyPlaceCatsOnField(copiedGameSetup, shouldCalculatePar, iteration + 1);
+    }
+
+    possibleSolutions = parInfo.possibleSolutions;
   }
 
   return {
     ...copiedGameSetup,
     elementPositions: copiedGameSetup.elementPositions,
-    possibleSolutions: parInfo.possibleSolutions,
+    possibleSolutions,
   };
 }

@@ -29,6 +29,15 @@ $border-style: outset;
   }
 }
 
+.loader {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0.5;
+  font-family: $font-family-special;
+}
+
 :global(.#{$CELL}) {
   background-color: var(--t);
   display: grid;
