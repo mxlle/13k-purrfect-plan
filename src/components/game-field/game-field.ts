@@ -13,7 +13,7 @@ import {
   increaseOnboardingStepIfApplicable,
   isSameLevel,
   OnboardingData,
-  wasLastOnboardingStep
+  wasLastOnboardingStep,
 } from "../../logic/onboarding";
 import { CssClass } from "../../utils/css-class";
 import { ALL_CAT_IDS, ALL_KITTEN_IDS } from "../../logic/data/catId";
@@ -32,7 +32,7 @@ import {
   GameSetup,
   GameState,
   getInitialGameState,
-  isValidGameSetup
+  isValidGameSetup,
 } from "../../logic/data/game-elements";
 import { calculateNewPositions, isWinConditionMet } from "../../logic/game-logic";
 import { getConfigComponent } from "../config/config-component";
