@@ -9,8 +9,9 @@ import { sleep } from "../utils/promise-utils";
 import { ConfigCategory, hasMoveLimit, shouldApplyKittenBehavior } from "./config/config";
 import { deepCopyElementsMap, GameElementPositions, GameState } from "./data/game-elements";
 
-import { kittenMeows, meow, styles as catStyles } from "../components/cat-component/cat-component";
+import { kittenMeows, meow } from "../components/cat-component/cat-component";
 import { globals } from "../globals";
+import { CssClass } from "../utils/css-class";
 
 let isPerformingMove = false;
 
@@ -147,7 +148,7 @@ function doMoonMove(gameState: GameState): CellPosition {
 async function preToolAction(tool: Tool) {
   switch (tool) {
     case Tool.MEOW:
-      document.body.classList.add(catStyles.meow);
+      document.body.classList.add(CssClass.MEOW);
 
       await Promise.all([meow(CatId.MOTHER), sleep(300)]); // Wait for meow speech bubble to appear
 
@@ -159,7 +160,7 @@ async function postToolAction(tool: Tool) {
   switch (tool) {
     case Tool.MEOW:
       setTimeout(() => {
-        document.body.classList.remove(catStyles.meow);
+        document.body.classList.remove(CssClass.MEOW);
       }, MEOW_TIME);
       break;
   }
