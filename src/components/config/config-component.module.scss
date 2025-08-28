@@ -2,7 +2,9 @@
 @use "../../theme" as *;
 
 .config {
-  grid-column: 2;
+  @media (orientation: landscape) {
+    grid-column: 2;
+  }
 }
 
 .config,
