@@ -210,7 +210,7 @@ export function addNewGameButtons(isInitialStart = false) {
       newGameContainer.remove();
     },
   });
-  hasAchievedGoal && continueButton.classList.add(CssClass.PRM);
+  hasAchievedGoal && continueButton.classList.add(CssClass.PRIMARY);
 
   newGameContainer.appendChild(continueButton);
 
@@ -223,10 +223,10 @@ export function addNewGameButtons(isInitialStart = false) {
       },
     });
 
-    !hasAchievedGoal && restartButton.classList.add(CssClass.PRM);
+    !hasAchievedGoal && restartButton.classList.add(CssClass.PRIMARY);
     newGameContainer.appendChild(restartButton);
   } else {
-    continueButton.classList.toggle(CssClass.PRM, true);
+    continueButton.classList.toggle(CssClass.PRIMARY, true);
   }
 
   return newGameContainer;

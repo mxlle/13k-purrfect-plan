@@ -45,7 +45,7 @@ export function createDialog(innerElement: HTMLElement, submitButtonText?: strin
       text: submitButtonText,
       onClick: () => closeDialog(true),
     });
-    submitButton.classList.add(CssClass.PRM);
+    submitButton.classList.add(CssClass.PRIMARY);
     buttons.appendChild(submitButton);
     dialog.appendChild(buttons);
   }

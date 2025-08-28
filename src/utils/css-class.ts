@@ -3,7 +3,7 @@ import { defineEnum } from "./enums";
 export type CssClass = defineEnum<typeof CssClass>;
 export const CssClass = defineEnum({
   TITLE: "global__title",
-  PRM: "global__prm",
+  PRIMARY: "global__primary",
   CELL: "global__cell",
   CAT_BOX: "global__cat-box",
   OBJECT_BOX: "global__object-box",
