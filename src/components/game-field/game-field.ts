@@ -13,7 +13,7 @@ import {
   increaseOnboardingStepIfApplicable,
   isSameLevel,
   OnboardingData,
-  wasLastOnboardingStep,
+  wasLastOnboardingStep
 } from "../../logic/onboarding";
 import { CssClass } from "../../utils/css-class";
 import { ALL_CAT_IDS, ALL_KITTEN_IDS } from "../../logic/data/catId";
@@ -32,7 +32,7 @@ import {
   GameSetup,
   GameState,
   getInitialGameState,
-  isValidGameSetup,
+  isValidGameSetup
 } from "../../logic/data/game-elements";
 import { calculateNewPositions, isWinConditionMet } from "../../logic/game-logic";
 import { getConfigComponent } from "../config/config-component";
@@ -66,7 +66,7 @@ export async function initializeEmptyGameField(fieldSize: FieldSize) {
 
   const tempGameState = getInitialGameState(getInitialGameSetup());
   await initializeObjectsOnGameField(tempGameState);
-  await initializeCatsOnGameField(tempGameState, undefined, true);
+  await initializeCatsOnGameField(tempGameState, undefined, true, true);
 
   appendGameField();
 }
@@ -84,7 +84,7 @@ async function shuffleFieldAnimation(config: Config) {
   for (let i = 0; i < 2; i++) {
     const randomState = getInitialGameState(randomlyPlaceCatsOnField(getInitialGameSetup(config), false));
     const nextPositionsIfWait = calculateNewPositions(randomState, SpecialAction.WAIT);
-    await initializeCatsOnGameField(randomState, nextPositionsIfWait, false);
+    await initializeCatsOnGameField(randomState, nextPositionsIfWait, false, true);
     await requestAnimationFrameWithTimeout(TIMEOUT_BETWEEN_GAMES);
   }
 
@@ -154,7 +154,7 @@ export async function startNewGame(options: { shouldIncreaseLevel: boolean } = {
     throw new Error("Generated or provided game setup is invalid, cannot start game.", { cause: gameSetup });
   }
 
-  await refreshFieldWithSetup(gameSetup, onboardingData, false);
+  await refreshFieldWithSetup(gameSetup, onboardingData, false, options.shouldIncreaseLevel);
 
   addOnboardingSuggestionIfApplicable(onboardingData);
 }
@@ -168,7 +168,12 @@ export async function generateRandomGameWhileAnimating(config: Config = allInCon
   return gameSetup;
 }
 
-export async function refreshFieldWithSetup(gameSetup: GameSetup, onboardingData: OnboardingData | undefined, isInitialStart: boolean) {
+export async function refreshFieldWithSetup(
+  gameSetup: GameSetup,
+  onboardingData: OnboardingData | undefined,
+  isInitialStart: boolean,
+  shouldResetToMiddle: boolean,
+) {
   globals.gameState = getInitialGameState(gameSetup);
   globals.nextPositionsIfWait = calculateNewPositions(globals.gameState, SpecialAction.WAIT);
   const serializedGameSetup = serializeGame(gameSetup);
@@ -185,7 +190,7 @@ export async function refreshFieldWithSetup(gameSetup: GameSetup, onboardingData
 
   await initializeObjectsOnGameField(globals.gameState);
 
-  await initializeCatsOnGameField(globals.gameState, globals.nextPositionsIfWait, isInitialStart);
+  await initializeCatsOnGameField(globals.gameState, globals.nextPositionsIfWait, isInitialStart, shouldResetToMiddle);
 }
 
 function appendGameField() {
@@ -254,7 +259,7 @@ function cellClickHandler(cellPosition: CellPosition) {
   if (globals.configMode && globals.selectedGameElement && globals.gameState) {
     const newSetup = copyGameSetup(globals.gameState.setup);
     newSetup.elementPositions[globals.selectedGameElement] = cellPosition;
-    void refreshFieldWithSetup(newSetup, undefined, false);
+    void refreshFieldWithSetup(newSetup, undefined, false, false);
     globals.selectedGameElement = undefined;
   }
 }
@@ -287,6 +292,7 @@ export async function initializeCatsOnGameField(
   gameState: GameState,
   nextPositionsIfWait: GameElementPositions | undefined,
   isInitialStart: boolean,
+  shouldResetToMiddle: boolean,
 ) {
   for (const catId of ALL_CAT_IDS) {
     const representation = gameState.representations[catId];
@@ -297,7 +303,7 @@ export async function initializeCatsOnGameField(
       // append if not already there
       if (!cellElement.contains(representation.htmlElement)) {
         cellElement.append(representation.htmlElement);
-      } else {
+      } else if (shouldResetToMiddle) {
         representation.htmlElement.style.transform = "translate(0, 0)";
       }
 

@@ -63,7 +63,7 @@ function getNewSetupWithConfig(gameState: GameState): GameSetup {
 
 function refreshField() {
   if (globals.gameState) {
-    void refreshFieldWithSetup(getNewSetupWithConfig(globals.gameState), undefined, true);
+    void refreshFieldWithSetup(getNewSetupWithConfig(globals.gameState), undefined, true, false);
   }
 }
 
@@ -72,13 +72,13 @@ function checkPossibleSolutions() {
     const newSetup = getNewSetupWithConfig(globals.gameState);
     const parInfo = calculatePar(newSetup);
     newSetup.possibleSolutions = parInfo.possibleSolutions;
-    void refreshFieldWithSetup(newSetup, undefined, false);
+    void refreshFieldWithSetup(newSetup, undefined, false, false);
   }
 }
 
 async function reshuffleField() {
   const newSetup = await generateRandomGameWhileAnimating(configObject);
-  void refreshFieldWithSetup(newSetup, undefined, false);
+  void refreshFieldWithSetup(newSetup, undefined, false, true);
 }
 
 function getConfigCategoryElement(category: ConfigCategory): HTMLElement {
