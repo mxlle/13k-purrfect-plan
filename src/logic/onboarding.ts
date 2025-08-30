@@ -30,10 +30,10 @@ const lastSetup: InitialSetup = (() => {
   const { _, M, t, o, c, T, O, C } = getCellTypePlaceholders();
   return [
     [C, _, M, _, _],
-    [_, _, _, _, O],
-    [o, _, _, _, _],
-    [_, _, T, _, _],
-    [_, t, _, _, c],
+    [o, _, _, _, O],
+    [_, _, _, _, _],
+    [_, t, T, _, c],
+    [_, _, _, _, _],
   ];
 })();
 

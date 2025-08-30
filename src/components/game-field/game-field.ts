@@ -20,8 +20,8 @@ import { CssClass } from "../../utils/css-class";
 import { ALL_CAT_IDS, ALL_KITTEN_IDS } from "../../logic/data/catId";
 import { CellPosition, getCellDifference, getDirection } from "../../logic/data/cell";
 import { PubSubEvent, pubSubService } from "../../utils/pub-sub-service";
-import { isSpecialAction, ObjectId, SpecialAction } from "../../types";
-import { allInConfig, Config, ConfigCategory, hasUnknownConfigItems } from "../../logic/config/config";
+import { isSpecialAction, isTool, ObjectId, SpecialAction } from "../../types";
+import { allInConfig, Config, ConfigCategory, ConfigItemId, hasUnknownConfigItems } from "../../logic/config/config";
 import { DEFAULT_FIELD_SIZE, FieldSize } from "../../logic/data/field-size";
 import { ALL_OBJECT_IDS } from "../../logic/data/objects";
 import { isValidCellPosition } from "../../logic/checks";
@@ -97,12 +97,13 @@ async function shuffleFieldAnimation(config: Config) {
 export async function startNewGame(options: { shouldIncreaseLevel: boolean } = { shouldIncreaseLevel: true }) {
   const isInitialStart = !globals.gameState;
   const notYetAllConfigItems = hasUnknownConfigItems();
+  let newConfigItem: ConfigItemId | false = false;
 
   if (isWinConditionMet(globals.gameState) && options.shouldIncreaseLevel) {
     increaseOnboardingStepIfApplicable();
 
     if (notYetAllConfigItems && !isOnboarding()) {
-      await createConfigChooserComponent();
+      newConfigItem = await createConfigChooserComponent();
     }
   }
 
@@ -165,7 +166,7 @@ export async function startNewGame(options: { shouldIncreaseLevel: boolean } = {
 
   await refreshFieldWithSetup(gameSetup, onboardingData, false, options.shouldIncreaseLevel);
 
-  addOnboardingSuggestionIfApplicable(onboardingData);
+  addOnboardingSuggestionIfApplicable(onboardingData, newConfigItem);
 }
 
 export async function generateRandomGameWhileAnimating(config: Config = allInConfig, fieldSize: FieldSize = DEFAULT_FIELD_SIZE) {
@@ -273,9 +274,11 @@ function cellClickHandler(cellPosition: CellPosition) {
   }
 }
 
-function addOnboardingSuggestionIfApplicable(onboardingData: OnboardingData | undefined) {
+function addOnboardingSuggestionIfApplicable(onboardingData: OnboardingData | undefined, newConfigItem: ConfigItemId | false) {
   if (onboardingData?.highlightedAction && !isSpecialAction(onboardingData?.highlightedAction)) {
     activateOnboardingHighlight(onboardingData?.highlightedAction);
+  } else if (newConfigItem && isTool(newConfigItem)) {
+    activateOnboardingHighlight(newConfigItem);
   }
 }
 

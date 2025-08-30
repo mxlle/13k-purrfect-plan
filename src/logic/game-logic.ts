@@ -6,7 +6,7 @@ import { CAT_NAMES } from "./data/cats";
 import { CellPosition, isSameCell } from "./data/cell";
 import { updateAllPositions } from "../components/game-field/game-field";
 import { sleep } from "../utils/promise-utils";
-import { ConfigCategory, hasMoveLimit, shouldApplyKittenBehavior, showMovesInfo } from "./config/config";
+import { ConfigCategory, shouldApplyKittenBehavior, showMovesInfo } from "./config/config";
 import { deepCopyElementsMap, GameElementPositions, GameState } from "./data/game-elements";
 
 import { kittenMeows, meow } from "../components/cat-component/cat-component";
@@ -55,6 +55,7 @@ export async function performMove(gameState: GameState, turnMove: TurnMove) {
     if (isWinConditionMet(gameState)) {
       pubSubService.publish(PubSubEvent.GAME_END);
 
+      await sleep(300); // to finish moving
       showSpeechBubble(gameState.representations[CatId.MOTHER].htmlElement, "United!");
       await kittenMeows(ALL_KITTEN_IDS, true);
     }
