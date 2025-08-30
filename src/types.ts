@@ -49,9 +49,8 @@ export type OnboardingStep = defineEnum<typeof OnboardingStep>;
 export const OnboardingStep = defineEnum({
   INTRO: 0,
   INTRO_SECOND_CAT: 1,
-  INTERMEDIATE_MEOW: 2,
-  INTERMEDIATE_OBJECTS: 3,
-  LAST_SETUP: 4,
+  INTERMEDIATE_OBJECTS: 2,
+  LAST_SETUP: 3,
 });
 export type ObjectId = defineEnum<typeof ObjectId>;
 export const ObjectId = defineEnum({

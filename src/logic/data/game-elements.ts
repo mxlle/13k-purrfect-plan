@@ -5,7 +5,7 @@ import { CellPosition } from "./cell";
 import { FieldSize, getMiddleCoordinates } from "./field-size";
 import { Config } from "../config/config";
 import { ObjectId, TurnMove } from "../../types";
-import { FALLBACK_PAR } from "../par";
+import { FALLBACK_PAR, MAX_PAR } from "../par";
 import { globals } from "../../globals";
 
 export type GameElementId = CatId | ObjectId;
@@ -73,7 +73,7 @@ export function getParFromGameState(gameState: GameState | null): number | null 
     return FALLBACK_PAR;
   }
 
-  return gameState.setup.possibleSolutions[0].length;
+  return MAX_PAR; // For now we always allow the maximum par
 }
 
 const ALL_GAME_ELEMENT_IDS: GameElementId[] = [...Object.values(CatId), ...Object.values(ObjectId)];

@@ -1,17 +1,17 @@
 import { createDialog, Dialog } from "../dialog/dialog";
 import { createElement } from "../../utils/html-utils";
-import { ConfigItemId, explanationMap, getKnownConfigItems, getNextUnknownConfigItems } from "../../logic/config/config";
+import { ConfigItemId, explanationMap, getNextUnknownConfigItems, updateKnownConfigItems } from "../../logic/config/config";
 import { shuffleArray } from "../../utils/random-utils";
 import { getCatElement, isCatId } from "../../logic/data/cats";
 import { isTool } from "../../types";
-import { isConstraintId } from "../../logic/config/constraint";
+import { isMoveLimit } from "../../logic/config/move-limit";
 
 import styles from "./config-chooser-component.module.scss";
 import configStyles from "../config/config-component.module.scss";
 import { getTranslation } from "../../translations/i18n";
 import { TranslationKey } from "../../translations/translationKey";
 import { getCatIdClass } from "../cat-component/cat-component";
-import { LocalStorageKey, setLocalStorageItem } from "../../utils/local-storage";
+import { sleep } from "../../utils/promise-utils";
 
 let chooserDialog: Dialog | undefined;
 
@@ -61,8 +61,10 @@ export async function createConfigChooserComponent(): Promise<ConfigItemId | fal
 
   return chooserDialog.open().then((isConfirmed): ConfigItemId | false => {
     if (isConfirmed && selectedConfigItem) {
-      setLocalStorageItem(LocalStorageKey.KNOWN_CONFIG_ELEMENTS, [...getKnownConfigItems(), selectedConfigItem].join(","));
+      updateKnownConfigItems([selectedConfigItem]);
     }
+
+    sleep(600).then(() => chooserDialog?.destroy());
 
     return isConfirmed ? selectedConfigItem || false : false;
   });
@@ -101,7 +103,7 @@ function getChoiceElement(configItem: ConfigItemId, chooseItem: (event: MouseEve
     });
   }
 
-  if (isConstraintId(configItem)) {
+  if (isMoveLimit(configItem)) {
     return createElement({
       text: getTranslation(TranslationKey.CHOICE_CONSTRAINT),
       onClick: (event) => {

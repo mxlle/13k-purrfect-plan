@@ -26,6 +26,7 @@ export const enTranslations: Record<TranslationKey, string> = {
   [TranslationKey.EXPLANATION_MEOW]: "When Mommy meows, all kittens will come a step closer.",
   [TranslationKey.EXPLANATION_MOVE_LIMIT_1]:
     "The moon will wander across the field. Once it sets, the field will become dark, but you can still continue.",
+  [TranslationKey.EXPLANATION_MOVE_LIMIT_2]: "You have to unite all kittens before the moon sets!",
   [TranslationKey.EXPLANATION_EMPTY]: "Your choice will be explained here.",
   [TranslationKey.YOUR_CHOICE]: "Your choice",
   [TranslationKey.CONFIRM]: "Let's go!",

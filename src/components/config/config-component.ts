@@ -8,7 +8,7 @@ import { allCategories, allInConfig, ConfigCategory, ConfigItemId, copyConfig } 
 import { ALL_OBJECT_IDS } from "../../logic/data/objects";
 import { getCatIdClass, meow } from "../cat-component/cat-component";
 import { Tool } from "../../types";
-import { Constraint } from "../../logic/config/constraint";
+import { MoveLimit } from "../../logic/config/move-limit";
 import { globals } from "../../globals";
 import { copyGameSetup, GameSetup, GameState } from "../../logic/data/game-elements";
 import { generateRandomGameWhileAnimating, refreshFieldWithSetup } from "../game-field/game-field";
@@ -118,7 +118,7 @@ function getConfigCategoryElement(category: ConfigCategory): HTMLElement {
       }
       break;
     case ConfigCategory.CONSTRAINTS:
-      for (const constraint of Object.values(Constraint)) {
+      for (const constraint of Object.values(MoveLimit)) {
         const constraintElem = createElement({ text: constraint });
         transformToConfigItemElement(category, constraint, constraintElem);
         contentElem.appendChild(constraintElem);

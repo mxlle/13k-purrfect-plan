@@ -1,9 +1,9 @@
-import { Direction, ObjectId, OnboardingStep, Tool, TurnMove } from "../types";
+import { Direction, ObjectId, OnboardingStep, TurnMove } from "../types";
 import { globals } from "../globals";
 import { LocalStorageKey, setLocalStorageItem } from "../utils/local-storage";
 import { ALL_CAT_IDS, CatId } from "./data/catId";
 import { CellPosition, containsCell, EMPTY_CELL, getCellTypePlaceholders } from "./data/cell";
-import { allInConfig, ConfigCategory, emptyConfig } from "./config/config";
+import { allInConfig, ConfigCategory, emptyConfig, getValidatedConfig } from "./config/config";
 import { FieldSize } from "./data/field-size";
 import { EMPTY_ELEMENT_MAP, GameElementPositions, GameSetup } from "./data/game-elements";
 import { calculatePar } from "./par";
@@ -75,7 +75,6 @@ export function getOnboardingData(): OnboardingData | undefined {
         },
         highlightedAction: isFirstStep ? Direction.DOWN : undefined,
       };
-    case OnboardingStep.INTERMEDIATE_MEOW:
     case OnboardingStep.INTERMEDIATE_OBJECTS:
       const intermediateSetup: InitialSetup = (() => {
         const { _, M, t, o, c, T, O, C } = getCellTypePlaceholders();
@@ -86,13 +85,6 @@ export function getOnboardingData(): OnboardingData | undefined {
           [t, _, c, _],
         ];
       })();
-      const isMeowStep = step === OnboardingStep.INTERMEDIATE_MEOW;
-      skipPositions = isMeowStep
-        ? [
-            { row: 0, column: 0 },
-            { row: 2, column: 2 },
-          ]
-        : [];
 
       const gameSetupIntermediate: GameSetup = {
         fieldSize: getFieldSizeFromInitialSetup(intermediateSetup),
@@ -101,12 +93,8 @@ export function getOnboardingData(): OnboardingData | undefined {
           ...emptyConfig,
           [ConfigCategory.OBJECTS]: {
             ...emptyConfig[ConfigCategory.OBJECTS],
-            [ObjectId.TREE]: step === OnboardingStep.INTERMEDIATE_OBJECTS,
-            [ObjectId.MOON]: step === OnboardingStep.INTERMEDIATE_OBJECTS,
-          },
-          [ConfigCategory.TOOLS]: {
-            ...emptyConfig[ConfigCategory.TOOLS],
-            [Tool.MEOW]: true,
+            [ObjectId.TREE]: true,
+            [ObjectId.MOON]: true,
           },
         },
         possibleSolutions: [],
@@ -114,13 +102,12 @@ export function getOnboardingData(): OnboardingData | undefined {
 
       return {
         gameSetup: { ...gameSetupIntermediate, possibleSolutions: calculatePar(gameSetupIntermediate).possibleSolutions },
-        highlightedAction: step === OnboardingStep.INTERMEDIATE_MEOW ? Tool.MEOW : undefined,
       };
     case OnboardingStep.LAST_SETUP:
       const gameSetupLast: GameSetup = {
         fieldSize: getFieldSizeFromInitialSetup(lastSetup),
         elementPositions: getElementPositionsFormInitialSetup(lastSetup),
-        config: { ...allInConfig, [ConfigCategory.CONSTRAINTS]: emptyConfig[ConfigCategory.CONSTRAINTS] },
+        config: getValidatedConfig(allInConfig),
         possibleSolutions: [],
       };
 

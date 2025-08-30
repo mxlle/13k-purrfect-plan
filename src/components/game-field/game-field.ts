@@ -99,10 +99,10 @@ export async function startNewGame(options: { shouldIncreaseLevel: boolean } = {
 
   if (isWinConditionMet(globals.gameState) && options.shouldIncreaseLevel) {
     increaseOnboardingStepIfApplicable();
-  }
 
-  if (notYetAllConfigItems && !isOnboarding()) {
-    await createConfigChooserComponent();
+    if (notYetAllConfigItems && !isOnboarding()) {
+      await createConfigChooserComponent();
+    }
   }
 
   document.body.classList.remove(CssClass.WON);

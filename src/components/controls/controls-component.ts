@@ -19,7 +19,7 @@ import { TranslationKey } from "../../translations/translationKey";
 import { globals } from "../../globals";
 import { isOnboarding } from "../../logic/onboarding";
 
-import { ConfigCategory, hasMoveLimit } from "../../logic/config/config";
+import { ConfigCategory, hasMoveLimit, showMovesInfo } from "../../logic/config/config";
 import { FALLBACK_PAR } from "../../logic/par";
 import { getParFromGameState } from "../../logic/data/game-elements";
 
@@ -165,6 +165,10 @@ function setupEventListeners() {
     controlsComponent.appendChild(addNewGameButtons());
   });
 
+  pubSubService.subscribe(PubSubEvent.START_NEW_GAME, () => {
+    updateTurnMovesComponent(true);
+  });
+
   pubSubService.subscribe(PubSubEvent.GAME_START, () => {
     controlsComponent.classList.remove(styles.disabled);
     toolsFrozenUntilTurn = undefined;
@@ -219,7 +223,7 @@ export function addNewGameButtons(isInitialStart = false) {
 
   newGameContainer.appendChild(continueButton);
 
-  if (!isInitialStart && hasMoveLimit(globals.gameState.setup)) {
+  if (!isInitialStart && showMovesInfo(globals.gameState.setup)) {
     const restartButton = createButton({
       text: getTranslation(TranslationKey.RESTART_GAME),
       onClick: () => {
@@ -228,7 +232,12 @@ export function addNewGameButtons(isInitialStart = false) {
       },
     });
 
-    !hasAchievedGoal && restartButton.classList.add(CssClass.PRIMARY);
+    if (!hasAchievedGoal && hasMoveLimit(globals.gameState.setup)) {
+      restartButton.classList.add(CssClass.PRIMARY);
+    } else {
+      continueButton.classList.toggle(CssClass.PRIMARY, true);
+    }
+
     newGameContainer.appendChild(restartButton);
   } else {
     continueButton.classList.toggle(CssClass.PRIMARY, true);
@@ -252,20 +261,21 @@ async function handleMove(turnMove: TurnMove) {
   updateRecoveryInfoComponent();
 }
 
-function updateTurnMovesComponent() {
+function updateTurnMovesComponent(isReset: boolean = false) {
   if (!turnMovesContainer) return;
 
-  const showMoves = globals.gameState && hasMoveLimit(globals.gameState.setup);
+  const showMoves = globals.gameState && showMovesInfo(globals.gameState.setup);
+  const showMoveLimit = globals.gameState && hasMoveLimit(globals.gameState.setup);
 
   turnMovesContainer.style.display = showMoves ? "flex" : "none";
   const par = getParFromGameState(globals.gameState);
-  const parString = par ? ` / ${par < FALLBACK_PAR ? par : "?"}` : "";
-  turnMovesComponent.innerHTML = `${getTranslation(TranslationKey.MOVES)}: ${globals.gameState?.moves.length ?? 0}${parString}`;
+  const parString = par && showMoveLimit && !isReset ? ` / ${par < FALLBACK_PAR ? par : "?"}` : "";
+  turnMovesComponent.innerHTML = `${getTranslation(TranslationKey.MOVES)}: ${isReset ? 0 : (globals.gameState?.moves.length ?? 0)}${parString}`;
 
   if (!solutionsComponent) return;
-  solutionsComponent.style.display = showMoves ? "flex" : "none";
+  solutionsComponent.style.display = showMoveLimit ? "flex" : "none";
   const solutionsCount = getPossibleSolutionsCount(globals.gameState);
-  solutionsComponent.innerHTML = `${getTranslation(TranslationKey.POSSIBLE_SOLUTIONS)}: ${solutionsCount ?? "?"}`;
+  solutionsComponent.innerHTML = `${getTranslation(TranslationKey.POSSIBLE_SOLUTIONS)}: ${isReset ? "?" : (solutionsCount ?? "?")}`;
 
   if (solutionsCount === 0) {
     const redoButton = createElement({

@@ -34,6 +34,7 @@ const deTranslations: Record<TranslationKey, string> = {
   [TranslationKey.EXPLANATION_MEOW]: "Wenn Mama miaut, kommen alle Kätzchen einen Schritt näher.",
   [TranslationKey.EXPLANATION_MOVE_LIMIT_1]:
     "Der Mond wird über das Feld wandern. Sobald er untergeht, wird das Feld dunkel, aber du kannst trotzdem weiterspielen.",
+  [TranslationKey.EXPLANATION_MOVE_LIMIT_2]: "Du musst alle Kätzchen vereinen, bevor der Mond untergeht!",
   [TranslationKey.EXPLANATION_EMPTY]: "Deine Wahl wird hier erklärt.",
   [TranslationKey.YOUR_CHOICE]: "Deine Wahl",
   [TranslationKey.CONFIRM]: "Bestätigen",

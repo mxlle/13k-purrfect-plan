@@ -14,6 +14,7 @@ export interface Dialog {
   toggleSubmitDisabled: (isDisabled: boolean) => void;
   recreateDialogContent: (newInnerElement: HTMLElement) => void;
   changeSubmitText: (newText: string) => void;
+  destroy: () => void;
 }
 
 export interface DialogOptions {
@@ -95,6 +96,9 @@ export function createDialog(innerElement: HTMLElement, options: DialogOptions):
     },
     changeSubmitText: (newText: string) => {
       if (submitButton) submitButton.innerText = newText;
+    },
+    destroy: () => {
+      dialog.remove();
     },
   };
 }

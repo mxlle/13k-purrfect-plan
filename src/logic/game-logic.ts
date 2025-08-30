@@ -6,7 +6,7 @@ import { CAT_NAMES } from "./data/cats";
 import { CellPosition, isSameCell } from "./data/cell";
 import { updateAllPositions } from "../components/game-field/game-field";
 import { sleep } from "../utils/promise-utils";
-import { ConfigCategory, hasMoveLimit, shouldApplyKittenBehavior } from "./config/config";
+import { ConfigCategory, hasMoveLimit, shouldApplyKittenBehavior, showMovesInfo } from "./config/config";
 import { deepCopyElementsMap, GameElementPositions, GameState } from "./data/game-elements";
 
 import { kittenMeows, meow, styles as catStyles } from "../components/cat-component/cat-component";
@@ -131,7 +131,7 @@ export function calculateNewPositions(gameState: GameState, turnMove: TurnMove):
 function doMoonMove(gameState: GameState): CellPosition {
   const moon = gameState.currentPositions[ObjectId.MOON];
 
-  if (!moon || !hasMoveLimit(gameState.setup)) {
+  if (!moon || !showMovesInfo(gameState.setup)) {
     return moon;
   }
 

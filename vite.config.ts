@@ -11,7 +11,7 @@ import { mapEntries, memoize } from "./src/utils/utils";
 import { Direction, ObjectId, OnboardingStep, SpecialAction, Tool } from "./src/types";
 import { ConfigCategory } from "./src/logic/config/config";
 import { CatId } from "./src/logic/data/catId";
-import { Constraint } from "./src/logic/config/constraint";
+import { MoveLimit } from "./src/logic/config/move-limit";
 
 const replaceEnum = (name: string, object: object) => mapEntries(object, ([key, value]) => [`${name}.${key}`, JSON.stringify(value)]);
 
@@ -86,7 +86,7 @@ export default defineConfig(({ mode, command }) => {
           ...replaceEnum("ObjectId", ObjectId),
           ...replaceEnum("ConfigCategory", ConfigCategory),
           ...replaceEnum("OnboardingStep", OnboardingStep),
-          ...replaceEnum("Constraint", Constraint),
+          ...replaceEnum("Constraint", MoveLimit),
           ...mapEntries(CssClass, ([, name]) => [name, getCssIdentifier(name)]),
         }),
       viteAwesomeSvgLoader(),

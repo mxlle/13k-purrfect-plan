@@ -11,15 +11,19 @@ interface ParInfo {
 let iterationCount = 1;
 
 export const MAX_PAR = 5;
-export const MIN_PAR = 3;
+export const MIN_PAR = 4;
 
 export const FALLBACK_PAR = 42; // Fallback value for par when no solution is found
 
-export function calculatePar(gameSetup: GameSetup): ParInfo {
+interface ParOptions {
+  returnAllSolutions?: boolean;
+}
+
+export function calculatePar(gameSetup: GameSetup, options: ParOptions = { returnAllSolutions: true }): ParInfo {
   const performanceStart = performance.now();
   const gameState = getInitialGameState(gameSetup);
   console.debug("Starting par calculation...");
-  const parInfo = calculateParInner(gameState);
+  const parInfo = calculateParInner(gameState, options);
   const performanceEnd = performance.now();
   const performanceTime = performanceEnd - performanceStart;
   console.info(
@@ -36,7 +40,7 @@ export function calculatePar(gameSetup: GameSetup): ParInfo {
   return parInfo;
 }
 
-function calculateParInner(gameState: GameState): ParInfo {
+function calculateParInner(gameState: GameState, options: ParOptions): ParInfo {
   const previousMoves = gameState.moves;
 
   if (previousMoves.length === 0) {
@@ -70,13 +74,14 @@ function calculateParInner(gameState: GameState): ParInfo {
     copiedGameState.currentPositions = deepCopyElementsMap(calculateNewPositions(copiedGameState, move));
 
     // Recursively calculate par for the next moves
-    const parInfo = calculateParInner(copiedGameState);
-    const newPar = parInfo.par + 1;
+    const parInfo = calculateParInner(copiedGameState, options);
+    const potentialNewPar = parInfo.par + 1;
+    bestParInfo.par = Math.min(potentialNewPar, bestParInfo.par);
 
-    if (newPar < bestParInfo.par) {
-      bestParInfo = { ...parInfo, par: newPar };
-    } else if (newPar === bestParInfo.par) {
-      bestParInfo = { par: newPar, possibleSolutions: [...bestParInfo.possibleSolutions, ...parInfo.possibleSolutions] }; // Increment the par count for this move
+    if (potentialNewPar < FALLBACK_PAR && (options.returnAllSolutions || potentialNewPar === bestParInfo.par)) {
+      bestParInfo.possibleSolutions = [...bestParInfo.possibleSolutions, ...parInfo.possibleSolutions];
+    } else if (potentialNewPar < FALLBACK_PAR) {
+      bestParInfo.possibleSolutions = [...parInfo.possibleSolutions];
     }
   }
 
