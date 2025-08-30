@@ -21,7 +21,7 @@ import { ALL_CAT_IDS, ALL_KITTEN_IDS } from "../../logic/data/catId";
 import { CellPosition, getCellDifference, getDirection } from "../../logic/data/cell";
 import { PubSubEvent, pubSubService } from "../../utils/pub-sub-service";
 import { ConfigCategory, ConfigItemId, isSpecialAction, isTool, ObjectId, SpecialAction } from "../../types";
-import { allInConfig, Config, hasUnknownConfigItems } from "../../logic/config/config";
+import { allInConfig, Config, getValidatedConfig, hasUnknownConfigItems } from "../../logic/config/config";
 import { DEFAULT_FIELD_SIZE, FieldSize } from "../../logic/data/field-size";
 import { ALL_OBJECT_IDS } from "../../logic/data/objects";
 import { isValidCellPosition } from "../../logic/checks";
@@ -156,7 +156,7 @@ export async function startNewGame(options: { shouldIncreaseLevel: boolean } = {
     if (!options.shouldIncreaseLevel && globals.gameState) {
       gameSetup = globals.gameState.setup;
     } else {
-      gameSetup = onboardingData ? onboardingData.gameSetup : await generateRandomGameWhileAnimating();
+      gameSetup = onboardingData ? onboardingData.gameSetup : await generateRandomGameWhileAnimating(getValidatedConfig(allInConfig));
     }
   }
 
@@ -169,7 +169,7 @@ export async function startNewGame(options: { shouldIncreaseLevel: boolean } = {
   addOnboardingSuggestionIfApplicable(onboardingData, newConfigItem);
 }
 
-export async function generateRandomGameWhileAnimating(config: Config = allInConfig, fieldSize: FieldSize = DEFAULT_FIELD_SIZE) {
+export async function generateRandomGameWhileAnimating(config: Config, fieldSize: FieldSize = DEFAULT_FIELD_SIZE) {
   const gameSetupPromise = generateRandomGameSetup(config, fieldSize);
   const animatePromise = shuffleFieldAnimation(config);
 

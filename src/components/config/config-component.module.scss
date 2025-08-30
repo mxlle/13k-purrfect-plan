@@ -47,8 +47,8 @@
     width: min(40vh, 40vw);
     font-size: 2em;
     transition:
-      transform 0.3s ease-in-out,
-      opacity 0.3s ease-in-out;
+      transform 0.3s,
+      opacity 0.3s;
 
     :global(.#{$CAT_BOX}) {
       height: 50%;

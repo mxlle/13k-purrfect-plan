@@ -3,7 +3,7 @@ import { shuffleArray } from "../utils/random-utils";
 import { getEmptyFields } from "./checks";
 import { ALL_CAT_IDS } from "./data/catId";
 import { CellPosition } from "./data/cell";
-import { allInConfig, Config, emptyConfig, getValidatedConfig } from "./config/config";
+import { Config, emptyConfig, getValidatedConfig, showMovesInfo } from "./config/config";
 import { DEFAULT_FIELD_SIZE, FieldSize, getMiddleCoordinates } from "./data/field-size";
 import { copyGameSetup, EMPTY_ELEMENT_MAP, GameElementPositions, GameSetup, isValidGameSetup } from "./data/game-elements";
 import { calculatePar, MAX_PAR, MIN_PAR } from "./par";
@@ -30,12 +30,12 @@ export function getInitialGameSetup(config: Config = emptyConfig, fieldSize: Fie
   };
 }
 
-export async function generateRandomGameSetup(config: Config = allInConfig, fieldSize: FieldSize = DEFAULT_FIELD_SIZE): Promise<GameSetup> {
+export async function generateRandomGameSetup(config: Config, fieldSize: FieldSize = DEFAULT_FIELD_SIZE): Promise<GameSetup> {
   await sleep(0);
 
   const tempGameSetup = getInitialGameSetup(config, fieldSize);
 
-  const finalGameSetup = randomlyPlaceCatsOnField(tempGameSetup, true);
+  const finalGameSetup = randomlyPlaceCatsOnField(tempGameSetup, showMovesInfo(config));
 
   return { ...finalGameSetup };
 }

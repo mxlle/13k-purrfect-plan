@@ -38,8 +38,10 @@ export function shouldApplyKittenBehavior(gameSetup: GameSetup, catId: CatId): b
   return gameSetup.config[ConfigCategory.KITTEN_BEHAVIOR][catId];
 }
 
-export function showMovesInfo(gameSetup: GameSetup): boolean {
-  return gameSetup.config[ConfigCategory.CONSTRAINTS].moveLimit !== MoveLimit.MOVE_LIMIT_NONE;
+export function showMovesInfo(gameSetupOrConfig: GameSetup | Config): boolean {
+  const config = "config" in gameSetupOrConfig ? gameSetupOrConfig.config : gameSetupOrConfig;
+
+  return config[ConfigCategory.CONSTRAINTS].moveLimit !== MoveLimit.MOVE_LIMIT_NONE;
 }
 
 export function hasMoveLimit(gameSetup: GameSetup): boolean {

@@ -29,6 +29,7 @@ export async function createConfigChooserComponent(): Promise<ConfigItemId | fal
   const choiceElements = choices.map((choice, index) => {
     function chooseItem(event: MouseEvent) {
       explanationElement.innerHTML = getTranslation(explanationMap[choice]);
+      explanationElement.classList.add(styles.active);
       header.innerHTML = getTranslation(TranslationKey.YOUR_CHOICE);
       selectedConfigItem = choice;
       chooserDialog?.toggleSubmitDisabled(false);
@@ -56,7 +57,7 @@ export async function createConfigChooserComponent(): Promise<ConfigItemId | fal
   chooserContainer.append(choicesContainer);
   chooserContainer.append(explanationElement);
 
-  chooserDialog = createDialog(chooserContainer, { submitButtonText: getTranslation(TranslationKey.CONFIRM) });
+  chooserDialog = createDialog(chooserContainer, { submitButtonText: getTranslation(TranslationKey.CONFIRM), showCloseButton: false });
   chooserDialog.toggleSubmitDisabled(true);
 
   return chooserDialog.open().then((isConfirmed): ConfigItemId | false => {

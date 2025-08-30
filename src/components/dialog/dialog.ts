@@ -20,6 +20,7 @@ export interface Dialog {
 export interface DialogOptions {
   submitButtonText?: string;
   cancelButtonText?: string;
+  showCloseButton?: boolean;
 }
 
 export function createDialog(innerElement: HTMLElement, options: DialogOptions): Dialog {
@@ -59,9 +60,11 @@ export function createDialog(innerElement: HTMLElement, options: DialogOptions):
     dialog.appendChild(buttons);
   }
 
-  const closeBtn = createButton({ text: "X", onClick: () => closeDialog(false), cssClass: CssClass.ICON_BTN });
+  if (options.showCloseButton !== false) {
+    const closeBtn = createButton({ text: "X", onClick: () => closeDialog(false), cssClass: CssClass.ICON_BTN });
 
-  dialog.appendChild(closeBtn);
+    dialog.appendChild(closeBtn);
+  }
 
   document.body.appendChild(dialog);
 
