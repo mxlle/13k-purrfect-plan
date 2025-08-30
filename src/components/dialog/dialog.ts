@@ -59,7 +59,7 @@ export function createDialog(innerElement: HTMLElement, options: DialogOptions):
     dialog.appendChild(buttons);
   }
 
-  const closeBtn = createButton({ text: "X", onClick: () => closeDialog(false), iconBtn: true });
+  const closeBtn = createButton({ text: "X", onClick: () => closeDialog(false), cssClass: CssClass.ICON_BTN });
 
   dialog.appendChild(closeBtn);
 

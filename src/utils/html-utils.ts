@@ -15,57 +15,34 @@ export function addCanvasToBody() {
 type HTMLTagName = keyof HTMLElementTagNameMap | keyof HTMLElementDeprecatedTagNameMap | string;
 type ElementByTag<TagName extends HTMLTagName> = TagName extends keyof HTMLElementTagNameMap ? HTMLElementTagNameMap[TagName] : HTMLElement;
 
-export function createElement<TagName extends HTMLTagName = "div">({
-  tag,
-  cssClass,
-  text,
-  onClick,
-}: {
+interface CreateElementOptions<TagName extends HTMLTagName = HTMLTagName> {
   tag?: TagName;
-  cssClass?: string;
+  cssClass?: string | string[];
   text?: string;
+  // children?: (Node | string | CreateElementOptions)[];
+  html?: string;
   onClick?: (this: ElementByTag<TagName>, evt: MouseEvent & { target: ElementByTag<TagName> }) => void;
-} = {}) {
+}
+export function createElement<TagName extends HTMLTagName = "div">(
+  { tag, cssClass, text, html, onClick }: CreateElementOptions<TagName> = {},
+  children: (Node | string)[] = [],
+) {
   const elem = document.createElement(tag || "div") as ElementByTag<TagName>;
-  if (cssClass) elem.classList.add(...cssClass.split(" ").filter(Boolean));
-  if (text) {
-    const textNode = document.createTextNode(text);
-    elem.appendChild(textNode);
+  if (cssClass) {
+    if (!Array.isArray(cssClass)) cssClass = cssClass.split(" ");
+    elem.classList.add(...cssClass.filter(Boolean));
   }
-  if (onClick) {
-    elem.addEventListener("click", onClick as EventListener);
+  for (let child of children) {
+    if (child) elem.append(child);
   }
+  if (html) elem.innerHTML += html;
+  if (text) elem.append(text);
+  if (onClick) elem.addEventListener("click", onClick as EventListener);
   return elem;
 }
 
-export function appendRainbowCapableText(element: HTMLElement, text: string) {
-  element.appendChild(createElement({ tag: "span", text, cssClass: "rbc" }));
-}
-
-export function createButton({
-  text,
-  onClick,
-  iconBtn,
-  rbc,
-}: {
-  text?: string;
-  onClick: (this: HTMLButtonElement, ev: MouseEvent) => void;
-  iconBtn?: boolean;
-  rbc?: boolean;
-}) {
-  const button = createElement({
-    tag: "button",
-    cssClass: iconBtn ? CssClass.ICON_BTN : "",
-    onClick,
-  });
-  if (text) {
-    if (rbc) {
-      appendRainbowCapableText(button, text);
-    } else {
-      button.innerHTML = text;
-    }
-  }
-  return button;
+export function createButton(props: Omit<CreateElementOptions<"button">, "tag">, children: (Node | string)[] = []) {
+  return createElement({ tag: "button", ...props }, children);
 }
 
 function absorbEvent_(event: Event) {

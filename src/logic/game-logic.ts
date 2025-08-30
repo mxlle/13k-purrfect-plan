@@ -9,8 +9,9 @@ import { sleep } from "../utils/promise-utils";
 import { ConfigCategory, hasMoveLimit, shouldApplyKittenBehavior, showMovesInfo } from "./config/config";
 import { deepCopyElementsMap, GameElementPositions, GameState } from "./data/game-elements";
 
-import { kittenMeows, meow, styles as catStyles } from "../components/cat-component/cat-component";
+import { kittenMeows, meow } from "../components/cat-component/cat-component";
 import { globals } from "../globals";
+import { removeSpeechBubble, showSpeechBubble } from "../components/speech-bubble/speech-bubble";
 
 let isPerformingMove = false;
 
@@ -34,7 +35,7 @@ export async function performMove(gameState: GameState, turnMove: TurnMove) {
   try {
     gameState.moves.push(turnMove);
 
-    const toolStartPromise = isTool(turnMove) ? preToolAction(turnMove) : Promise.resolve();
+    const toolStartPromise = isTool(turnMove) ? preToolAction(gameState, turnMove) : Promise.resolve();
 
     const kittensOnCellBefore = getKittensOnCell(gameState, gameState.currentPositions[CatId.MOTHER]);
     gameState.currentPositions = calculateNewPositions(gameState, turnMove);
@@ -46,7 +47,7 @@ export async function performMove(gameState: GameState, turnMove: TurnMove) {
 
     updateAllPositions(gameState, globals.nextPositionsIfWait);
 
-    isTool(turnMove) && (await postToolAction(turnMove));
+    isTool(turnMove) && (await postToolAction(gameState, turnMove));
 
     const newKittensOnCell = kittensOnCellAfter.filter((kitten) => !kittensOnCellBefore.includes(kitten));
     await kittenMeows(newKittensOnCell);
@@ -54,6 +55,7 @@ export async function performMove(gameState: GameState, turnMove: TurnMove) {
     if (isWinConditionMet(gameState)) {
       pubSubService.publish(PubSubEvent.GAME_END);
 
+      showSpeechBubble(gameState.representations[CatId.MOTHER].htmlElement, "United!");
       await kittenMeows(ALL_KITTEN_IDS, true);
     }
   } catch (error) {
@@ -144,10 +146,10 @@ function doMoonMove(gameState: GameState): CellPosition {
   return moon;
 }
 
-async function preToolAction(tool: Tool) {
+async function preToolAction(gameState: GameState, tool: Tool) {
   switch (tool) {
     case Tool.MEOW:
-      document.body.classList.add(catStyles.meow);
+      showSpeechBubble(gameState.representations[CatId.MOTHER].htmlElement, "Meow!");
 
       await Promise.all([meow(CatId.MOTHER), sleep(300)]); // Wait for meow speech bubble to appear
 
@@ -155,11 +157,11 @@ async function preToolAction(tool: Tool) {
   }
 }
 
-async function postToolAction(tool: Tool) {
+async function postToolAction(gameState: GameState, tool: Tool) {
   switch (tool) {
     case Tool.MEOW:
       setTimeout(() => {
-        document.body.classList.remove(catStyles.meow);
+        removeSpeechBubble(gameState.representations[CatId.MOTHER].htmlElement);
       }, MEOW_TIME);
       break;
   }

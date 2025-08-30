@@ -22,28 +22,26 @@ const playbackRateMap: Record<CatId, number> = {
 };
 
 export function createCatElement(catId: CatId): HTMLElement {
-  const catBox = createElement({
-    cssClass: CssClass.CAT_BOX,
-  });
+  return createElement(
+    {
+      cssClass: CssClass.CAT_BOX,
+      onClick: (mouseEvent) => {
+        void meow(catId);
 
-  const catElem = createElement({
-    cssClass: `${styles.cat} ${isMom(catId) ? styles.isMom : ""} ''`,
-    onClick: (mouseEvent) => {
-      void meow(catId);
-
-      if (import.meta.env.DEV) {
-        gameElementClickHandler(catId);
-        mouseEvent.preventDefault();
-        mouseEvent.stopPropagation();
-      }
+        if (import.meta.env.DEV) {
+          gameElementClickHandler(catId);
+          mouseEvent.preventDefault();
+          mouseEvent.stopPropagation();
+        }
+      },
     },
-  });
-
-  catElem.innerHTML = catSvg;
-
-  catBox.append(catElem);
-
-  return catBox;
+    [
+      createElement({
+        cssClass: [styles.cat, isMom(catId) && styles.isMom],
+        html: catSvg,
+      }),
+    ],
+  );
 }
 
 export function meow(catId: CatId): Promise<void> {
