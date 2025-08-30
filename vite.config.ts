@@ -8,8 +8,7 @@ import { CssClass } from "./src/utils/css-class";
 import { PubSubEvent } from "./src/utils/pub-sub-service";
 import { LocalStorageKey } from "./src/utils/local-storage";
 import { mapEntries, memoize } from "./src/utils/utils";
-import { Direction, ObjectId, OnboardingStep, SpecialAction, Tool } from "./src/types";
-import { ConfigCategory } from "./src/logic/config/config";
+import { ConfigCategory, Direction, ObjectId, OnboardingStep, SpecialAction, Tool } from "./src/types";
 import { CatId } from "./src/logic/data/catId";
 import { MoveLimit } from "./src/logic/config/move-limit";
 
@@ -86,7 +85,7 @@ export default defineConfig(({ mode, command }) => {
           ...replaceEnum("ObjectId", ObjectId),
           ...replaceEnum("ConfigCategory", ConfigCategory),
           ...replaceEnum("OnboardingStep", OnboardingStep),
-          ...replaceEnum("Constraint", MoveLimit),
+          ...replaceEnum("MoveLimit", MoveLimit),
           ...mapEntries(CssClass, ([, name]) => [name, getCssIdentifier(name)]),
         }),
       viteAwesomeSvgLoader(),

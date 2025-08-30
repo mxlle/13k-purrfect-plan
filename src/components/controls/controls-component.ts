@@ -1,6 +1,6 @@
 import { createButton, createElement } from "../../utils/html-utils";
 import { CssClass } from "../../utils/css-class";
-import { Direction, isTool, RECOVERY_TIME_MAP, Tool, TurnMove } from "../../types";
+import { ConfigCategory, Direction, isTool, RECOVERY_TIME_MAP, Tool, TurnMove } from "../../types";
 
 import styles from "./controls-component.module.scss";
 import { getPossibleSolutionsCount, isWinConditionMet, performMove } from "../../logic/game-logic";
@@ -18,7 +18,7 @@ import { TranslationKey } from "../../translations/translationKey";
 import { globals } from "../../globals";
 import { isOnboarding } from "../../logic/onboarding";
 
-import { ConfigCategory, hasMoveLimit, showMovesInfo } from "../../logic/config/config";
+import { hasMoveLimit, showMovesInfo } from "../../logic/config/config";
 import { FALLBACK_PAR } from "../../logic/par";
 import { getParFromGameState } from "../../logic/data/game-elements";
 
@@ -134,12 +134,19 @@ function getAllMoveButtons(): HTMLElement[] {
   return [Direction.UP, Direction.RIGHT, Direction.DOWN, Direction.LEFT].map(getMoveButton);
 }
 
+const directionStyleMap: { [key in Direction]: string } = {
+  [Direction.UP]: styles.up,
+  [Direction.RIGHT]: styles.right,
+  [Direction.DOWN]: styles.down,
+  [Direction.LEFT]: styles.left,
+};
+
 const buttons: { [key in Direction | Tool]?: HTMLElement } = {};
 export function getMoveButton(direction: Direction): HTMLElement {
   return (buttons[direction] ??= createButton(
     {
       onClick: () => handleMove(direction),
-      cssClass: [CssClass.ICON_BTN, styles[direction]],
+      cssClass: [CssClass.ICON_BTN, directionStyleMap[direction]],
     },
     [getArrowComponent(direction)],
   ));

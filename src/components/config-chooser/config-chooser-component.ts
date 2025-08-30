@@ -1,9 +1,9 @@
 import { createDialog, Dialog } from "../dialog/dialog";
 import { createElement } from "../../utils/html-utils";
-import { ConfigItemId, explanationMap, getNextUnknownConfigItems, updateKnownConfigItems } from "../../logic/config/config";
+import { explanationMap, getNextUnknownConfigItems, updateKnownConfigItems } from "../../logic/config/config";
 import { shuffleArray } from "../../utils/random-utils";
 import { getCatElement, isCatId } from "../../logic/data/cats";
-import { isTool } from "../../types";
+import { ConfigItemId, isTool } from "../../types";
 import { isMoveLimit } from "../../logic/config/move-limit";
 
 import styles from "./config-chooser-component.module.scss";

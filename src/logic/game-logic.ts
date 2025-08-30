@@ -1,4 +1,15 @@
-import { Direction, isDirection, isSpecialAction, isTool, ObjectId, RECOVERY_TIME_MAP, SpecialAction, Tool, TurnMove } from "../types";
+import {
+  ConfigCategory,
+  Direction,
+  isDirection,
+  isSpecialAction,
+  isTool,
+  ObjectId,
+  RECOVERY_TIME_MAP,
+  SpecialAction,
+  Tool,
+  TurnMove,
+} from "../types";
 import { PubSubEvent, pubSubService } from "../utils/pub-sub-service";
 import { getKittensElsewhere, getKittensOnCell, isValidCellPosition } from "./checks";
 import { ALL_CAT_IDS, ALL_KITTEN_IDS, CatId } from "./data/catId";
@@ -6,7 +17,7 @@ import { CAT_NAMES } from "./data/cats";
 import { CellPosition, isSameCell } from "./data/cell";
 import { updateAllPositions } from "../components/game-field/game-field";
 import { sleep } from "../utils/promise-utils";
-import { ConfigCategory, shouldApplyKittenBehavior, showMovesInfo } from "./config/config";
+import { shouldApplyKittenBehavior, showMovesInfo } from "./config/config";
 import { deepCopyElementsMap, GameElementPositions, GameState } from "./data/game-elements";
 
 import { kittenMeows, meow } from "../components/cat-component/cat-component";

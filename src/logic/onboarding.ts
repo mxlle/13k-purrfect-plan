@@ -1,9 +1,9 @@
-import { Direction, ObjectId, OnboardingStep, TurnMove } from "../types";
+import { ConfigCategory, Direction, ObjectId, OnboardingStep, TurnMove } from "../types";
 import { globals } from "../globals";
 import { LocalStorageKey, setLocalStorageItem } from "../utils/local-storage";
 import { ALL_CAT_IDS, CatId } from "./data/catId";
 import { CellPosition, containsCell, EMPTY_CELL, getCellTypePlaceholders } from "./data/cell";
-import { allInConfig, ConfigCategory, emptyConfig, getValidatedConfig } from "./config/config";
+import { allInConfig, emptyConfig, getValidatedConfig } from "./config/config";
 import { FieldSize } from "./data/field-size";
 import { EMPTY_ELEMENT_MAP, GameElementPositions, GameSetup } from "./data/game-elements";
 import { calculatePar } from "./par";

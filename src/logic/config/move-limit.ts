@@ -1,5 +1,6 @@
 import { defineEnum } from "../../utils/enums";
-import { ConfigItemId } from "./config";
+
+import { ConfigItemId } from "../../types";
 
 export type MoveLimit = defineEnum<typeof MoveLimit>;
 export const MoveLimit = defineEnum({

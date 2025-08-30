@@ -1,4 +1,6 @@
 import { defineEnum } from "./utils/enums";
+import type { KittenId } from "./logic/data/catId";
+import { MoveLimit } from "./logic/config/move-limit";
 
 export interface Settings {
   minAmount: number;
@@ -58,3 +60,11 @@ export const ObjectId = defineEnum({
   TREE: "🌳",
   PUDDLE: "💧",
 });
+export type ConfigCategory = defineEnum<typeof ConfigCategory>;
+export const ConfigCategory = defineEnum({
+  KITTEN_BEHAVIOR: "Kitten Behavior",
+  OBJECTS: "Objects",
+  TOOLS: "Tools",
+  CONSTRAINTS: "Constraints",
+});
+export type ConfigItemId = KittenId | ObjectId | Tool | MoveLimit;

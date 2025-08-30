@@ -65,7 +65,7 @@
   }
 
   :global(.#{$ICON_BTN}) {
-    &:not(:nth-child(5)) {
+    & {
       width: 3.5rem;
       height: 3.5rem;
       margin: -0.25rem;
@@ -88,11 +88,6 @@
 
     &.left {
       grid-column: 1;
-      grid-row: 2;
-    }
-
-    &:nth-child(5) {
-      grid-column: 2;
       grid-row: 2;
     }
   }

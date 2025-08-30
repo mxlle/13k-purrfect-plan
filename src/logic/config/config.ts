@@ -1,19 +1,10 @@
 import { ALL_KITTEN_IDS, CatId, type KittenId } from "../data/catId";
-import { ObjectId, Tool } from "../../types";
+import { ConfigCategory, ConfigItemId, ObjectId, Tool } from "../../types";
 import { GameSetup } from "../data/game-elements";
-import { defineEnum } from "../../utils/enums";
 import { getHighestMoveLimit, MoveLimit } from "./move-limit";
 import { TranslationKey } from "../../translations/translationKey";
 import { getArrayFromStorage, LocalStorageKey, setLocalStorageItem } from "../../utils/local-storage";
 import { ALL_OBJECT_IDS } from "../data/objects";
-
-export type ConfigCategory = defineEnum<typeof ConfigCategory>;
-export const ConfigCategory = defineEnum({
-  KITTEN_BEHAVIOR: "Kitten Behavior",
-  OBJECTS: "Objects",
-  TOOLS: "Tools",
-  CONSTRAINTS: "Constraints",
-});
 
 export interface Config {
   [ConfigCategory.KITTEN_BEHAVIOR]: Record<KittenId, boolean>;
@@ -24,7 +15,6 @@ export interface Config {
   };
 }
 
-export type ConfigItemId = KittenId | ObjectId | Tool | MoveLimit;
 export const emptyConfig: Config = {
   [ConfigCategory.KITTEN_BEHAVIOR]: Object.fromEntries(ALL_KITTEN_IDS.map((catId) => [catId, false])) as Record<KittenId, boolean>,
   [ConfigCategory.OBJECTS]: Object.fromEntries(Object.values(ObjectId).map((type) => [type, false])) as Record<ObjectId, boolean>,
