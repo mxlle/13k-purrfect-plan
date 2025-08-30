@@ -27,6 +27,7 @@ export { styles };
 
 let hasSetupEventListeners = false;
 let controlsComponent: HTMLElement | undefined;
+let turnMovesContainer: HTMLElement | undefined;
 let turnMovesComponent: HTMLElement | undefined;
 let solutionsComponent: HTMLElement | undefined;
 let toolContainer: HTMLElement | undefined;
@@ -41,6 +42,8 @@ export function getControlsComponent(): HTMLElement {
     cssClass: styles.controls,
   });
 
+  turnMovesContainer = createElement({ cssClass: styles.movesContainer });
+
   turnMovesComponent = createElement({
     cssClass: styles.moves,
   });
@@ -49,10 +52,12 @@ export function getControlsComponent(): HTMLElement {
     cssClass: styles.solutions,
   });
 
+  turnMovesContainer.appendChild(turnMovesComponent);
+  turnMovesContainer.appendChild(solutionsComponent);
+
   updateTurnMovesComponent();
 
-  controlsComponent.appendChild(turnMovesComponent);
-  controlsComponent.appendChild(solutionsComponent);
+  controlsComponent.appendChild(turnMovesContainer);
 
   const movementContainer = createElement({
     cssClass: styles.movementControls,
@@ -74,9 +79,9 @@ export function getControlsComponent(): HTMLElement {
   });
   meowButton.classList.add(catStyles.meow);
 
-  recoveryInfoComponent = createElement();
+  recoveryInfoComponent = createElement({ cssClass: styles.recoveryInfo });
 
-  toolContainer.appendChild(createRecordButton([Tool.MEOW]));
+  // toolContainer.appendChild(createRecordButton([Tool.MEOW]));
   toolContainer.appendChild(meowButton);
   toolContainer.appendChild(recoveryInfoComponent);
   controlsComponent.appendChild(toolContainer);
@@ -248,11 +253,11 @@ async function handleMove(turnMove: TurnMove) {
 }
 
 function updateTurnMovesComponent() {
-  if (!turnMovesComponent) return;
+  if (!turnMovesContainer) return;
 
   const showMoves = globals.gameState && hasMoveLimit(globals.gameState.setup);
 
-  turnMovesComponent.style.display = showMoves ? "block" : "none";
+  turnMovesContainer.style.display = showMoves ? "flex" : "none";
   const par = getParFromGameState(globals.gameState);
   const parString = par ? ` / ${par < FALLBACK_PAR ? par : "?"}` : "";
   turnMovesComponent.innerHTML = `${getTranslation(TranslationKey.MOVES)}: ${globals.gameState?.moves.length ?? 0}${parString}`;

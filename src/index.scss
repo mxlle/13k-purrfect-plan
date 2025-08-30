@@ -60,11 +60,11 @@ main {
   display: grid;
   padding: 1rem;
   gap: 1rem;
-  grid-template-columns: minmax(min-content, 1fr) minmax(min-content, 600px);
+  grid-template-columns: minmax(min-content, 1fr) minmax(min-content, 450px);
 
   @media (orientation: portrait) {
     grid-template-columns: 1fr;
-    grid-template-rows: min-content auto auto;
+    grid-template-rows: min-content auto;
     justify-items: center;
   }
 }
@@ -89,7 +89,7 @@ button {
   color: $text-primary;
   border: 1px solid $bg-alpha-10;
   background-color: $bg-alpha-05;
-  padding: 1rem 1.5rem;
+  padding: 0.8rem 1.2rem;
   border-radius: $border-radius;
 
   @include hover {
