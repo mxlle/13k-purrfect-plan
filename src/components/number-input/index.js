@@ -1,16 +1,9 @@
 import { createButton, createElement } from "../../utils/html-utils";
 
 import styles from "./index.module.scss";
+import { CssClass } from "../../utils/css-class.js";
 
-export function createNumberInputComponent({
-  value,
-  min,
-  max,
-  placeholder,
-  onChange,
-  onBlur,
-  hideButtons,
-}) {
+export function createNumberInputComponent({ value, min, max, placeholder, onChange, onBlur, hideButtons }) {
   const numberInputContainer = createElement({
     cssClass: styles.numberInput,
   });
@@ -24,16 +17,18 @@ export function createNumberInputComponent({
   onBlur && numberInput.addEventListener("blur", onBlur);
 
   if (!hideButtons) {
-    const decreaseButton = createButton({
-      iconBtn: true,
-      text: "▽️",
-      rbc: true,
-    });
-    const increaseButton = createButton({
-      iconBtn: true,
-      text: "△️",
-      rbc: true,
-    });
+    const decreaseButton = createButton(
+      {
+        cssClass: CssClass.ICON_BTN,
+      },
+      [createElement({ tag: "span", text: "▽️", cssClass: "rbc" })],
+    );
+    const increaseButton = createButton(
+      {
+        cssClass: CssClass.ICON_BTN,
+      },
+      [createElement({ tag: "span", text: "△️", cssClass: "rbc" })],
+    );
 
     function checkDisabledStates() {
       decreaseButton.disabled = min && numberInput.value <= min;

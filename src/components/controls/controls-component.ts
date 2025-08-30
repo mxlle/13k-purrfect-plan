@@ -3,7 +3,6 @@ import { CssClass } from "../../utils/css-class";
 import { Direction, isTool, RECOVERY_TIME_MAP, Tool, TurnMove } from "../../types";
 
 import styles from "./controls-component.module.scss";
-import { styles as catStyles } from "../cat-component/cat-component";
 import { getPossibleSolutionsCount, isWinConditionMet, performMove } from "../../logic/game-logic";
 import { getArrowComponent } from "../arrow-component/arrow-component";
 import {
@@ -23,8 +22,6 @@ import { ConfigCategory, hasMoveLimit } from "../../logic/config/config";
 import { FALLBACK_PAR } from "../../logic/par";
 import { getParFromGameState } from "../../logic/data/game-elements";
 
-export { styles };
-
 let hasSetupEventListeners = false;
 let controlsComponent: HTMLElement | undefined;
 let turnMovesComponent: HTMLElement | undefined;
@@ -34,7 +31,7 @@ let recoveryInfoComponent: HTMLElement | undefined;
 let activeRecording: ActiveRecording | undefined;
 let toolsFrozenUntilTurn: number | undefined;
 
-export function getControlsComponent(): HTMLElement {
+export function createControlsComponent(): HTMLElement {
   setupEventListeners();
 
   controlsComponent = createElement({
@@ -68,16 +65,10 @@ export function getControlsComponent(): HTMLElement {
     cssClass: styles.toolControls,
   });
 
-  const meowButton = createButton({
-    text: "Meow",
-    onClick: () => handleMove(Tool.MEOW),
-  });
-  meowButton.classList.add(catStyles.meow);
-
   recoveryInfoComponent = createElement();
 
   toolContainer.appendChild(createRecordButton([Tool.MEOW]));
-  toolContainer.appendChild(meowButton);
+  toolContainer.appendChild(getToolButton(Tool.MEOW));
   toolContainer.appendChild(recoveryInfoComponent);
   controlsComponent.appendChild(toolContainer);
 
@@ -127,7 +118,7 @@ async function toggleRecordSoundEffect(btn: HTMLButtonElement, actions: TurnMove
 function createRecordButton(actions: TurnMove[]): HTMLElement {
   const recordButton = createButton({
     text: "🎤",
-    iconBtn: true,
+    cssClass: CssClass.ICON_BTN,
     onClick: () => void toggleRecordSoundEffect(recordButton, actions),
   });
 
@@ -135,20 +126,26 @@ function createRecordButton(actions: TurnMove[]): HTMLElement {
 }
 
 function getAllMoveButtons(): HTMLElement[] {
-  return [getMoveButton(Direction.UP), getMoveButton(Direction.RIGHT), getMoveButton(Direction.DOWN), getMoveButton(Direction.LEFT)];
+  return [Direction.UP, Direction.RIGHT, Direction.DOWN, Direction.LEFT].map(getMoveButton);
 }
 
-function getMoveButton(direction: Direction): HTMLElement {
-  const button = createButton({
-    text: "",
-    onClick: () => handleMove(direction),
-    iconBtn: true,
-  });
+const buttons: { [key in Direction | Tool]?: HTMLElement } = {};
+export function getMoveButton(direction: Direction): HTMLElement {
+  return (buttons[direction] ??= createButton(
+    {
+      onClick: () => handleMove(direction),
+      cssClass: [CssClass.ICON_BTN, styles[direction]],
+    },
+    [getArrowComponent(direction)],
+  ));
+}
 
-  const arrow = getArrowComponent(direction);
-  button.append(arrow);
+export function getToolButton(tool: Tool) {
+  return (buttons[tool] ??= createButton({ text: "Meow", onClick: () => handleMove(tool) }));
+}
 
-  return button;
+export function getControlButton(type: Direction | Tool): HTMLElement {
+  return isTool(type) ? getToolButton(type) : getMoveButton(type);
 }
 
 function setupEventListeners() {
@@ -300,4 +297,14 @@ function updateToolContainer() {
   const shouldHaveTools = Object.values(globals.gameState.setup.config[ConfigCategory.TOOLS]).some(Boolean);
 
   toolContainer.classList.toggle(styles.hidden, !shouldHaveTools);
+}
+
+export function activateOnboardingHighlight(action: Direction | Tool) {
+  const actionComponent = getControlButton(action);
+  actionComponent.classList.add(styles.onboardingHighlight);
+
+  actionComponent.addEventListener("click", function listener() {
+    actionComponent.classList.remove(styles.onboardingHighlight);
+    actionComponent.removeEventListener("click", listener);
+  });
 }

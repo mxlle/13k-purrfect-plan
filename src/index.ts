@@ -35,13 +35,13 @@ function init() {
     //     const isActive = togglePlayer();
     //     (event.target as HTMLElement).textContent = isActive ? "🔊" : "🔇";
     //   },
-    //   iconBtn: true,
+    //   cssClass: CssClass.ICON_BTN,
     // });
     //
     // btnContainer.append(muteButton);
     header.append(btnContainer);
 
-    btnContainer.append(createButton({ text: "⚙️", onClick: () => toggleConfig(), iconBtn: true }));
+    btnContainer.append(createButton({ text: "⚙️", onClick: () => toggleConfig(), cssClass: CssClass.ICON_BTN }));
   }
 
   document.body.append(header);

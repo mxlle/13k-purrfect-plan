@@ -1,7 +1,7 @@
 import styles from "./game-field.module.scss";
-import { getControlsComponent, styles as controlsStyles } from "../controls/controls-component";
-import { cssClassByDirection, getArrowComponent, styles as arrowStyles } from "../arrow-component/arrow-component";
-import { getCatIdClass, styles as catStyles } from "../cat-component/cat-component";
+import { activateOnboardingHighlight, createControlsComponent } from "../controls/controls-component";
+import { getArrowComponent, styles as arrowStyles } from "../arrow-component/arrow-component";
+import { getCatIdClass } from "../cat-component/cat-component";
 
 import { createElement } from "../../utils/html-utils";
 import { globals } from "../../globals";
@@ -19,7 +19,7 @@ import { CssClass } from "../../utils/css-class";
 import { ALL_CAT_IDS, ALL_KITTEN_IDS } from "../../logic/data/catId";
 import { CellPosition, getCellDifference, getDirection } from "../../logic/data/cell";
 import { PubSubEvent, pubSubService } from "../../utils/pub-sub-service";
-import { isTool, ObjectId, SpecialAction } from "../../types";
+import { isSpecialAction, ObjectId, SpecialAction } from "../../types";
 import { allInConfig, Config, ConfigCategory } from "../../logic/config/config";
 import { DEFAULT_FIELD_SIZE, FieldSize } from "../../logic/data/field-size";
 import { ALL_OBJECT_IDS } from "../../logic/data/objects";
@@ -36,6 +36,7 @@ import {
 } from "../../logic/data/game-elements";
 import { calculateNewPositions, isWinConditionMet } from "../../logic/game-logic";
 import { getConfigComponent } from "../config/config-component";
+import { removeSpeechBubble } from "../speech-bubble/speech-bubble";
 
 let mainContainer: HTMLElement | undefined;
 let gameFieldElem: HTMLElement | undefined;
@@ -98,6 +99,7 @@ export async function startNewGame(options: { shouldIncreaseLevel: boolean } = {
     increaseOnboardingStepIfApplicable();
   }
 
+  if (mainContainer) removeSpeechBubble(mainContainer);
   document.body.classList.remove(CssClass.WON);
 
   startButton?.remove();
@@ -215,7 +217,7 @@ function appendGameField() {
     mainContainer.append(configElem);
   }
 
-  controlsElem = getControlsComponent();
+  controlsElem = createControlsComponent();
 
   mainContainer.append(controlsElem);
 }
@@ -265,26 +267,8 @@ function cellClickHandler(cellPosition: CellPosition) {
 }
 
 function addOnboardingSuggestionIfApplicable(onboardingData: OnboardingData | undefined) {
-  if (onboardingData?.highlightedAction) {
-    let actionComponent: HTMLElement | null = null;
-
-    if (isTool(onboardingData.highlightedAction)) {
-      actionComponent = document.querySelector(`.${catStyles.meow}`) as HTMLElement | null;
-    } else {
-      const directionComponent = isTool(onboardingData.highlightedAction)
-        ? undefined
-        : (document.querySelector(`.${arrowStyles.arrow}.${cssClassByDirection[onboardingData?.highlightedAction]}`) as HTMLElement | null);
-      actionComponent = directionComponent.parentNode as HTMLElement | null;
-    }
-
-    if (actionComponent) {
-      actionComponent.classList.add(controlsStyles.onboardingHighlight);
-      let listener = () => {
-        actionComponent.classList.remove(controlsStyles.onboardingHighlight);
-        actionComponent.removeEventListener("click", listener);
-      };
-      actionComponent.addEventListener("click", listener);
-    }
+  if (onboardingData?.highlightedAction && !isSpecialAction(onboardingData?.highlightedAction)) {
+    activateOnboardingHighlight(onboardingData?.highlightedAction);
   }
 }
 
