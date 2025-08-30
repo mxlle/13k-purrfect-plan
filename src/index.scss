@@ -96,7 +96,7 @@ button {
     background-color: $bg-alpha-10;
   }
 
-  &.#{$PRIMARY} {
+  &.#{$PRIMARY}:not([disabled]) {
     border-color: $main-color;
     background-color: $main-color;
 
@@ -106,7 +106,7 @@ button {
   }
 
   &[disabled] {
-    opacity: 0.3;
+    opacity: 0;
     pointer-events: none;
   }
 }

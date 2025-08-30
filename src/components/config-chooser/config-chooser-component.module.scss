@@ -1,0 +1,20 @@
+.container,
+.choices {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+}
+
+.choices {
+  flex-direction: row;
+}
+
+.explanation {
+  max-width: 90vw;
+
+  &::before {
+    content: "💡";
+  }
+}

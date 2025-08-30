@@ -219,7 +219,7 @@ export function addNewGameButtons(isInitialStart = false) {
 
   newGameContainer.appendChild(continueButton);
 
-  if (!isOnboarding() && !isInitialStart) {
+  if (!isInitialStart && hasMoveLimit(globals.gameState.setup)) {
     const restartButton = createButton({
       text: getTranslation(TranslationKey.RESTART_GAME),
       onClick: () => {

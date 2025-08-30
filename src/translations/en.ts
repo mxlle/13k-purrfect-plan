@@ -16,4 +16,17 @@ export const enTranslations: Record<TranslationKey, string> = {
   [TranslationKey.HIGHSCORE]: "Top:",
   [TranslationKey.AVERAGE]: "Avg:",
   [TranslationKey.POSSIBLE_SOLUTIONS]: "Remaining solutions",
+  [TranslationKey.CHOOSER_TITLE]: "What do you want to add next?",
+  [TranslationKey.CHOICE_TOOL]: "New control",
+  [TranslationKey.CHOICE_CONSTRAINT]: "New limitation",
+  [TranslationKey.CHOICE_KITTEN_BEHAVIOR]: "Kitten behavior",
+  [TranslationKey.EXPLANATION_MOONY]: "Moony loves the moon and will try to reach it.",
+  [TranslationKey.EXPLANATION_IVY]: "Ivy loves to run around the tree.",
+  [TranslationKey.EXPLANATION_SPLASHY]: "Splashy loves water and wants to play in it.",
+  [TranslationKey.EXPLANATION_MEOW]: "When Mommy meows, all kittens will come a step closer.",
+  [TranslationKey.EXPLANATION_MOVE_LIMIT_1]:
+    "The moon will wander across the field. Once it sets, the field will become dark, but you can still continue.",
+  [TranslationKey.EXPLANATION_EMPTY]: "Your choice will be explained here.",
+  [TranslationKey.YOUR_CHOICE]: "Your choice",
+  [TranslationKey.CONFIRM]: "Let's go!",
 };

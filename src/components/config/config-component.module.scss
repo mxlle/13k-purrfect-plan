@@ -22,21 +22,38 @@
   }
 
   .configItem {
-    position: relative;
-    height: 90px;
-    width: 90px;
-    cursor: pointer;
-    display: grid;
-    place-items: center;
-    border-radius: $border-radius;
-    padding: 0.25rem;
-
-    &:not(:global(.#{$CAT_BOX})) {
-      background-color: $bg-alpha-05;
-    }
-
     &:not(.selected) {
       filter: grayscale(80%) opacity(0.5);
+    }
+  }
+}
+
+.configItem {
+  position: relative;
+  height: 90px;
+  width: 90px;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  border-radius: $border-radius;
+  padding: 0.25rem;
+
+  &:not(:global(.#{$CAT_BOX})) {
+    background-color: $bg-alpha-05;
+  }
+
+  &.chooser {
+    height: min(40vh, 40vw);
+    width: min(40vh, 40vw);
+    font-size: 2em;
+    transition:
+      transform 0.3s ease-in-out,
+      opacity 0.3s ease-in-out;
+
+    :global(.#{$CAT_BOX}) {
+      height: 50%;
+      width: 50%;
+      pointer-events: none;
     }
   }
 }

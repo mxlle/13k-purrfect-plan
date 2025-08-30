@@ -24,4 +24,17 @@ const deTranslations: Record<TranslationKey, string> = {
   [TranslationKey.HIGHSCORE]: "Top:",
   [TranslationKey.AVERAGE]: "Ø",
   [TranslationKey.POSSIBLE_SOLUTIONS]: "Verbleibende Lösungen",
+  [TranslationKey.CHOOSER_TITLE]: "Was möchtest du als nächstes hinzufügen?",
+  [TranslationKey.CHOICE_TOOL]: "Neue Steuerung",
+  [TranslationKey.CHOICE_CONSTRAINT]: "Neue Einschränkung",
+  [TranslationKey.CHOICE_KITTEN_BEHAVIOR]: "Kätzchenverhalten",
+  [TranslationKey.EXPLANATION_MOONY]: "Moony liebt den Mond und wird versuchen, ihn zu erreichen.",
+  [TranslationKey.EXPLANATION_IVY]: "Ivy liebt es, um den Baum herumzulaufen.",
+  [TranslationKey.EXPLANATION_SPLASHY]: "Splashy liebt Wasser und möchte darin spielen.",
+  [TranslationKey.EXPLANATION_MEOW]: "Wenn Mama miaut, kommen alle Kätzchen einen Schritt näher.",
+  [TranslationKey.EXPLANATION_MOVE_LIMIT_1]:
+    "Der Mond wird über das Feld wandern. Sobald er untergeht, wird das Feld dunkel, aber du kannst trotzdem weiterspielen.",
+  [TranslationKey.EXPLANATION_EMPTY]: "Deine Wahl wird hier erklärt.",
+  [TranslationKey.YOUR_CHOICE]: "Deine Wahl",
+  [TranslationKey.CONFIRM]: "Bestätigen",
 };

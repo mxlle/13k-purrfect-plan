@@ -33,7 +33,12 @@ export function deserializeGame(serializedGame: string): GameSetup {
     };
   }
 
-  const gameSetup: GameSetup = { fieldSize: DEFAULT_FIELD_SIZE, elementPositions, config: allInConfig, possibleSolutions: [] };
+  const gameSetup: GameSetup = {
+    fieldSize: DEFAULT_FIELD_SIZE,
+    elementPositions,
+    config: allInConfig,
+    possibleSolutions: [],
+  };
 
   return { ...gameSetup, possibleSolutions: calculatePar(gameSetup).possibleSolutions };
 }

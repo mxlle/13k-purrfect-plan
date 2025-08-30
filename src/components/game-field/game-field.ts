@@ -11,6 +11,7 @@ import { handlePokiCommercial } from "../../poki-integration";
 import {
   getOnboardingData,
   increaseOnboardingStepIfApplicable,
+  isOnboarding,
   isSameLevel,
   OnboardingData,
   wasLastOnboardingStep,
@@ -20,7 +21,7 @@ import { ALL_CAT_IDS, ALL_KITTEN_IDS } from "../../logic/data/catId";
 import { CellPosition, getCellDifference, getDirection } from "../../logic/data/cell";
 import { PubSubEvent, pubSubService } from "../../utils/pub-sub-service";
 import { isTool, ObjectId, SpecialAction } from "../../types";
-import { allInConfig, Config, ConfigCategory } from "../../logic/config/config";
+import { allInConfig, Config, ConfigCategory, hasUnknownConfigItems } from "../../logic/config/config";
 import { DEFAULT_FIELD_SIZE, FieldSize } from "../../logic/data/field-size";
 import { ALL_OBJECT_IDS } from "../../logic/data/objects";
 import { isValidCellPosition } from "../../logic/checks";
@@ -36,6 +37,7 @@ import {
 } from "../../logic/data/game-elements";
 import { calculateNewPositions, isWinConditionMet } from "../../logic/game-logic";
 import { getConfigComponent } from "../config/config-component";
+import { createConfigChooserComponent } from "../config-chooser/config-chooser-component";
 
 let mainContainer: HTMLElement | undefined;
 let gameFieldElem: HTMLElement | undefined;
@@ -93,9 +95,14 @@ async function shuffleFieldAnimation(config: Config) {
 
 export async function startNewGame(options: { shouldIncreaseLevel: boolean } = { shouldIncreaseLevel: true }) {
   const isInitialStart = !globals.gameState;
+  const notYetAllConfigItems = hasUnknownConfigItems();
 
   if (isWinConditionMet(globals.gameState) && options.shouldIncreaseLevel) {
     increaseOnboardingStepIfApplicable();
+  }
+
+  if (notYetAllConfigItems && !isOnboarding()) {
+    await createConfigChooserComponent();
   }
 
   document.body.classList.remove(CssClass.WON);
@@ -125,7 +132,7 @@ export async function startNewGame(options: { shouldIncreaseLevel: boolean } = {
   const gameSetupFromHash = location.hash.replace("#", "");
 
   let gameSetupFromUrl: GameSetup | undefined;
-  if (isInitialStart && gameSetupFromHash && !onboardingData) {
+  if (isInitialStart && gameSetupFromHash && !onboardingData && !notYetAllConfigItems) {
     try {
       gameSetupFromUrl = deserializeGame(decodeURI(gameSetupFromHash));
       console.debug("Loaded game setup from hash:", gameSetupFromUrl);
@@ -177,7 +184,7 @@ export async function refreshFieldWithSetup(
   globals.gameState = getInitialGameState(gameSetup);
   globals.nextPositionsIfWait = calculateNewPositions(globals.gameState, SpecialAction.WAIT);
   const serializedGameSetup = serializeGame(gameSetup);
-  location.hash = onboardingData ? "" : `#${serializedGameSetup}`;
+  location.hash = onboardingData || hasUnknownConfigItems() ? "" : `#${serializedGameSetup}`;
   document.body.style.setProperty("--s-cnt", globals.gameState.setup.fieldSize.toString());
 
   pubSubService.publish(PubSubEvent.GAME_START);

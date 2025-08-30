@@ -35,7 +35,7 @@ export function isDirection(move: TurnMove): move is Direction {
   return Object.values(Direction).includes(move as Direction);
 }
 
-export function isTool(move: TurnMove): move is Tool {
+export function isTool(move: unknown): move is Tool {
   return Object.values(Tool).includes(move as Tool);
 }
 

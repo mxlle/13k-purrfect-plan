@@ -1,9 +1,9 @@
-import { defaultPlacedObjects } from "./onboarding";
+import { getDefaultPlacedObjects } from "./onboarding";
 import { shuffleArray } from "../utils/random-utils";
 import { getEmptyFields } from "./checks";
 import { ALL_CAT_IDS } from "./data/catId";
 import { CellPosition } from "./data/cell";
-import { allInConfig, Config, emptyConfig } from "./config/config";
+import { allInConfig, Config, emptyConfig, getValidatedConfig } from "./config/config";
 import { DEFAULT_FIELD_SIZE, FieldSize, getMiddleCoordinates } from "./data/field-size";
 import { copyGameSetup, EMPTY_ELEMENT_MAP, GameElementPositions, GameSetup, isValidGameSetup } from "./data/game-elements";
 import { calculatePar, MAX_PAR, MIN_PAR } from "./par";
@@ -11,7 +11,7 @@ import { ALL_OBJECT_IDS } from "./data/objects";
 import { sleep } from "../utils/promise-utils";
 
 export function getInitialGameSetup(config: Config = emptyConfig, fieldSize: FieldSize = DEFAULT_FIELD_SIZE): GameSetup {
-  const placedObjects = defaultPlacedObjects;
+  const placedObjects = getDefaultPlacedObjects();
   const elementPositions: GameElementPositions = EMPTY_ELEMENT_MAP();
 
   for (const obj of ALL_OBJECT_IDS) {
@@ -25,7 +25,7 @@ export function getInitialGameSetup(config: Config = emptyConfig, fieldSize: Fie
   return {
     fieldSize,
     elementPositions,
-    config,
+    config: getValidatedConfig(config),
     possibleSolutions: [],
   };
 }

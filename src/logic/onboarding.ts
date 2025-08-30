@@ -37,7 +37,9 @@ const lastSetup: InitialSetup = (() => {
   ];
 })();
 
-export const defaultPlacedObjects = getElementPositionsFormInitialSetup(lastSetup);
+export function getDefaultPlacedObjects() {
+  return getElementPositionsFormInitialSetup(lastSetup);
+}
 
 export function getOnboardingData(): OnboardingData | undefined {
   const step = globals.onboardingStep;

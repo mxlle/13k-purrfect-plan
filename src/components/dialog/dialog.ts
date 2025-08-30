@@ -16,7 +16,12 @@ export interface Dialog {
   changeSubmitText: (newText: string) => void;
 }
 
-export function createDialog(innerElement: HTMLElement, submitButtonText?: string): Dialog {
+export interface DialogOptions {
+  submitButtonText?: string;
+  cancelButtonText?: string;
+}
+
+export function createDialog(innerElement: HTMLElement, options: DialogOptions): Dialog {
   const dialog = createElement({
     cssClass: styles.dialog,
     onClick: (event) => event.stopPropagation(), // TODO - why?
@@ -28,21 +33,24 @@ export function createDialog(innerElement: HTMLElement, submitButtonText?: strin
 
   function closeDialog(confirm: boolean) {
     zIndexCounter--;
-    dialog.classList.remove("open");
+    dialog.classList.remove(styles.open);
     pubSubService.publish(PubSubEvent.CLOSE_DIALOG, confirm);
   }
 
   let buttons, cancelButton, submitButton;
-  if (submitButtonText !== undefined) {
+  if (options.submitButtonText !== undefined) {
     buttons = createElement({ cssClass: styles.btns });
 
-    cancelButton = createButton({
-      text: getTranslation(TranslationKey.BACK),
-      onClick: () => closeDialog(false),
-    });
-    buttons.appendChild(cancelButton);
+    if (options.cancelButtonText !== undefined) {
+      cancelButton = createButton({
+        text: getTranslation(TranslationKey.BACK),
+        onClick: () => closeDialog(false),
+      });
+      buttons.appendChild(cancelButton);
+    }
+
     submitButton = createButton({
-      text: submitButtonText,
+      text: options.submitButtonText,
       onClick: () => closeDialog(true),
     });
     submitButton.classList.add(CssClass.PRIMARY);
@@ -62,9 +70,9 @@ export function createDialog(innerElement: HTMLElement, submitButtonText?: strin
       zIndexCounter++;
       dialog.style.zIndex = zIndexCounter.toString();
       if (openImmediately) {
-        dialog.classList.add("open");
+        dialog.classList.add(styles.open);
       } else {
-        setTimeout(() => dialog.classList.add("open"), 0);
+        setTimeout(() => dialog.classList.add(styles.open), 0);
       }
 
       dialogContent.classList.toggle(styles.ovrflw, dialogContent.scrollHeight > dialogContent.clientHeight);

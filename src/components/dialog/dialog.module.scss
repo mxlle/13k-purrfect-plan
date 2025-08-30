@@ -47,6 +47,11 @@
   padding: 1rem;
   grid-template-columns: repeat(2, minmax(auto, 1fr));
 
+  &:has(:only-child) {
+    grid-template-columns: 1fr;
+    place-items: center;
+  }
+
   > * {
     white-space: nowrap;
   }
