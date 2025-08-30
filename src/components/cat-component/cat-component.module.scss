@@ -64,7 +64,8 @@
         transform-origin: center;
         animation: eye-blink 8s 4s infinite;
 
-        :global(.#{$WON}) & {
+        :global(.#{$WON}) &,
+        :global(.#{$LOST}) & {
           animation: none;
         }
       }

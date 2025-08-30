@@ -9,6 +9,7 @@ export const CssClass = defineEnum({
   OBJECT_BOX: "global__object-box",
   DARKNESS: "global__darkness",
   WON: "global__won",
+  LOST: "global__lost",
   TOUCHING: "global__touching",
   ICON_BTN: "global__icon-btn",
   HIDDEN: "global__hidden",

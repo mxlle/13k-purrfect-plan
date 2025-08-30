@@ -108,7 +108,7 @@ export async function startNewGame(options: { shouldIncreaseLevel: boolean } = {
   }
 
   if (mainContainer) removeSpeechBubble(mainContainer);
-  document.body.classList.remove(CssClass.WON);
+  document.body.classList.remove(CssClass.WON, CssClass.LOST);
 
   startButton?.remove();
 

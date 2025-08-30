@@ -19,7 +19,8 @@
   }
 
   &.disabled > *,
-  :global(.#{$WON}) & > * {
+  :global(.#{$WON}) & > *,
+  :global(.#{$LOST}) & > * {
     &:not(.newGameContainer) {
       pointer-events: none;
       opacity: 0;

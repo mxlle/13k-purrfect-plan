@@ -56,8 +56,9 @@ function init() {
     void startNewGame(options);
   });
 
-  pubSubService.subscribe(PubSubEvent.GAME_END, () => {
-    document.body.classList.add(CssClass.WON);
+  pubSubService.subscribe(PubSubEvent.GAME_END, (result) => {
+    result.isWon && document.body.classList.add(CssClass.WON);
+    !result.isWon && document.body.classList.add(CssClass.LOST);
   });
 }
 

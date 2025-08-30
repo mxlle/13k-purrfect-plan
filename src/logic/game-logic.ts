@@ -17,8 +17,8 @@ import { CAT_NAMES } from "./data/cats";
 import { CellPosition, isSameCell } from "./data/cell";
 import { updateAllPositions } from "../components/game-field/game-field";
 import { sleep } from "../utils/promise-utils";
-import { shouldApplyKittenBehavior, showMovesInfo } from "./config/config";
-import { deepCopyElementsMap, GameElementPositions, GameState } from "./data/game-elements";
+import { hasMoveLimit, shouldApplyKittenBehavior, showMovesInfo } from "./config/config";
+import { deepCopyElementsMap, GameElementPositions, GameState, getParFromGameState } from "./data/game-elements";
 
 import { kittenMeows, meow } from "../components/cat-component/cat-component";
 import { globals } from "../globals";
@@ -64,11 +64,16 @@ export async function performMove(gameState: GameState, turnMove: TurnMove) {
     await kittenMeows(newKittensOnCell);
 
     if (isWinConditionMet(gameState)) {
-      pubSubService.publish(PubSubEvent.GAME_END);
+      pubSubService.publish(PubSubEvent.GAME_END, { isWon: true });
 
       await sleep(300); // to finish moving
       showSpeechBubble(gameState.representations[CatId.MOTHER].htmlElement, "United!");
       await kittenMeows(ALL_KITTEN_IDS, true);
+    } else if (hasLost(gameState)) {
+      pubSubService.publish(PubSubEvent.GAME_END, { isWon: false });
+
+      await sleep(300); // to finish moving
+      showSpeechBubble(gameState.representations[CatId.MOTHER].htmlElement, "Oh no!");
     }
   } catch (error) {
     console.error("Error performing move:", error);
@@ -368,6 +373,14 @@ export function isWinConditionMet(gameState: GameState | null): boolean {
 
     return catPosition === null || isSameCell(momPosition, catPosition);
   });
+}
+
+export function hasLost(gameState: GameState | null): boolean {
+  if (!gameState || !hasMoveLimit(gameState.setup)) {
+    return false;
+  }
+
+  return gameState.moves.length >= getParFromGameState(gameState) && !isWinConditionMet(gameState);
 }
 
 function newCellPositionFromDirection(fromCell: CellPosition, direction: Direction): CellPosition {

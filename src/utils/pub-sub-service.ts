@@ -1,6 +1,6 @@
 import { defineEnum } from "./enums";
 
-type PubSubEvent = defineEnum<typeof PubSubEvent>
+type PubSubEvent = defineEnum<typeof PubSubEvent>;
 export const PubSubEvent = defineEnum({
   START_NEW_GAME: 0,
   GAME_START: 1,
@@ -8,12 +8,12 @@ export const PubSubEvent = defineEnum({
   MUTE_MUSIC: 3,
   UNMUTE_MUSIC: 4,
   CLOSE_DIALOG: 5,
-})
+});
 
 type EventDataTypes = {
   [PubSubEvent.START_NEW_GAME]: { shouldIncreaseLevel: boolean };
   [PubSubEvent.GAME_START]: undefined;
-  [PubSubEvent.GAME_END]: undefined;
+  [PubSubEvent.GAME_END]: { isWon: boolean };
   [PubSubEvent.MUTE_MUSIC]: undefined;
   [PubSubEvent.UNMUTE_MUSIC]: undefined;
   [PubSubEvent.CLOSE_DIALOG]: boolean;
