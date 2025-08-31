@@ -73,7 +73,7 @@ export const explanationMap: Record<ConfigItemId, TranslationKey | undefined> = 
 export const preconditions: Record<ConfigItemId, ConfigItemId[]> = {
   [CatId.MOONY]: [ObjectId.MOON],
   [CatId.IVY]: [ObjectId.TREE],
-  [CatId.SPLASHY]: [ObjectId.PUDDLE],
+  [CatId.SPLASHY]: [ObjectId.PUDDLE, Tool.MEOW],
   [Tool.MEOW]: [],
   [MoveLimit.MOVE_LIMIT_NONE]: [],
   [MoveLimit.MOVE_LIMIT_SIMPLE]: [ObjectId.MOON],

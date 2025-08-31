@@ -2,7 +2,8 @@ import { ALL_KITTEN_IDS, KittenId } from "./data/catId";
 import { CellPosition, isEmptyField, isSameCell } from "./data/cell";
 import { FieldSize } from "./data/field-size";
 import { ObjectId } from "../types";
-import { GameSetup, GameState } from "./data/game-elements";
+import { GameElementId, GameSetup, GameState } from "./data/game-elements";
+import { isCatId, isMom } from "./data/cats";
 
 export function getKittensOnCell(gameState: GameState, cell: CellPosition): KittenId[] {
   return ALL_KITTEN_IDS.filter((catId) => isSameCell(gameState.currentPositions[catId], cell));
@@ -26,7 +27,7 @@ export function getAllCellPositions(fieldSize: FieldSize): CellPosition[] {
   return positions;
 }
 
-export function isValidCellPosition(gameState: GameState, position: CellPosition): boolean {
+export function isValidCellPosition(gameState: GameState, position: CellPosition, elementToBeMoved: GameElementId): boolean {
   const fieldSize = gameState.setup.fieldSize;
 
   if (position.row < 0 || position.row >= fieldSize || position.column < 0 || position.column >= fieldSize) {
@@ -37,5 +38,8 @@ export function isValidCellPosition(gameState: GameState, position: CellPosition
     return true;
   }
 
-  return !isSameCell(position, gameState.currentPositions[ObjectId.TREE]);
+  const targetIsTree = isSameCell(position, gameState.currentPositions[ObjectId.TREE]);
+  const targetIsPuddle = isSameCell(position, gameState.currentPositions[ObjectId.PUDDLE]);
+
+  return !targetIsTree && (!targetIsPuddle || !isCatId(elementToBeMoved) || !isMom(elementToBeMoved)); // mom doesn't move into the puddle
 }

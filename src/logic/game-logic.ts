@@ -115,7 +115,7 @@ export function isValidMove(gameState: GameState, turnMove: TurnMove): boolean {
 
   const newPosition = newCellPositionFromDirection(motherPosition, turnMove);
 
-  return isValidCellPosition(gameState, newPosition);
+  return isValidCellPosition(gameState, newPosition, CatId.MOTHER);
 }
 
 export function calculateNewPositions(gameState: GameState, turnMove: TurnMove): GameElementPositions {
@@ -334,14 +334,14 @@ function moveCatTowardsCell(gameState: GameState, catId: CatId, targetCell: Cell
   const horizontalPathCell = { row: catPosition.row, column: catPosition.column + getDirectionalDiff(columnDiff) };
 
   if (
-    isValidCellPosition(gameState, horizontalPathCell) &&
-    (Math.abs(columnDiff) >= Math.abs(rowDiff) || !isValidCellPosition(gameState, verticalPathCell))
+    isValidCellPosition(gameState, horizontalPathCell, catId) &&
+    (Math.abs(columnDiff) >= Math.abs(rowDiff) || !isValidCellPosition(gameState, verticalPathCell, catId))
   ) {
     // Move horizontal firsts
     return horizontalPathCell;
   }
 
-  if (isValidCellPosition(gameState, verticalPathCell)) {
+  if (isValidCellPosition(gameState, verticalPathCell, catId)) {
     return verticalPathCell;
   }
 
@@ -362,7 +362,7 @@ export function moveCat(gameState: GameState, catId: CatId, direction: Direction
 }
 
 export function moveCatToCell(gameState: GameState, catId: CatId, cell: CellPosition): CellPosition {
-  const isValidMove = isValidCellPosition(gameState, cell);
+  const isValidMove = isValidCellPosition(gameState, cell, catId);
 
   if (!isValidMove) {
     console.warn(`Invalid move for cat ${CAT_NAMES[catId]} to cell (${cell.row}, ${cell.column})`);

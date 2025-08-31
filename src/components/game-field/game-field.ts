@@ -335,7 +335,7 @@ export function updateAllPositions(gameState: GameState, nextPositionsIfWait: Ga
     representation.htmlElement.style.transform = `translate(${diff.column * 100}%, ${diff.row * 100}%)`;
 
     if (gameElementId === ObjectId.MOON) {
-      if (!isValidCellPosition(gameState, position)) {
+      if (!isValidCellPosition(gameState, position, ObjectId.MOON)) {
         representation.htmlElement.style.opacity = "0";
         document.body.classList.toggle(CssClass.DARKNESS, true);
       } else {
