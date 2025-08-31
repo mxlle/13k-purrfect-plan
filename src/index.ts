@@ -7,12 +7,18 @@ import { initPoki, pokiSdk } from "./poki-integration";
 import { isOnboarding } from "./logic/onboarding";
 import { DEFAULT_FIELD_SIZE } from "./logic/data/field-size";
 import { CssClass } from "./utils/css-class";
+import { sleep } from "./utils/promise-utils";
 
 let titleElement: HTMLElement;
 
 // const initializeMuted = getLocalStorageItem(LocalStorageKey.MUTED) === "true";
 
+let isInitialized = false;
+
 function init() {
+  if (isInitialized) return;
+  isInitialized = true;
+
   const header = createElement({
     tag: "header",
   });
@@ -69,6 +75,7 @@ function init() {
 // INIT
 const initApp = async () => {
   init();
+  await sleep(0); // to make it a real promise
   // await initAudio(initializeMuted);
 };
 
