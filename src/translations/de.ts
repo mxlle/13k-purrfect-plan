@@ -25,9 +25,9 @@ const deTranslations: Record<TranslationKey, string> = {
   [TranslationKey.AVERAGE]: "Ø",
   [TranslationKey.POSSIBLE_SOLUTIONS]: "Verbleibende Lösungen",
   [TranslationKey.CHOOSER_TITLE]: "Was möchtest du als nächstes hinzufügen?",
-  [TranslationKey.CHOICE_TOOL]: "Neue Steuerung",
-  [TranslationKey.CHOICE_CONSTRAINT]: "Neue Einschränkung",
-  [TranslationKey.CHOICE_KITTEN_BEHAVIOR]: "Kätzchenverhalten",
+  [TranslationKey.CHOICE_TOOL]: "Neue Aktion",
+  [TranslationKey.CHOICE_CONSTRAINT]: "Neue Regel",
+  [TranslationKey.CHOICE_KITTEN_BEHAVIOR]: "Kätzchen­charakter",
   [TranslationKey.EXPLANATION_MOONY]: "Moony liebt den Mond und wird versuchen, ihn zu erreichen.",
   [TranslationKey.EXPLANATION_IVY]: "Ivy liebt es, um den Baum herumzulaufen.",
   [TranslationKey.EXPLANATION_SPLASHY]:
