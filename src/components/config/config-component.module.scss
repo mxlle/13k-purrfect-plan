@@ -45,10 +45,13 @@
   &.chooser {
     height: min(40vh, 40vw);
     width: min(40vh, 40vw);
-    font-size: 2em;
     transition:
       transform 0.3s,
       opacity 0.3s;
+
+    @media (min-height: 700px) {
+      font-size: 2em;
+    }
 
     :global(.#{$CAT_BOX}) {
       height: 50%;

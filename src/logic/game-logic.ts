@@ -71,16 +71,14 @@ export async function performMove(gameState: GameState, turnMove: TurnMove) {
     await kittenMeows(newKittensOnCell);
 
     if (isWinConditionMet(gameState)) {
-      pubSubService.publish(PubSubEvent.GAME_END, { isWon: true });
-
       await sleep(300); // to finish moving
       showSpeechBubble(gameState.representations[CatId.MOTHER].htmlElement, getTranslation(TranslationKey.UNITED));
+      pubSubService.publish(PubSubEvent.GAME_END, { isWon: true });
       await kittenMeows(ALL_KITTEN_IDS, true);
     } else if (hasLost(gameState)) {
-      pubSubService.publish(PubSubEvent.GAME_END, { isWon: false });
-
       await sleep(300); // to finish moving
       showSpeechBubble(gameState.representations[CatId.MOTHER].htmlElement, getTranslation(TranslationKey.LOST));
+      pubSubService.publish(PubSubEvent.GAME_END, { isWon: false });
     }
   } catch (error) {
     console.error("Error performing move:", error);
