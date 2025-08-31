@@ -39,21 +39,22 @@ export default defineConfig(({ mode, command }) => {
     build: {
       minify: production ? "terser" : false,
       cssMinify: production ? "lightningcss" : false,
-      terserOptions: {
-        mangle: {
-          properties: {
-            keep_quoted: true,
+      terserOptions: production &&
+        !poki && {
+          mangle: {
+            properties: {
+              keep_quoted: true,
+            },
+          },
+          compress: {
+            booleans_as_integers: true,
+            drop_console: js13k,
+            hoist_funs: true,
+            keep_fargs: false,
+            passes: 3,
+            unsafe: true,
           },
         },
-        compress: {
-          booleans_as_integers: true,
-          drop_console: js13k,
-          hoist_funs: true,
-          keep_fargs: false,
-          passes: 3,
-          unsafe: true,
-        },
-      },
       rollupOptions: {
         treeshake: {
           preset: "smallest",
