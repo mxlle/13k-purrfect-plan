@@ -330,22 +330,30 @@ function moveCatTowardsCell(gameState: GameState, catId: CatId, targetCell: Cell
     return catPosition;
   }
 
-  if (Math.abs(rowDiff) >= Math.abs(columnDiff)) {
-    // Move vertically firsts
-    const newRow = catPosition.row + (rowDiff > 0 ? 1 : -1);
+  const verticalPathCell = { row: catPosition.row + getDirectionalDiff(rowDiff), column: catPosition.column };
+  const horizontalPathCell = { row: catPosition.row, column: catPosition.column + getDirectionalDiff(columnDiff) };
 
-    if (isValidCellPosition(gameState, { row: newRow, column: catPosition.column })) {
-      return { row: newRow, column: catPosition.column };
-    }
+  if (
+    isValidCellPosition(gameState, horizontalPathCell) &&
+    (Math.abs(columnDiff) >= Math.abs(rowDiff) || !isValidCellPosition(gameState, verticalPathCell))
+  ) {
+    // Move horizontal firsts
+    return horizontalPathCell;
   }
 
-  const newColumn = catPosition.column + (columnDiff > 0 ? 1 : -1);
-
-  if (isValidCellPosition(gameState, { row: catPosition.row, column: newColumn })) {
-    return { row: catPosition.row, column: newColumn };
+  if (isValidCellPosition(gameState, verticalPathCell)) {
+    return verticalPathCell;
   }
 
   return catPosition;
+}
+
+function getDirectionalDiff(diff: number): -1 | 0 | 1 {
+  if (diff === 0) {
+    return 0;
+  }
+
+  return diff > 0 ? 1 : -1;
 }
 
 export function moveCat(gameState: GameState, catId: CatId, direction: Direction): CellPosition {
