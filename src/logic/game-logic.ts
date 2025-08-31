@@ -8,7 +8,7 @@ import {
   RECOVERY_TIME_MAP,
   SpecialAction,
   Tool,
-  TurnMove
+  TurnMove,
 } from "../types";
 import { PubSubEvent, pubSubService } from "../utils/pub-sub-service";
 import { getKittensElsewhere, getKittensOnCell, isValidCellPosition } from "./checks";
