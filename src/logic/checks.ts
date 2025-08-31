@@ -1,5 +1,5 @@
 import { ALL_KITTEN_IDS, KittenId } from "./data/catId";
-import { CellPosition, isEmptyField, isSameCell } from "./data/cell";
+import { CellPosition, isSameCell } from "./data/cell";
 import { FieldSize } from "./data/field-size";
 import { ObjectId } from "../types";
 import { GameElementId, GameSetup, GameState } from "./data/game-elements";
@@ -13,8 +13,16 @@ export function getKittensElsewhere(gameState: GameState, cell: CellPosition): K
   return ALL_KITTEN_IDS.filter((catId) => !isSameCell(gameState.currentPositions[catId], cell));
 }
 
-export function getEmptyFields(gameSetup: GameSetup): CellPosition[] {
-  return getAllCellPositions(gameSetup.fieldSize).filter((cell) => isEmptyField(cell, gameSetup));
+export function isEmptyField(cell: CellPosition, gameSetup: GameSetup, options?: { ignoreCats: boolean }): boolean {
+  const occupiedPositions = Object.entries(gameSetup.elementPositions)
+    .filter(([id]) => !options?.ignoreCats || !isCatId(id))
+    .map(([_id, position]) => position)
+    .filter(Boolean) as CellPosition[];
+  return occupiedPositions.every((pos: CellPosition) => !isSameCell(pos, cell));
+}
+
+export function getEmptyFields(gameSetup: GameSetup, options?: { ignoreCats: boolean }): CellPosition[] {
+  return getAllCellPositions(gameSetup.fieldSize).filter((cell) => isEmptyField(cell, gameSetup, options));
 }
 
 export function getAllCellPositions(fieldSize: FieldSize): CellPosition[] {

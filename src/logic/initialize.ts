@@ -84,7 +84,7 @@ export function randomlyPlaceGameElementsOnField(
   copiedGameSetup.elementPositions[ObjectId.MOON] = newObjectPositions[ObjectId.MOON];
 
   const cats = [...ALL_CAT_IDS];
-  const emptyFields = getEmptyFields(copiedGameSetup);
+  const emptyFields = getEmptyFields(copiedGameSetup, { ignoreCats: true });
   const catPositions = ALL_CAT_IDS.map((catId) => copiedGameSetup.elementPositions[catId]);
   const fieldsWithCats = getAllCellPositions(gameSetup.fieldSize).filter((cell) => catPositions.some((cat) => isSameCell(cat, cell)));
   emptyFields.push(...fieldsWithCats);

@@ -1,5 +1,4 @@
 import { CatId } from "./catId";
-import { GameSetup } from "./game-elements";
 import { Direction, ObjectId } from "../../types";
 
 export interface CellPosition {
@@ -8,11 +7,6 @@ export interface CellPosition {
 }
 
 export const EMPTY_CELL = " " as const;
-
-export function isEmptyField(cell: CellPosition, gameSetup: GameSetup): boolean {
-  const occupiedPositions = Object.values(gameSetup.elementPositions).filter(Boolean) as CellPosition[];
-  return occupiedPositions.every((pos: CellPosition) => !isSameCell(pos, cell));
-}
 
 export function isSameCell(cell1: CellPosition, cell2: CellPosition) {
   return cell1.row === cell2.row && cell1.column === cell2.column;
