@@ -2,7 +2,7 @@ import { Settings } from "./types";
 import { getLocalStorageItem, LocalStorageKey } from "./utils/local-storage";
 import { Difficulty, difficultySettings } from "./logic/difficulty";
 import { GameElementId, GameElementPositions, GameState } from "./logic/data/game-elements";
-import { isWinConditionMet } from "./logic/game-logic";
+import { hasLost, isWinConditionMet } from "./logic/game-logic";
 
 interface GameGlobals {
   previousOnboardingStep: number | undefined;
@@ -50,5 +50,5 @@ function getNumFromParam(param: string, fallback: number) {
 }
 
 export function isGameInProgress(): boolean {
-  return globals.gameState !== undefined && !isWinConditionMet(globals.gameState);
+  return globals.gameState !== undefined && !isWinConditionMet(globals.gameState) && !hasLost(globals.gameState);
 }

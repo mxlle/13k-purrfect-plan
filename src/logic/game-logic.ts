@@ -21,7 +21,7 @@ import { hasMoveLimit, shouldApplyKittenBehavior, showMovesInfo } from "./config
 import { deepCopyElementsMap, GameElementPositions, GameState, getParFromGameState } from "./data/game-elements";
 
 import { kittenMeows, meow } from "../components/cat-component/cat-component";
-import { globals } from "../globals";
+import { globals, isGameInProgress } from "../globals";
 import { removeAllSpeechBubbles, showSpeechBubble } from "../components/speech-bubble/speech-bubble";
 import { getTranslation } from "../translations/i18n";
 import { TranslationKey } from "../translations/translationKey";
@@ -36,6 +36,11 @@ export async function performMove(gameState: GameState, turnMove: TurnMove) {
 
   if (isPerformingMove) {
     console.warn("Already performing a move, ignoring this one.");
+    return;
+  }
+
+  if (!isGameInProgress()) {
+    console.warn("Game is not in progress, ignoring this move.");
     return;
   }
 
