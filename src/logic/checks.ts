@@ -34,12 +34,8 @@ export function isValidCellPosition(gameState: GameState, position: CellPosition
     return false;
   }
 
-  if (!gameState.currentPositions[ObjectId.TREE]) {
-    return true;
-  }
-
-  const targetIsTree = isSameCell(position, gameState.currentPositions[ObjectId.TREE]);
-  const targetIsPuddle = isSameCell(position, gameState.currentPositions[ObjectId.PUDDLE]);
+  const targetIsTree = !!gameState.currentPositions[ObjectId.TREE] && isSameCell(position, gameState.currentPositions[ObjectId.TREE]);
+  const targetIsPuddle = !!gameState.currentPositions[ObjectId.PUDDLE] && isSameCell(position, gameState.currentPositions[ObjectId.PUDDLE]);
 
   return !targetIsTree && (!targetIsPuddle || !isCatId(elementToBeMoved) || !isMom(elementToBeMoved)); // mom doesn't move into the puddle
 }
