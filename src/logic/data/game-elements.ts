@@ -7,7 +7,7 @@ import { Config } from "../config/config";
 import { ObjectId, TurnMove } from "../../types";
 import { FALLBACK_PAR, MAX_PAR } from "../par";
 import { globals } from "../../globals";
-import { getDefaultPlacedObjects } from "../onboarding";
+import { getDefaultPlacedObjects, isOnboarding } from "../onboarding";
 
 export type GameElementId = CatId | ObjectId;
 
@@ -51,7 +51,7 @@ export function getInitialGameState(setup: GameSetup): GameState {
     if (position) {
       representations[id] = {
         htmlElement: isObjectId(id) ? getObjectElement(id) : getCatElement(id),
-        initialPosition: isObjectId(id) ? defaultObjectPositions[id] : middlePosition,
+        initialPosition: isObjectId(id) ? (isOnboarding() ? position : defaultObjectPositions[id]) : middlePosition,
       };
     } else {
       representations[id] = null;

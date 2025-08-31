@@ -82,7 +82,7 @@ export function getOnboardingData(): OnboardingData | undefined {
           [_, _, _, _],
           [_, _, M, _],
           [_, O, T, _],
-          [t, _, c, _],
+          [_, t, c, _],
         ];
       })();
 
