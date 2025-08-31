@@ -27,6 +27,7 @@ let controlsComponent: HTMLElement | undefined;
 let turnMovesContainer: HTMLElement | undefined;
 let turnMovesComponent: HTMLElement | undefined;
 let solutionsComponent: HTMLElement | undefined;
+let redoButton: HTMLElement | undefined;
 let toolContainer: HTMLElement | undefined;
 let recoveryInfoComponent: HTMLElement | undefined;
 let activeRecording: ActiveRecording | undefined;
@@ -49,8 +50,17 @@ export function createControlsComponent(): HTMLElement {
     cssClass: styles.solutions,
   });
 
+  redoButton = createElement({
+    tag: "a",
+    text: getTranslation(TranslationKey.RESTART_GAME),
+    onClick: () => {
+      pubSubService.publish(PubSubEvent.START_NEW_GAME, { shouldIncreaseLevel: false });
+    },
+  });
+
   turnMovesContainer.appendChild(turnMovesComponent);
   turnMovesContainer.appendChild(solutionsComponent);
+  turnMovesContainer.appendChild(redoButton);
 
   updateTurnMovesComponent();
 
@@ -276,21 +286,14 @@ function updateTurnMovesComponent(isReset: boolean = false) {
   const parString = par && showMoveLimit && !isReset ? ` / ${par < FALLBACK_PAR ? par : "?"}` : "";
   turnMovesComponent.innerHTML = `${getTranslation(TranslationKey.MOVES)}: ${isReset ? 0 : (globals.gameState?.moves.length ?? 0)}${parString}`;
 
-  if (!solutionsComponent) return;
-  solutionsComponent.style.display = showMoveLimit ? "flex" : "none";
   const solutionsCount = getPossibleSolutionsCount(globals.gameState);
-  solutionsComponent.innerHTML = `${getTranslation(TranslationKey.POSSIBLE_SOLUTIONS)}: ${isReset ? "?" : (solutionsCount ?? "?")}`;
+  if (solutionsComponent) {
+    solutionsComponent.style.display = showMoveLimit ? "flex" : "none";
+    solutionsComponent.innerHTML = `${getTranslation(TranslationKey.POSSIBLE_SOLUTIONS)}: ${isReset ? "?" : (solutionsCount ?? "?")}`;
+  }
 
-  if (solutionsCount === 0) {
-    const redoButton = createElement({
-      tag: "a",
-      text: getTranslation(TranslationKey.RESTART_GAME),
-      onClick: () => {
-        pubSubService.publish(PubSubEvent.START_NEW_GAME, { shouldIncreaseLevel: false });
-      },
-    });
-
-    solutionsComponent.appendChild(redoButton);
+  if (redoButton) {
+    redoButton.style.opacity = isReset || solutionsCount > 0 || !showMoveLimit ? "0" : "1";
   }
 }
 
