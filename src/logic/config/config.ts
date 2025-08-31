@@ -78,7 +78,7 @@ export const preconditions: Record<ConfigItemId, ConfigItemId[]> = {
   [CatId.SPLASHY]: [ObjectId.PUDDLE, Tool.MEOW],
   [Tool.MEOW]: [],
   [MoveLimit.MOVE_LIMIT_NONE]: [],
-  [MoveLimit.MOVE_LIMIT_SIMPLE]: [ObjectId.MOON, Tool.MEOW],
+  [MoveLimit.MOVE_LIMIT_SIMPLE]: [ObjectId.MOON],
   [MoveLimit.MOVE_LIMIT_STRICT]: [ObjectId.MOON, MoveLimit.MOVE_LIMIT_SIMPLE],
   [ObjectId.TREE]: [],
   [ObjectId.MOON]: [],

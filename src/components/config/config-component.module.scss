@@ -49,8 +49,8 @@
       transform 0.3s,
       opacity 0.3s;
 
-    @media (min-height: 700px) {
-      font-size: 2em;
+    @media (min-height: 750px) {
+      font-size: 1.5em;
     }
 
     :global(.#{$CAT_BOX}) {
