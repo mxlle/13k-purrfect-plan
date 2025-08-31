@@ -85,9 +85,6 @@ export function randomlyPlaceGameElementsOnField(
 
   const cats = [...ALL_CAT_IDS];
   const emptyFields = getEmptyFields(copiedGameSetup, { ignoreCats: true });
-  const catPositions = ALL_CAT_IDS.map((catId) => copiedGameSetup.elementPositions[catId]);
-  const fieldsWithCats = getAllCellPositions(gameSetup.fieldSize).filter((cell) => catPositions.some((cat) => isSameCell(cat, cell)));
-  emptyFields.push(...fieldsWithCats);
   const shuffledRequiredFields = shuffleArray(emptyFields).slice(0, cats.length);
   shuffledRequiredFields.forEach((cell: CellPosition) => {
     const cat = cats.pop();
