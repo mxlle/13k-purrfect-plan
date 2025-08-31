@@ -153,7 +153,7 @@ export function getMoveButton(direction: Direction): HTMLElement {
 }
 
 export function getToolButton(tool: Tool) {
-  return (buttons[tool] ??= createButton({ text: "Meow", onClick: () => handleMove(tool) }));
+  return (buttons[tool] ??= createButton({ text: getTranslation(TranslationKey.MEOW), onClick: () => handleMove(tool) }));
 }
 
 export function getControlButton(type: Direction | Tool): HTMLElement {

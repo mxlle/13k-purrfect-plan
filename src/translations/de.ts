@@ -31,11 +31,15 @@ const deTranslations: Record<TranslationKey, string> = {
   [TranslationKey.EXPLANATION_MOONY]: "Moony liebt den Mond und wird versuchen, ihn zu erreichen.",
   [TranslationKey.EXPLANATION_IVY]: "Ivy liebt es, um den Baum herumzulaufen.",
   [TranslationKey.EXPLANATION_SPLASHY]: "Splashy liebt Wasser und möchte darin spielen.",
-  [TranslationKey.EXPLANATION_MEOW]: "Wenn Mama miaut, kommen alle Kätzchen einen Schritt näher.",
+  [TranslationKey.EXPLANATION_MEOW]: "Wenn Mama miaut, kommen alle Kätzchen einen Schritt näher. Aber das geht nur alle 2 Züge.",
   [TranslationKey.EXPLANATION_MOVE_LIMIT_1]:
     "Der Mond wird über das Feld wandern. Sobald er untergeht, wird das Feld dunkel, aber du kannst trotzdem weiterspielen.",
   [TranslationKey.EXPLANATION_MOVE_LIMIT_2]: "Du musst alle Kätzchen vereinen, bevor der Mond untergeht!",
   [TranslationKey.EXPLANATION_EMPTY]: "Deine Wahl wird hier erklärt.",
   [TranslationKey.YOUR_CHOICE]: "Deine Wahl",
   [TranslationKey.CONFIRM]: "Bestätigen",
+  [TranslationKey.UNITED]: "Vereint!",
+  [TranslationKey.LOST]: "Oh nein!",
+  [TranslationKey.MEOW]: "Miau",
+  [TranslationKey.LOADING]: "Laden...",
 };

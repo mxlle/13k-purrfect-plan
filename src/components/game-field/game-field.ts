@@ -39,6 +39,8 @@ import { calculateNewPositions, isWinConditionMet } from "../../logic/game-logic
 import { getConfigComponent } from "../config/config-component";
 import { createConfigChooserComponent } from "../config-chooser/config-chooser-component";
 import { removeSpeechBubble } from "../speech-bubble/speech-bubble";
+import { getTranslation } from "../../translations/i18n";
+import { TranslationKey } from "../../translations/translationKey";
 
 let mainContainer: HTMLElement | undefined;
 let gameFieldElem: HTMLElement | undefined;
@@ -80,7 +82,7 @@ async function shuffleFieldAnimation(config: Config) {
     return;
   }
 
-  const loader = createElement({ cssClass: styles.loader, text: "Loading..." });
+  const loader = createElement({ cssClass: styles.loader, text: getTranslation(TranslationKey.LOADING) });
 
   gameFieldElem.append(loader);
 

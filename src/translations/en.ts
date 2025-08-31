@@ -23,11 +23,15 @@ export const enTranslations: Record<TranslationKey, string> = {
   [TranslationKey.EXPLANATION_MOONY]: "Moony loves the moon and will try to reach it.",
   [TranslationKey.EXPLANATION_IVY]: "Ivy loves to run around the tree.",
   [TranslationKey.EXPLANATION_SPLASHY]: "Splashy loves water and wants to play in it.",
-  [TranslationKey.EXPLANATION_MEOW]: "When Mommy meows, all kittens will come a step closer.",
+  [TranslationKey.EXPLANATION_MEOW]: "When Mommy meows, all kittens will come a step closer. But this can only be done every 2 moves.",
   [TranslationKey.EXPLANATION_MOVE_LIMIT_1]:
     "The moon will wander across the field. Once it sets, the field will become dark, but you can still continue.",
   [TranslationKey.EXPLANATION_MOVE_LIMIT_2]: "You have to unite all kittens before the moon sets!",
   [TranslationKey.EXPLANATION_EMPTY]: "Your choice will be explained here.",
   [TranslationKey.YOUR_CHOICE]: "Your choice",
   [TranslationKey.CONFIRM]: "Let's go!",
+  [TranslationKey.UNITED]: "United!",
+  [TranslationKey.LOST]: "Oh no!",
+  [TranslationKey.MEOW]: "Meow",
+  [TranslationKey.LOADING]: "Loading...",
 };

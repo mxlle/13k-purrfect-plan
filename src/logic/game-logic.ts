@@ -23,6 +23,8 @@ import { deepCopyElementsMap, GameElementPositions, GameState, getParFromGameSta
 import { kittenMeows, meow } from "../components/cat-component/cat-component";
 import { globals } from "../globals";
 import { removeSpeechBubble, showSpeechBubble } from "../components/speech-bubble/speech-bubble";
+import { getTranslation } from "../translations/i18n";
+import { TranslationKey } from "../translations/translationKey";
 
 let isPerformingMove = false;
 
@@ -67,13 +69,13 @@ export async function performMove(gameState: GameState, turnMove: TurnMove) {
       pubSubService.publish(PubSubEvent.GAME_END, { isWon: true });
 
       await sleep(300); // to finish moving
-      showSpeechBubble(gameState.representations[CatId.MOTHER].htmlElement, "United!");
+      showSpeechBubble(gameState.representations[CatId.MOTHER].htmlElement, getTranslation(TranslationKey.UNITED));
       await kittenMeows(ALL_KITTEN_IDS, true);
     } else if (hasLost(gameState)) {
       pubSubService.publish(PubSubEvent.GAME_END, { isWon: false });
 
       await sleep(300); // to finish moving
-      showSpeechBubble(gameState.representations[CatId.MOTHER].htmlElement, "Oh no!");
+      showSpeechBubble(gameState.representations[CatId.MOTHER].htmlElement, getTranslation(TranslationKey.LOST));
     }
   } catch (error) {
     console.error("Error performing move:", error);
@@ -166,7 +168,7 @@ function doMoonMove(gameState: GameState): CellPosition {
 async function preToolAction(gameState: GameState, tool: Tool) {
   switch (tool) {
     case Tool.MEOW:
-      showSpeechBubble(gameState.representations[CatId.MOTHER].htmlElement, "Meow!");
+      showSpeechBubble(gameState.representations[CatId.MOTHER].htmlElement, getTranslation(TranslationKey.MEOW));
 
       await Promise.all([meow(CatId.MOTHER), sleep(300)]); // Wait for meow speech bubble to appear
 

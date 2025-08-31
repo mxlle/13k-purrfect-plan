@@ -30,4 +30,8 @@ export const TranslationKey = defineEnum({
   EXPLANATION_EMPTY: 25,
   YOUR_CHOICE: 26,
   CONFIRM: 27,
+  UNITED: 28,
+  LOST: 29,
+  MEOW: 30,
+  LOADING: 31,
 });

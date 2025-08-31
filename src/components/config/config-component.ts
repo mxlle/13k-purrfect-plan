@@ -13,6 +13,8 @@ import { globals } from "../../globals";
 import { copyGameSetup, GameSetup, GameState } from "../../logic/data/game-elements";
 import { generateRandomGameWhileAnimating, refreshFieldWithSetup } from "../game-field/game-field";
 import { calculatePar } from "../../logic/par";
+import { getTranslation } from "../../translations/i18n";
+import { TranslationKey } from "../../translations/translationKey";
 
 let configComponent: HTMLElement | undefined;
 let configObject = copyConfig({ ...allInConfig });
@@ -112,7 +114,7 @@ function getConfigCategoryElement(category: ConfigCategory): HTMLElement {
       break;
     case ConfigCategory.TOOLS:
       for (const tool of Object.values(Tool)) {
-        const toolElem = createElement({ text: "Meow" });
+        const toolElem = createElement({ text: getTranslation(TranslationKey.MEOW) });
         transformToConfigItemElement(category, tool, toolElem);
         contentElem.appendChild(toolElem);
       }

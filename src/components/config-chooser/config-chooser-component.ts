@@ -98,7 +98,7 @@ function getChoiceElement(configItem: ConfigItemId, chooseItem: (event: MouseEve
     return createElement({
       text: getTranslation(TranslationKey.CHOICE_TOOL),
       onClick: (event) => {
-        event.target.innerHTML = "Meow!";
+        event.target.innerHTML = getTranslation(TranslationKey.MEOW);
         chooseItem(event);
       },
     });
