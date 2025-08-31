@@ -38,14 +38,16 @@ export function shouldApplyKittenBehavior(gameSetup: GameSetup, catId: CatId): b
   return gameSetup.config[ConfigCategory.KITTEN_BEHAVIOR][catId];
 }
 
-export function showMovesInfo(gameSetupOrConfig: GameSetup | Config): boolean {
-  const config = "config" in gameSetupOrConfig ? gameSetupOrConfig.config : gameSetupOrConfig;
-
+export function showMovesInfo(config: Config): boolean {
   return config[ConfigCategory.CONSTRAINTS].moveLimit !== MoveLimit.MOVE_LIMIT_NONE;
 }
 
-export function hasMoveLimit(gameSetup: GameSetup): boolean {
-  return gameSetup.config[ConfigCategory.CONSTRAINTS].moveLimit === MoveLimit.MOVE_LIMIT_STRICT;
+export function showMoon(config: Config) {
+  return config[ConfigCategory.OBJECTS][ObjectId.MOON] && showMovesInfo(config);
+}
+
+export function hasMoveLimit(config: Config): boolean {
+  return config[ConfigCategory.CONSTRAINTS].moveLimit === MoveLimit.MOVE_LIMIT_STRICT;
 }
 
 export function copyConfig(config: Config): Config {
@@ -71,12 +73,12 @@ export const explanationMap: Record<ConfigItemId, TranslationKey | undefined> = 
 };
 
 export const preconditions: Record<ConfigItemId, ConfigItemId[]> = {
-  [CatId.MOONY]: [ObjectId.MOON],
+  [CatId.MOONY]: [ObjectId.MOON, MoveLimit.MOVE_LIMIT_SIMPLE],
   [CatId.IVY]: [ObjectId.TREE],
   [CatId.SPLASHY]: [ObjectId.PUDDLE, Tool.MEOW],
   [Tool.MEOW]: [],
   [MoveLimit.MOVE_LIMIT_NONE]: [],
-  [MoveLimit.MOVE_LIMIT_SIMPLE]: [ObjectId.MOON],
+  [MoveLimit.MOVE_LIMIT_SIMPLE]: [ObjectId.MOON, Tool.MEOW],
   [MoveLimit.MOVE_LIMIT_STRICT]: [ObjectId.MOON, MoveLimit.MOVE_LIMIT_SIMPLE],
   [ObjectId.TREE]: [],
   [ObjectId.MOON]: [],

@@ -37,6 +37,7 @@ $border-style: outset;
   opacity: 0.5;
   white-space: nowrap;
   font-family: $font-family-special;
+  z-index: 5;
 }
 
 :global(.#{$CELL}) {

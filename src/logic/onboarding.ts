@@ -30,9 +30,9 @@ const lastSetup: InitialSetup = (() => {
   const { _, M, t, o, c, T, O, C } = getCellTypePlaceholders();
   return [
     [C, _, M, _, _],
-    [o, _, _, _, O],
-    [_, _, _, _, _],
-    [_, t, T, _, c],
+    [o, _, _, _, _],
+    [_, O, _, T, _],
+    [_, t, _, _, c],
     [_, _, _, _, _],
   ];
 })();
@@ -51,9 +51,9 @@ export function getOnboardingData(): OnboardingData | undefined {
       const introSetup: InitialSetup = (() => {
         const { _, M, t, o, c, T, O, C } = getCellTypePlaceholders();
         return [
+          [_, _, _],
           [_, M, _],
-          [_, c, _],
-          [_, _, t],
+          [_, c, t],
         ];
       })();
       const isFirstStep = step === OnboardingStep.INTRO;
@@ -79,9 +79,9 @@ export function getOnboardingData(): OnboardingData | undefined {
       const intermediateSetup: InitialSetup = (() => {
         const { _, M, t, o, c, T, O, C } = getCellTypePlaceholders();
         return [
-          [C, _, _, _],
+          [_, _, _, _],
           [_, _, M, _],
-          [_, _, T, _],
+          [_, O, T, _],
           [t, _, c, _],
         ];
       })();
@@ -106,7 +106,7 @@ export function getOnboardingData(): OnboardingData | undefined {
     case OnboardingStep.LAST_SETUP:
       const gameSetupLast: GameSetup = {
         fieldSize: getFieldSizeFromInitialSetup(lastSetup),
-        elementPositions: getElementPositionsFormInitialSetup(lastSetup),
+        elementPositions: getElementPositionsFormInitialSetup(lastSetup, [{ row: 0, column: 0 }]),
         config: getValidatedConfig(allInConfig),
         possibleSolutions: [],
       };

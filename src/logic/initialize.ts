@@ -3,18 +3,22 @@ import { shuffleArray } from "../utils/random-utils";
 import { getEmptyFields } from "./checks";
 import { ALL_CAT_IDS } from "./data/catId";
 import { CellPosition } from "./data/cell";
-import { Config, emptyConfig, getValidatedConfig, showMovesInfo } from "./config/config";
+import { allInConfig, Config, emptyConfig, getValidatedConfig, hasMoveLimit, showMoon, showMovesInfo } from "./config/config";
 import { DEFAULT_FIELD_SIZE, FieldSize, getMiddleCoordinates } from "./data/field-size";
 import { copyGameSetup, EMPTY_ELEMENT_MAP, GameElementPositions, GameSetup, isValidGameSetup } from "./data/game-elements";
 import { calculatePar, MAX_PAR, MIN_PAR } from "./par";
 import { ALL_OBJECT_IDS } from "./data/objects";
 import { sleep } from "../utils/promise-utils";
+import { ConfigCategory, ObjectId } from "../types";
 
-export function getInitialGameSetup(config: Config = emptyConfig, fieldSize: FieldSize = DEFAULT_FIELD_SIZE): GameSetup {
+export function getInitialGameSetup(config: Config = getValidatedConfig(allInConfig), fieldSize: FieldSize = DEFAULT_FIELD_SIZE): GameSetup {
   const placedObjects = getDefaultPlacedObjects();
   const elementPositions: GameElementPositions = EMPTY_ELEMENT_MAP();
 
   for (const obj of ALL_OBJECT_IDS) {
+    if ((obj === ObjectId.MOON && !showMoon(config)) || config[ConfigCategory.OBJECTS][obj] === false) {
+      continue;
+    }
     elementPositions[obj] = { ...placedObjects[obj] };
   }
 
@@ -35,7 +39,7 @@ export async function generateRandomGameSetup(config: Config, fieldSize: FieldSi
 
   const tempGameSetup = getInitialGameSetup(config, fieldSize);
 
-  const finalGameSetup = randomlyPlaceCatsOnField(tempGameSetup, showMovesInfo(config));
+  const finalGameSetup = randomlyPlaceCatsOnField(tempGameSetup, hasMoveLimit(config));
 
   return { ...finalGameSetup };
 }

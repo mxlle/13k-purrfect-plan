@@ -253,7 +253,7 @@ export function addNewGameButtons(isInitialStart = false) {
 
   newGameContainer.appendChild(continueButton);
 
-  if (!isInitialStart && showMovesInfo(globals.gameState.setup)) {
+  if (!isInitialStart && showMovesInfo(globals.gameState.setup.config)) {
     const restartButton = createButton({
       text: getTranslation(TranslationKey.RESTART_GAME),
       onClick: () => {
@@ -262,7 +262,7 @@ export function addNewGameButtons(isInitialStart = false) {
       },
     });
 
-    if (!hasAchievedGoal && hasMoveLimit(globals.gameState.setup)) {
+    if (!hasAchievedGoal && hasMoveLimit(globals.gameState.setup.config)) {
       restartButton.classList.add(CssClass.PRIMARY);
     } else {
       continueButton.classList.toggle(CssClass.PRIMARY, true);
@@ -295,8 +295,8 @@ async function handleMove(turnMove: TurnMove) {
 function updateTurnMovesComponent(isReset: boolean = false) {
   if (!turnMovesContainer) return;
 
-  const showMoves = globals.gameState && showMovesInfo(globals.gameState.setup);
-  const showMoveLimit = globals.gameState && hasMoveLimit(globals.gameState.setup);
+  const showMoves = globals.gameState && showMovesInfo(globals.gameState.setup.config);
+  const showMoveLimit = globals.gameState && hasMoveLimit(globals.gameState.setup.config);
 
   // console.debug("updateTurnMovesComponent", { showMoves, showMoveLimit, isReset, moves: globals.gameState?.moves });
 

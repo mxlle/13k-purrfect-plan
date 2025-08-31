@@ -159,7 +159,7 @@ export function calculateNewPositions(gameState: GameState, turnMove: TurnMove):
 function doMoonMove(gameState: GameState): CellPosition {
   const moon = gameState.currentPositions[ObjectId.MOON];
 
-  if (!moon || !showMovesInfo(gameState.setup)) {
+  if (!moon || !showMovesInfo(gameState.setup.config)) {
     return moon;
   }
 
@@ -387,7 +387,7 @@ export function isWinConditionMet(gameState: GameState | null): boolean {
 }
 
 export function hasLost(gameState: GameState | null): boolean {
-  if (!gameState || !hasMoveLimit(gameState.setup)) {
+  if (!gameState || !hasMoveLimit(gameState.setup.config)) {
     return false;
   }
 
