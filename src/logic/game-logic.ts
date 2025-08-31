@@ -44,7 +44,7 @@ export async function performMove(gameState: GameState, turnMove: TurnMove) {
     return;
   }
 
-  if (gameState.moves.length === 0) {
+  if (import.meta.env.POKI_ENABLED === "true" && gameState.moves.length === 0) {
     pokiSdk.gameplayStart();
   }
 

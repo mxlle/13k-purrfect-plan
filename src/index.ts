@@ -60,7 +60,9 @@ function init() {
     result.isWon && document.body.classList.add(CssClass.WON);
     !result.isWon && document.body.classList.add(CssClass.LOST);
 
-    pokiSdk.gameplayStop();
+    if (import.meta.env.POKI_ENABLED === "true") {
+      pokiSdk.gameplayStop();
+    }
   });
 }
 
