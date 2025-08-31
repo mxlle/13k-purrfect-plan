@@ -1,7 +1,7 @@
 $squareCount: var(--s-cnt, 5);
-$buffer: 2rem; // = 2 * margin
+$buffer: 1.5rem; // = 2 * margin
 $bufferLandscape: 3rem; // = 2 * margin
-$headerHeight: 3rem;
+$headerHeight: 2.5rem;
 $controls-width: 280px;
 $gap: 1px;
 $totalGap: calc($gap * ($squareCount - 1));

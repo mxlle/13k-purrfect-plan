@@ -71,6 +71,11 @@
       width: 3.5rem;
       height: 3.5rem;
       margin: -0.25rem;
+
+      @media (max-height: 600px) {
+        width: 3rem;
+        height: 3rem;
+      }
     }
 
     &.up {
