@@ -67,7 +67,7 @@ function init() {
     !result.isWon && document.body.classList.add(CssClass.LOST);
 
     if (import.meta.env.POKI_ENABLED === "true") {
-      pokiSdk.gameplayStop();
+      sleep(300).then(() => pokiSdk.gameplayStop()); // to avoid issue that stop is called before start
     }
   });
 }
