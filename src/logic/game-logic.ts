@@ -25,6 +25,7 @@ import { globals } from "../globals";
 import { removeSpeechBubble, showSpeechBubble } from "../components/speech-bubble/speech-bubble";
 import { getTranslation } from "../translations/i18n";
 import { TranslationKey } from "../translations/translationKey";
+import { pokiSdk } from "../poki-integration";
 
 let isPerformingMove = false;
 
@@ -41,6 +42,10 @@ export async function performMove(gameState: GameState, turnMove: TurnMove) {
   if (!isValidMove(gameState, turnMove)) {
     console.warn(`Invalid move: ${turnMove}`);
     return;
+  }
+
+  if (gameState.moves.length === 0) {
+    pokiSdk.gameplayStart();
   }
 
   isPerformingMove = true;

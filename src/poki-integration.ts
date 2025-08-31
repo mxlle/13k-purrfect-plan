@@ -12,14 +12,14 @@ declare const PokiSDK: PokiSDK;
 
 export let pokiSdk: PokiSDK | undefined;
 
-const createElement = (tag, props) => Object.assign(document.createElement(tag), props)
-const loadScript = (src) => new Promise((onload, onerror) => document.head.appendChild(createElement('script', { src, onload, onerror })))
+const createElement = (tag, props) => Object.assign(document.createElement(tag), props);
+const loadScript = (src) => new Promise((onload, onerror) => document.head.appendChild(createElement("script", { src, onload, onerror })));
 
 export async function initPoki(continueToGame: () => Promise<void>) {
   if (import.meta.env.POKI_ENABLED !== "true") return continueToGame();
 
   try {
-    await loadScript('https://game-cdn.poki.com/scripts/v2/poki-sdk.js');
+    await loadScript("https://game-cdn.poki.com/scripts/v2/poki-sdk.js");
     pokiSdk = PokiSDK;
   } catch (error) {
     console.log("Failed to load Poki SDK", error);

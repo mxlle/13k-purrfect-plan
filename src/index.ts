@@ -3,7 +3,7 @@ import "./index.scss";
 import { createButton, createElement } from "./utils/html-utils";
 import { PubSubEvent, pubSubService } from "./utils/pub-sub-service";
 import { initializeEmptyGameField, startNewGame, toggleConfig } from "./components/game-field/game-field";
-import { initPoki } from "./poki-integration";
+import { initPoki, pokiSdk } from "./poki-integration";
 import { isOnboarding } from "./logic/onboarding";
 import { DEFAULT_FIELD_SIZE } from "./logic/data/field-size";
 import { CssClass } from "./utils/css-class";
@@ -59,6 +59,8 @@ function init() {
   pubSubService.subscribe(PubSubEvent.GAME_END, (result) => {
     result.isWon && document.body.classList.add(CssClass.WON);
     !result.isWon && document.body.classList.add(CssClass.LOST);
+
+    pokiSdk.gameplayStop();
   });
 }
 
