@@ -3,7 +3,7 @@ import { CssClass } from "../../utils/css-class";
 import { ConfigCategory, Direction, isTool, RECOVERY_TIME_MAP, Tool, TurnMove } from "../../types";
 
 import styles from "./controls-component.module.scss";
-import { getPossibleSolutionsCount, isWinConditionMet, performMove } from "../../logic/game-logic";
+import { getPossibleSolutionsCount, isValidMove, isWinConditionMet, performMove } from "../../logic/game-logic";
 import { getArrowComponent } from "../arrow-component/arrow-component";
 import {
   ActiveRecording,
@@ -73,7 +73,7 @@ export function createControlsComponent(): HTMLElement {
   const moveButtons = getAllMoveButtons();
   moveButtons.forEach((button) => movementContainer.appendChild(button));
   // movementContainer.appendChild(createRecordButton([Direction.UP, Direction.RIGHT, Direction.DOWN, Direction.LEFT]));
-
+  updateMoveButtonsDisabledState();
   controlsComponent.appendChild(movementContainer);
 
   toolContainer = createElement({
@@ -140,8 +140,23 @@ function createRecordButton(actions: TurnMove[]): HTMLElement {
   return recordButton;
 }
 
+const allDirections = [Direction.UP, Direction.RIGHT, Direction.DOWN, Direction.LEFT];
+
 function getAllMoveButtons(): HTMLElement[] {
-  return [Direction.UP, Direction.RIGHT, Direction.DOWN, Direction.LEFT].map(getMoveButton);
+  return allDirections.map(getMoveButton);
+}
+
+function updateMoveButtonsDisabledState() {
+  for (const direction of allDirections) {
+    const shouldDisable = globals.gameState && !isValidMove(globals.gameState, direction);
+    const button = getMoveButton(direction);
+
+    if (shouldDisable) {
+      button.setAttribute("disabled", "disabled");
+    } else {
+      button.removeAttribute("disabled");
+    }
+  }
 }
 
 const directionStyleMap: { [key in Direction]: string } = {
@@ -189,6 +204,7 @@ function setupEventListeners() {
     updateRecoveryInfoComponent();
     updateTurnMovesComponent();
     updateToolContainer();
+    updateMoveButtonsDisabledState();
   });
 
   document.addEventListener("keydown", (event) => {
@@ -273,6 +289,7 @@ async function handleMove(turnMove: TurnMove) {
   }
 
   updateRecoveryInfoComponent();
+  updateMoveButtonsDisabledState();
 }
 
 function updateTurnMovesComponent(isReset: boolean = false) {
@@ -280,6 +297,8 @@ function updateTurnMovesComponent(isReset: boolean = false) {
 
   const showMoves = globals.gameState && showMovesInfo(globals.gameState.setup);
   const showMoveLimit = globals.gameState && hasMoveLimit(globals.gameState.setup);
+
+  // console.debug("updateTurnMovesComponent", { showMoves, showMoveLimit, isReset, moves: globals.gameState?.moves });
 
   turnMovesContainer.style.display = showMoves ? "flex" : "none";
   const par = getParFromGameState(globals.gameState);

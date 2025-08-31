@@ -57,6 +57,10 @@
     white-space: nowrap;
   }
 
+  button[disabled] {
+    opacity: 0;
+  }
+
   @media (max-height: 600px) {
     padding: 0.5rem;
     padding-bottom: 0.5rem;
