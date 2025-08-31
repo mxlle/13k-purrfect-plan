@@ -29,8 +29,8 @@ export interface OnboardingData {
 const lastSetup: InitialSetup = (() => {
   const { _, M, t, o, c, T, O, C } = getCellTypePlaceholders();
   return [
-    [C, _, M, _, _],
-    [o, _, _, _, _],
+    [_, _, M, _, _],
+    [o, _, C, _, _],
     [_, O, _, T, _],
     [_, t, _, _, c],
     [_, _, _, _, _],
@@ -106,7 +106,7 @@ export function getOnboardingData(): OnboardingData | undefined {
     case OnboardingStep.LAST_SETUP:
       const gameSetupLast: GameSetup = {
         fieldSize: getFieldSizeFromInitialSetup(lastSetup),
-        elementPositions: getElementPositionsFormInitialSetup(lastSetup, [{ row: 0, column: 0 }]),
+        elementPositions: getElementPositionsFormInitialSetup(lastSetup, [{ row: 1, column: 2 }]),
         config: getValidatedConfig(allInConfig),
         possibleSolutions: [],
       };

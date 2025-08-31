@@ -6,7 +6,7 @@ import { getCatIdClass } from "../cat-component/cat-component";
 import { createElement } from "../../utils/html-utils";
 import { globals } from "../../globals";
 import { requestAnimationFrameWithTimeout } from "../../utils/promise-utils";
-import { generateRandomGameSetup, getInitialGameSetup, randomlyPlaceCatsOnField } from "../../logic/initialize";
+import { generateRandomGameSetup, getInitialGameSetup, randomlyPlaceGameElementsOnField } from "../../logic/initialize";
 import { handlePokiCommercial } from "../../poki-integration";
 import {
   getOnboardingData,
@@ -70,8 +70,7 @@ export async function initializeEmptyGameField(fieldSize: FieldSize) {
   gameFieldElem = generateGameFieldElement(fieldSize);
 
   const tempGameState = getInitialGameState(getInitialGameSetup());
-  await initializeObjectsOnGameField(tempGameState);
-  await initializeCatsOnGameField(tempGameState, undefined, true, true);
+  await initializeElementsOnGameField(tempGameState, undefined, true, true);
 
   appendGameField();
 }
@@ -87,9 +86,9 @@ async function shuffleFieldAnimation(config: Config) {
   gameFieldElem.append(loader);
 
   for (let i = 0; i < 2; i++) {
-    const randomState = getInitialGameState(randomlyPlaceCatsOnField(getInitialGameSetup(config), false));
+    const randomState = getInitialGameState(randomlyPlaceGameElementsOnField(getInitialGameSetup(config), false, true));
     const nextPositionsIfWait = calculateNewPositions(randomState, SpecialAction.WAIT);
-    await initializeCatsOnGameField(randomState, nextPositionsIfWait, false, true);
+    await initializeElementsOnGameField(randomState, nextPositionsIfWait, false, true);
     await requestAnimationFrameWithTimeout(TIMEOUT_BETWEEN_GAMES);
   }
 
@@ -200,9 +199,7 @@ export async function refreshFieldWithSetup(
     await requestAnimationFrameWithTimeout(TIMEOUT_BETWEEN_GAMES);
   }
 
-  await initializeObjectsOnGameField(globals.gameState);
-
-  await initializeCatsOnGameField(globals.gameState, globals.nextPositionsIfWait, isInitialStart, shouldResetToMiddle);
+  await initializeElementsOnGameField(globals.gameState, globals.nextPositionsIfWait, isInitialStart, shouldResetToMiddle);
 }
 
 function appendGameField() {
@@ -287,11 +284,11 @@ function addOnboardingSuggestionIfApplicable(onboardingData: OnboardingData | un
   }
 }
 
-export async function initializeCatsOnGameField(
+export async function initializeElementsOnGameField(
   gameState: GameState,
   nextPositionsIfWait: GameElementPositions | undefined,
   isInitialStart: boolean,
-  shouldResetToMiddle: boolean,
+  shouldResetToInitialPosition: boolean,
 ) {
   for (const catId of ALL_CAT_IDS) {
     const representation = gameState.representations[catId];
@@ -302,11 +299,26 @@ export async function initializeCatsOnGameField(
       // append if not already there
       if (!cellElement.contains(representation.htmlElement)) {
         cellElement.append(representation.htmlElement);
-      } else if (shouldResetToMiddle) {
+      } else if (shouldResetToInitialPosition) {
         representation.htmlElement.style.transform = "translate(0, 0)";
       }
 
       representation.htmlElement.classList.toggle(getCatIdClass(catId), gameState.setup.config[ConfigCategory.KITTEN_BEHAVIOR][catId]);
+    }
+  }
+
+  for (const objId of ALL_OBJECT_IDS) {
+    const representation = gameState.representations[objId];
+
+    if (representation) {
+      const cellElement = getCellElement(representation.initialPosition);
+
+      // append if not already there
+      if (!cellElement.contains(representation.htmlElement)) {
+        cellElement.append(representation.htmlElement);
+      } else if (shouldResetToInitialPosition) {
+        representation.htmlElement.style.transform = "translate(0, 0)";
+      }
     }
   }
 
@@ -315,17 +327,6 @@ export async function initializeCatsOnGameField(
   }
 
   updateAllPositions(gameState, nextPositionsIfWait);
-}
-
-export async function initializeObjectsOnGameField(gameState: GameState) {
-  for (const objId of ALL_OBJECT_IDS) {
-    const representation = gameState.representations[objId];
-
-    if (representation) {
-      const cellElement = getCellElement(representation.initialPosition);
-      cellElement.append(representation.htmlElement);
-    }
-  }
 }
 
 export function updateAllPositions(gameState: GameState, nextPositionsIfWait: GameElementPositions | undefined, hasWon: boolean = false) {

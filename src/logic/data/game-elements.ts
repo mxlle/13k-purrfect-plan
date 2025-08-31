@@ -7,6 +7,7 @@ import { Config } from "../config/config";
 import { ObjectId, TurnMove } from "../../types";
 import { FALLBACK_PAR, MAX_PAR } from "../par";
 import { globals } from "../../globals";
+import { getDefaultPlacedObjects } from "../onboarding";
 
 export type GameElementId = CatId | ObjectId;
 
@@ -43,13 +44,14 @@ export function isValidGameSetup(setup: GameSetup): boolean {
 export function getInitialGameState(setup: GameSetup): GameState {
   const representations: GameElementRepresentations = EMPTY_ELEMENT_MAP();
   const middlePosition = getMiddleCoordinates(setup.fieldSize);
+  const defaultObjectPositions = getDefaultPlacedObjects();
 
   for (const id of ALL_GAME_ELEMENT_IDS) {
     const position = setup.elementPositions[id];
     if (position) {
       representations[id] = {
         htmlElement: isObjectId(id) ? getObjectElement(id) : getCatElement(id),
-        initialPosition: isObjectId(id) ? position : middlePosition,
+        initialPosition: isObjectId(id) ? defaultObjectPositions[id] : middlePosition,
       };
     } else {
       representations[id] = null;
