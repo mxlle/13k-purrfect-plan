@@ -37,6 +37,7 @@
   place-items: center;
   border-radius: $border-radius;
   padding: 0.25rem;
+  text-wrap: balance;
 
   &:not(:global(.#{$CAT_BOX})) {
     background-color: $bg-alpha-05;
