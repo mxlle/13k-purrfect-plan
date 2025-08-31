@@ -8,7 +8,7 @@ import {
   RECOVERY_TIME_MAP,
   SpecialAction,
   Tool,
-  TurnMove,
+  TurnMove
 } from "../types";
 import { PubSubEvent, pubSubService } from "../utils/pub-sub-service";
 import { getKittensElsewhere, getKittensOnCell, isValidCellPosition } from "./checks";
@@ -22,7 +22,7 @@ import { deepCopyElementsMap, GameElementPositions, GameState, getParFromGameSta
 
 import { kittenMeows, meow } from "../components/cat-component/cat-component";
 import { globals } from "../globals";
-import { removeSpeechBubble, showSpeechBubble } from "../components/speech-bubble/speech-bubble";
+import { removeAllSpeechBubbles, showSpeechBubble } from "../components/speech-bubble/speech-bubble";
 import { getTranslation } from "../translations/i18n";
 import { TranslationKey } from "../translations/translationKey";
 import { pokiSdk } from "../poki-integration";
@@ -51,6 +51,8 @@ export async function performMove(gameState: GameState, turnMove: TurnMove) {
   isPerformingMove = true;
 
   try {
+    removeAllSpeechBubbles();
+
     gameState.moves.push(turnMove);
 
     const toolStartPromise = isTool(turnMove) ? preToolAction(gameState, turnMove) : Promise.resolve();
@@ -63,22 +65,24 @@ export async function performMove(gameState: GameState, turnMove: TurnMove) {
 
     globals.nextPositionsIfWait = calculateNewPositions(gameState, SpecialAction.WAIT);
 
-    updateAllPositions(gameState, globals.nextPositionsIfWait);
+    const hasWon = isWinConditionMet(gameState);
+
+    updateAllPositions(gameState, globals.nextPositionsIfWait, hasWon);
 
     isTool(turnMove) && (await postToolAction(gameState, turnMove));
 
     const newKittensOnCell = kittensOnCellAfter.filter((kitten) => !kittensOnCellBefore.includes(kitten));
     await kittenMeows(newKittensOnCell);
 
-    if (isWinConditionMet(gameState)) {
-      pubSubService.publish(PubSubEvent.GAME_END, { isWon: true });
+    if (hasWon) {
       await sleep(300); // to finish moving
       showSpeechBubble(gameState.representations[CatId.MOTHER].htmlElement, getTranslation(TranslationKey.UNITED));
+      pubSubService.publish(PubSubEvent.GAME_END, { isWon: true });
       await kittenMeows(ALL_KITTEN_IDS, true);
     } else if (hasLost(gameState)) {
-      pubSubService.publish(PubSubEvent.GAME_END, { isWon: false });
       await sleep(300); // to finish moving
       showSpeechBubble(gameState.representations[CatId.MOTHER].htmlElement, getTranslation(TranslationKey.LOST));
+      pubSubService.publish(PubSubEvent.GAME_END, { isWon: false });
     }
   } catch (error) {
     console.error("Error performing move:", error);
@@ -171,7 +175,7 @@ function doMoonMove(gameState: GameState): CellPosition {
 async function preToolAction(gameState: GameState, tool: Tool) {
   switch (tool) {
     case Tool.MEOW:
-      showSpeechBubble(gameState.representations[CatId.MOTHER].htmlElement, getTranslation(TranslationKey.MEOW));
+      showSpeechBubble(gameState.representations[CatId.MOTHER].htmlElement, getTranslation(TranslationKey.MEOW), MEOW_TIME);
 
       await Promise.all([meow(CatId.MOTHER), sleep(300)]); // Wait for meow speech bubble to appear
 
@@ -179,14 +183,8 @@ async function preToolAction(gameState: GameState, tool: Tool) {
   }
 }
 
-async function postToolAction(gameState: GameState, tool: Tool) {
-  switch (tool) {
-    case Tool.MEOW:
-      setTimeout(() => {
-        removeSpeechBubble(gameState.representations[CatId.MOTHER].htmlElement);
-      }, MEOW_TIME);
-      break;
-  }
+async function postToolAction(_gameState: GameState, _tool: Tool) {
+  // currently nothing
 }
 
 function executeTool(gameState: GameState, tool: Tool): GameElementPositions {

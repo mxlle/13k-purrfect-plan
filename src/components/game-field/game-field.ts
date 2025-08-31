@@ -38,7 +38,7 @@ import {
 import { calculateNewPositions, isWinConditionMet } from "../../logic/game-logic";
 import { getConfigComponent } from "../config/config-component";
 import { createConfigChooserComponent } from "../config-chooser/config-chooser-component";
-import { removeSpeechBubble } from "../speech-bubble/speech-bubble";
+import { removeAllSpeechBubbles } from "../speech-bubble/speech-bubble";
 import { getTranslation } from "../../translations/i18n";
 import { TranslationKey } from "../../translations/translationKey";
 
@@ -109,7 +109,7 @@ export async function startNewGame(options: { shouldIncreaseLevel: boolean } = {
     }
   }
 
-  if (mainContainer) removeSpeechBubble(mainContainer);
+  removeAllSpeechBubbles();
   document.body.classList.remove(CssClass.WON, CssClass.LOST);
 
   startButton?.remove();
@@ -216,6 +216,9 @@ function appendGameField() {
       tag: "main",
     });
     document.body.append(mainContainer);
+    mainContainer.addEventListener("scroll", () => {
+      removeAllSpeechBubbles();
+    });
   }
 
   mainContainer.append(gameFieldElem);
@@ -325,7 +328,7 @@ export async function initializeObjectsOnGameField(gameState: GameState) {
   }
 }
 
-export function updateAllPositions(gameState: GameState, nextPositionsIfWait: GameElementPositions | undefined) {
+export function updateAllPositions(gameState: GameState, nextPositionsIfWait: GameElementPositions | undefined, hasWon: boolean = false) {
   for (const gameElementId in gameState.representations) {
     const representation = gameState.representations[gameElementId as GameElementId];
     const position = gameState.currentPositions[gameElementId as GameElementId];
@@ -335,7 +338,7 @@ export function updateAllPositions(gameState: GameState, nextPositionsIfWait: Ga
     representation.htmlElement.style.transform = `translate(${diff.column * 100}%, ${diff.row * 100}%)`;
 
     if (gameElementId === ObjectId.MOON) {
-      if (!isValidCellPosition(gameState, position, ObjectId.MOON)) {
+      if (!isValidCellPosition(gameState, position, ObjectId.MOON) && !hasWon) {
         representation.htmlElement.style.opacity = "0";
         document.body.classList.toggle(CssClass.DARKNESS, true);
       } else {
