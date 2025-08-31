@@ -48,6 +48,7 @@ body {
   user-select: none;
   -webkit-tap-highlight-color: transparent;
   hyphens: auto;
+  text-wrap: balance;
   display: grid;
   grid-template-rows: min-content 1fr;
   overflow: hidden; // to hide dialogs
