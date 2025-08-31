@@ -331,14 +331,42 @@ function moveCatTowardsCell(gameState: GameState, catId: CatId, targetCell: Cell
 
   if (
     isValidCellPosition(gameState, horizontalPathCell, catId) &&
+    !isSameCell(horizontalPathCell, catPosition) &&
     (Math.abs(columnDiff) >= Math.abs(rowDiff) || !isValidCellPosition(gameState, verticalPathCell, catId))
   ) {
     // Move horizontal firsts
     return horizontalPathCell;
   }
 
-  if (isValidCellPosition(gameState, verticalPathCell, catId)) {
+  if (isValidCellPosition(gameState, verticalPathCell, catId) && !isSameCell(verticalPathCell, catPosition)) {
     return verticalPathCell;
+  }
+
+  // no move will bring the cat closer, navigate around the obstacle
+  if (rowDiff === 0) {
+    const alternativeRoute1 = { row: catPosition.row + 1, column: catPosition.column };
+    const alternativeRoute2 = { row: catPosition.row - 1, column: catPosition.column };
+
+    if (isValidCellPosition(gameState, alternativeRoute1, catId)) {
+      return alternativeRoute1;
+    }
+
+    if (isValidCellPosition(gameState, alternativeRoute2, catId)) {
+      return alternativeRoute2;
+    }
+  }
+
+  if (columnDiff === 0) {
+    const alternativeRoute1 = { row: catPosition.row, column: catPosition.column + 1 };
+    const alternativeRoute2 = { row: catPosition.row, column: catPosition.column - 1 };
+
+    if (isValidCellPosition(gameState, alternativeRoute1, catId)) {
+      return alternativeRoute1;
+    }
+
+    if (isValidCellPosition(gameState, alternativeRoute2, catId)) {
+      return alternativeRoute2;
+    }
   }
 
   return catPosition;
