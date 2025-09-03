@@ -30,6 +30,7 @@ let turnMovesComponent: HTMLElement | undefined;
 // let solutionsComponent: HTMLElement | undefined;
 let difficultyComponent: HTMLElement | undefined;
 let redoButton: HTMLElement | undefined;
+let retryInfo: HTMLElement | undefined;
 let toolContainer: HTMLElement | undefined;
 let hintButton: HTMLElement | undefined;
 let highlightedElement: HTMLElement | undefined;
@@ -58,18 +59,21 @@ export function createControlsComponent(): HTMLElement {
     cssClass: styles.difficultyBox,
   });
 
+  retryInfo = createElement({ cssClass: styles.retryInfo });
+
   redoButton = createElement({
     tag: "a",
     text: getTranslation(TranslationKey.RESTART_GAME),
     cssClass: CssClass.OPACITY_HIDDEN,
     onClick: () => {
-      pubSubService.publish(PubSubEvent.START_NEW_GAME, { shouldIncreaseLevel: false });
+      pubSubService.publish(PubSubEvent.START_NEW_GAME, { isDoOver: true });
     },
   });
 
   turnMovesContainer.appendChild(turnMovesComponent);
   // turnMovesContainer.appendChild(solutionsComponent);
   turnMovesContainer.appendChild(difficultyComponent);
+  turnMovesContainer.appendChild(retryInfo);
   turnMovesContainer.appendChild(redoButton);
 
   updateTurnMovesComponent();
@@ -277,28 +281,23 @@ export function addNewGameButtons(isInitialStart = false) {
   const continueButton = createButton({
     text: getTranslation(isInitialStart ? TranslationKey.START_GAME : isOnboarding() ? TranslationKey.CONTINUE : TranslationKey.NEW_GAME),
     onClick: () => {
-      pubSubService.publish(PubSubEvent.START_NEW_GAME);
+      pubSubService.publish(PubSubEvent.START_NEW_GAME, { isDoOver: false });
       newGameContainer.remove();
+      retryInfo?.classList.toggle(CssClass.HIDDEN, true);
     },
   });
-  hasAchievedGoal && continueButton.classList.add(CssClass.PRIMARY);
 
   newGameContainer.appendChild(continueButton);
 
-  if (!isInitialStart && hasMoveLimit(globals.gameState.setup.config)) {
+  if (!isInitialStart && hasMoveLimit(globals.gameState.setup.config) && !hasAchievedGoal) {
     const restartButton = createButton({
       text: getTranslation(TranslationKey.RESTART_GAME),
       onClick: () => {
-        pubSubService.publish(PubSubEvent.START_NEW_GAME, { shouldIncreaseLevel: false });
+        pubSubService.publish(PubSubEvent.START_NEW_GAME, { isDoOver: true });
         newGameContainer.remove();
       },
     });
-
-    if (!hasAchievedGoal && hasMoveLimit(globals.gameState.setup.config)) {
-      restartButton.classList.add(CssClass.PRIMARY);
-    } else {
-      continueButton.classList.toggle(CssClass.PRIMARY, true);
-    }
+    restartButton.classList.add(CssClass.PRIMARY);
 
     newGameContainer.appendChild(restartButton);
   } else {
@@ -357,6 +356,11 @@ function updateTurnMovesComponent(isReset: boolean = false) {
     difficultyComponent.append(
       isReset ? "?" : createElement({ cssClass: getCssClassForDifficulty(difficulty), text: getDifficultyRepresention(difficulty) }),
     );
+  }
+
+  if (retryInfo) {
+    retryInfo.classList.toggle(CssClass.HIDDEN, globals.failedAttempts === 0);
+    retryInfo.innerHTML = `${getTranslation(TranslationKey.RETRIES)}: ${Array.from({ length: globals.failedAttempts }, () => "I").join("")}`;
   }
 
   // if (redoButton) {

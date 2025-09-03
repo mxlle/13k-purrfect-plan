@@ -53,7 +53,7 @@ function init() {
   document.body.append(header);
 
   if (isOnboarding() || location.hash.length > 1) {
-    void startNewGame({ shouldIncreaseLevel: false });
+    void startNewGame({ isDoOver: false });
   } else {
     void initializeEmptyGameField(DEFAULT_FIELD_SIZE);
   }

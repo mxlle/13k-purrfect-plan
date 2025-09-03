@@ -11,13 +11,15 @@ export const PubSubEvent = defineEnum({
 });
 
 type EventDataTypes = {
-  [PubSubEvent.START_NEW_GAME]: { shouldIncreaseLevel: boolean };
+  [PubSubEvent.START_NEW_GAME]: { isDoOver: boolean };
   [PubSubEvent.GAME_START]: undefined;
   [PubSubEvent.GAME_END]: { isWon: boolean };
   [PubSubEvent.MUTE_MUSIC]: undefined;
   [PubSubEvent.UNMUTE_MUSIC]: undefined;
   [PubSubEvent.CLOSE_DIALOG]: boolean;
 };
+
+type PubSubEventWithData = typeof PubSubEvent.START_NEW_GAME | typeof PubSubEvent.GAME_END;
 
 type Callback<Event extends PubSubEvent> = (data: EventDataTypes[Event]) => void;
 
@@ -57,7 +59,9 @@ export class PubSubService {
   /**
    * Publishes an event.
    */
-  publish<Event extends PubSubEvent>(event: Event, data?: EventDataTypes[Event]) {
+  publish<Event extends Exclude<PubSubEvent, PubSubEventWithData>>(event: Event): void;
+  publish<Event extends PubSubEventWithData>(event: Event, data: EventDataTypes[Event]): void;
+  publish<Event extends PubSubEvent>(event: Event, data?: EventDataTypes[Event]): void {
     if (!this._subscriptions[event]) {
       return;
     }

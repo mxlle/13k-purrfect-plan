@@ -12,6 +12,7 @@ const deTranslations: Record<TranslationKey, string> = {
   [TranslationKey.START_GAME]: "Spiel starten",
   [TranslationKey.NEW_GAME]: "Neues Spiel",
   [TranslationKey.RESTART_GAME]: "Nochmal versuchen",
+  [TranslationKey.RETRIES]: "Neustarts",
   [TranslationKey.WIN]: "Gewonnen 🎉",
   [TranslationKey.CONTINUE]: "Weiter",
   [TranslationKey.BACK]: "Zurück",

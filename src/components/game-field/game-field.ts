@@ -95,12 +95,12 @@ async function shuffleFieldAnimation(config: Config) {
   loader.remove();
 }
 
-export async function startNewGame(options: { shouldIncreaseLevel: boolean } = { shouldIncreaseLevel: true }) {
+export async function startNewGame(options: { isDoOver: boolean }) {
   const isInitialStart = !globals.gameState;
   const notYetAllConfigItems = hasUnknownConfigItems();
   let newConfigItem: ConfigItemId | false = false;
 
-  if (isWinConditionMet(globals.gameState) && options.shouldIncreaseLevel) {
+  if (isWinConditionMet(globals.gameState) && !options.isDoOver) {
     increaseOnboardingStepIfApplicable();
 
     if (notYetAllConfigItems && !isOnboarding()) {
@@ -154,7 +154,7 @@ export async function startNewGame(options: { shouldIncreaseLevel: boolean } = {
   if (gameSetupFromUrl) {
     gameSetup = gameSetupFromUrl;
   } else {
-    if (!options.shouldIncreaseLevel && globals.gameState) {
+    if (options.isDoOver && globals.gameState) {
       gameSetup = globals.gameState.setup;
     } else {
       gameSetup = onboardingData ? onboardingData.gameSetup : await generateRandomGameWhileAnimating(getValidatedConfig(allInConfig));
@@ -165,7 +165,9 @@ export async function startNewGame(options: { shouldIncreaseLevel: boolean } = {
     throw new Error("Generated or provided game setup is invalid, cannot start game.", { cause: gameSetup });
   }
 
-  await refreshFieldWithSetup(gameSetup, onboardingData, false, options.shouldIncreaseLevel);
+  globals.failedAttempts = options.isDoOver ? globals.failedAttempts + 1 : 0;
+
+  await refreshFieldWithSetup(gameSetup, onboardingData, false, !options.isDoOver);
 
   addOnboardingSuggestionIfApplicable(onboardingData, newConfigItem);
 }

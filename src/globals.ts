@@ -10,6 +10,7 @@ interface GameGlobals {
   language: string;
   configMode: boolean;
   selectedGameElement?: GameElementId;
+  failedAttempts: number;
 }
 
 const onboardingStepSetting = getLocalStorageItem(LocalStorageKey.ONBOARDING_STEP);
@@ -21,6 +22,7 @@ const defaultGlobals: GameGlobals = {
   nextPositionsIfWait: undefined,
   language: "en",
   configMode: false,
+  failedAttempts: 0,
 };
 
 export const globals: GameGlobals = { ...defaultGlobals };
