@@ -24,7 +24,7 @@ export const enTranslations: Record<TranslationKey, string> = {
   [TranslationKey.EXPLANATION_IVY]: "Ivy loves to run around the tree.",
   [TranslationKey.EXPLANATION_SPLASHY]:
     "Splashy loves water and wants to play in it. Once she's in, you can only lure her out with Mom's meow.",
-  [TranslationKey.EXPLANATION_MEOW]: "When Mom meows, all kittens move one step closer. But you can only do this every 2 moves.",
+  [TranslationKey.EXPLANATION_MEOW]: "When Mom meows, all kittens move one step closer. But you can only do this every 3 moves.",
   [TranslationKey.EXPLANATION_MOVE_LIMIT_1]: "The moon moves across sky. Once it sets, darkness falls - but you can still finish.",
   [TranslationKey.EXPLANATION_MOVE_LIMIT_2]: "Unite all the kittens before the moon sets!",
   [TranslationKey.EXPLANATION_EMPTY]: "Your choice will be explained here.",

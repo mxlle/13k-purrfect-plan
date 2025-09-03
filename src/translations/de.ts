@@ -32,7 +32,7 @@ const deTranslations: Record<TranslationKey, string> = {
   [TranslationKey.EXPLANATION_IVY]: "Ivy liebt es, um den Baum herumzulaufen.",
   [TranslationKey.EXPLANATION_SPLASHY]:
     "Splashy liebt Wasser und möchte darin spielen. Ist sie erst einmal drin, kannst du sie nur mit Mamas Miauen herauslocken.",
-  [TranslationKey.EXPLANATION_MEOW]: "Wenn Mama miaut, kommen alle Kätzchen einen Schritt näher. Aber das geht nur alle 2 Züge.",
+  [TranslationKey.EXPLANATION_MEOW]: "Wenn Mama miaut, kommen alle Kätzchen einen Schritt näher. Aber das geht nur alle 3 Züge.",
   [TranslationKey.EXPLANATION_MOVE_LIMIT_1]:
     "Der Mond wird über das Feld wandern. Sobald er untergeht, wird das Feld dunkel, aber du kannst trotzdem weiterspielen.",
   [TranslationKey.EXPLANATION_MOVE_LIMIT_2]: "Du musst alle Kätzchen vereinen, bevor der Mond untergeht!",

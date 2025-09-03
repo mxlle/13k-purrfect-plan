@@ -55,7 +55,7 @@
 :global(.#{$CELL}) {
   .cat {
     &:not(.isMom) {
-      transform: scale(0.7) translate(var(--t-x, 0), 22%);
+      transform: scale(0.65) translate(var(--t-x, 0), 27%);
     }
 
     svg {
@@ -70,10 +70,6 @@
         }
       }
     }
-  }
-
-  .isMom {
-    transform: scale(0.95);
   }
 }
 
