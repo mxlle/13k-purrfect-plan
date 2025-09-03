@@ -9,7 +9,7 @@ import { copyGameSetup, EMPTY_ELEMENT_MAP, GameElementPositions, GameSetup, isVa
 import { calculatePar, MAX_PAR, MIN_PAR } from "./par";
 import { ALL_OBJECT_IDS, DEFAULT_MOON_POSITION } from "./data/objects";
 import { sleep } from "../utils/promise-utils";
-import { ConfigCategory, ObjectId } from "../types";
+import { ConfigCategory, Difficulty, ObjectId } from "../types";
 import { getRandomItem } from "../utils/array-utils";
 
 export function getInitialGameSetup(
@@ -101,6 +101,7 @@ export function randomlyPlaceGameElementsOnField(
   }
 
   let possibleSolutions = copiedGameSetup.possibleSolutions;
+  let difficulty: Difficulty | undefined;
 
   if (shouldCalculatePar) {
     const parInfo = calculatePar(copiedGameSetup);
@@ -112,11 +113,13 @@ export function randomlyPlaceGameElementsOnField(
     }
 
     possibleSolutions = parInfo.possibleSolutions;
+    difficulty = parInfo.difficulty;
   }
 
   return {
     ...copiedGameSetup,
     elementPositions: copiedGameSetup.elementPositions,
     possibleSolutions,
+    difficulty,
   };
 }

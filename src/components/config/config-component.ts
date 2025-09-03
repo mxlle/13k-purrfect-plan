@@ -74,6 +74,7 @@ function checkPossibleSolutions() {
     const newSetup = getNewSetupWithConfig(globals.gameState);
     const parInfo = calculatePar(newSetup);
     newSetup.possibleSolutions = parInfo.possibleSolutions;
+    newSetup.difficulty = parInfo.difficulty;
     void refreshFieldWithSetup(newSetup, undefined, false, false);
   }
 }

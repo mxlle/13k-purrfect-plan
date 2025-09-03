@@ -1,12 +1,17 @@
-import { ALL_TURN_MOVES, TurnMove } from "../types";
+import { ALL_TURN_MOVES, Difficulty, isDirection, TurnMove } from "../types";
 import { calculateNewPositions, isValidMove, isWinConditionMet } from "./game-logic";
 import { shuffleArray } from "../utils/random-utils";
 import { copyGameState, deepCopyElementsMap, GameSetup, GameState, getInitialGameState } from "./data/game-elements";
+import { difficultyEmoji } from "./difficulty";
+import { removeDuplicates } from "../utils/array-utils";
 
 interface ParInfo {
   par: number;
   possibleSolutions: TurnMove[][];
+  difficulty: Difficulty;
 }
+
+type ParInfoWithoutDifficulty = Omit<ParInfo, "difficulty">;
 
 let iterationCount = 1;
 
@@ -24,6 +29,7 @@ export function calculatePar(gameSetup: GameSetup, options: ParOptions = { retur
   const gameState = getInitialGameState(gameSetup);
   console.debug("Starting par calculation...");
   const parInfo = calculateParInner(gameState, options);
+  const difficulty = calculateDifficulty(gameState, parInfo);
   const performanceEnd = performance.now();
   const performanceTime = performanceEnd - performanceStart;
   console.info(
@@ -32,15 +38,55 @@ export function calculatePar(gameSetup: GameSetup, options: ParOptions = { retur
     "Time taken:",
     Math.round(performanceTime),
     "ms",
+    "Difficulty:",
+    difficultyEmoji[difficulty],
     parInfo.possibleSolutions.length + " solutions: ",
     parInfo.possibleSolutions,
   );
   console.info("First solution:", parInfo.possibleSolutions[0]?.join(" > "));
 
-  return parInfo;
+  return { par: parInfo.par, possibleSolutions: shuffleArray(parInfo.possibleSolutions), difficulty };
 }
 
-function calculateParInner(gameState: GameState, options: ParOptions): ParInfo {
+function calculateDifficulty(gameState: GameState, parInfo: ParInfoWithoutDifficulty): Difficulty {
+  const numberOfSolutions = parInfo.possibleSolutions.length;
+
+  if (numberOfSolutions <= 1) {
+    return Difficulty.HARD;
+  }
+
+  const containsSpecialMoves = parInfo.possibleSolutions.every((solution) => solution.some((move) => !isDirection(move)));
+  const containsSpecialMovesInBeginning = parInfo.possibleSolutions.every((solution) =>
+    solution.slice(0, 2).some((move) => !isDirection(move)),
+  );
+
+  if (numberOfSolutions < 5) {
+    if (containsSpecialMovesInBeginning) {
+      return Difficulty.HARD;
+    }
+
+    return Difficulty.MEDIUM;
+  }
+
+  const possibleStartMoves = getPossibleMoves(gameState, [...ALL_TURN_MOVES]);
+  const startMovesThatAllowWin = removeDuplicates(parInfo.possibleSolutions.map((solution) => solution[0]));
+  const probabilityToChooseCorrectStartMove = startMovesThatAllowWin.length / possibleStartMoves.length;
+
+  if (probabilityToChooseCorrectStartMove < 0.5) {
+    return Difficulty.MEDIUM;
+  }
+
+  if (containsSpecialMovesInBeginning) {
+    return Difficulty.MEDIUM;
+  }
+
+  if (numberOfSolutions < 10 && containsSpecialMoves) {
+    return Difficulty.MEDIUM;
+  }
+
+  return Difficulty.EASY;
+}
+function calculateParInner(gameState: GameState, options: ParOptions): ParInfoWithoutDifficulty {
   const previousMoves = gameState.moves;
 
   if (previousMoves.length === 0) {
@@ -58,11 +104,9 @@ function calculateParInner(gameState: GameState, options: ParOptions): ParInfo {
     return { par: FALLBACK_PAR, possibleSolutions: [previousMoves] }; // Limit the recursion depth to prevent excessive computation
   }
 
-  let bestParInfo: ParInfo = { par: FALLBACK_PAR, possibleSolutions: [] };
+  let bestParInfo: ParInfoWithoutDifficulty = { par: FALLBACK_PAR, possibleSolutions: [] };
 
-  const shuffledMoves = shuffleArray([...ALL_TURN_MOVES]);
-
-  for (const move of shuffledMoves) {
+  for (const move of getPossibleMoves(gameState, [...ALL_TURN_MOVES])) {
     if (!isValidMove(gameState, move)) {
       continue; // Tool is still in recovery, skip this move
     }
@@ -90,4 +134,8 @@ function calculateParInner(gameState: GameState, options: ParOptions): ParInfo {
   }
 
   return bestParInfo;
+}
+
+function getPossibleMoves(gameState: GameState, moves: TurnMove[]): TurnMove[] {
+  return moves.filter((move) => isValidMove(gameState, move));
 }

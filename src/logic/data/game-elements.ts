@@ -4,7 +4,7 @@ import { getObjectElement, isObjectId } from "./objects";
 import { CellPosition } from "./cell";
 import { FieldSize, getMiddleCoordinates } from "./field-size";
 import { Config } from "../config/config";
-import { ObjectId, TurnMove } from "../../types";
+import { Difficulty, ObjectId, TurnMove } from "../../types";
 import { FALLBACK_PAR, MAX_PAR } from "../par";
 import { globals } from "../../globals";
 import { getDefaultPlacedObjects, isOnboarding } from "../onboarding";
@@ -25,6 +25,7 @@ export interface GameSetup {
   elementPositions: GameElementPositions;
   config: Config;
   possibleSolutions: TurnMove[][];
+  difficulty?: Difficulty;
 }
 
 export interface GameState {

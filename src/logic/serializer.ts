@@ -40,5 +40,7 @@ export function deserializeGame(serializedGame: string): GameSetup {
     possibleSolutions: [],
   };
 
-  return { ...gameSetup, possibleSolutions: calculatePar(gameSetup).possibleSolutions };
+  const parInfo = calculatePar(gameSetup);
+
+  return { ...gameSetup, possibleSolutions: parInfo.possibleSolutions, difficulty: parInfo.difficulty };
 }

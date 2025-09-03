@@ -1,6 +1,6 @@
 import { createButton, createElement } from "../../utils/html-utils";
 import { CssClass } from "../../utils/css-class";
-import { ConfigCategory, Direction, isTool, RECOVERY_TIME_MAP, Tool, TurnMove } from "../../types";
+import { ConfigCategory, Difficulty, Direction, isTool, RECOVERY_TIME_MAP, Tool, TurnMove } from "../../types";
 
 import styles from "./controls-component.module.scss";
 import { getPossibleSolutionsCount, isValidMove, isWinConditionMet, performMove } from "../../logic/game-logic";
@@ -21,12 +21,14 @@ import { isOnboarding } from "../../logic/onboarding";
 import { hasMoveLimit, showMovesInfo } from "../../logic/config/config";
 import { FALLBACK_PAR } from "../../logic/par";
 import { getParFromGameState } from "../../logic/data/game-elements";
+import { getDifficultyRepresention } from "../../logic/difficulty";
 
 let hasSetupEventListeners = false;
 let controlsComponent: HTMLElement | undefined;
 let turnMovesContainer: HTMLElement | undefined;
 let turnMovesComponent: HTMLElement | undefined;
 let solutionsComponent: HTMLElement | undefined;
+let difficultyComponent: HTMLElement | undefined;
 let redoButton: HTMLElement | undefined;
 let toolContainer: HTMLElement | undefined;
 let recoveryInfoComponent: HTMLElement | undefined;
@@ -50,6 +52,10 @@ export function createControlsComponent(): HTMLElement {
     cssClass: styles.solutions,
   });
 
+  difficultyComponent = createElement({
+    cssClass: styles.difficultyBox,
+  });
+
   redoButton = createElement({
     tag: "a",
     text: getTranslation(TranslationKey.RESTART_GAME),
@@ -60,6 +66,7 @@ export function createControlsComponent(): HTMLElement {
 
   turnMovesContainer.appendChild(turnMovesComponent);
   turnMovesContainer.appendChild(solutionsComponent);
+  turnMovesContainer.appendChild(difficultyComponent);
   turnMovesContainer.appendChild(redoButton);
 
   updateTurnMovesComponent();
@@ -311,8 +318,30 @@ function updateTurnMovesComponent(isReset: boolean = false) {
     solutionsComponent.innerHTML = `${getTranslation(TranslationKey.POSSIBLE_SOLUTIONS)}: ${isReset ? "?" : (solutionsCount ?? "?")}`;
   }
 
+  if (difficultyComponent) {
+    const difficulty = globals.gameState?.setup.difficulty;
+    difficultyComponent.style.display = showMoveLimit && difficulty ? "flex" : "none";
+    difficultyComponent.innerHTML = `${getTranslation(TranslationKey.DIFFICULTY)}: `;
+    difficultyComponent.append(
+      isReset ? "?" : createElement({ cssClass: getCssClassForDifficulty(difficulty), text: getDifficultyRepresention(difficulty) }),
+    );
+  }
+
   if (redoButton) {
     redoButton.style.opacity = isReset || solutionsCount > 0 || !showMoveLimit ? "0" : "1";
+  }
+}
+
+function getCssClassForDifficulty(difficulty: Difficulty) {
+  switch (difficulty) {
+    case Difficulty.EASY:
+      return styles.easy;
+    case Difficulty.MEDIUM:
+      return styles.medium;
+    case Difficulty.HARD:
+      return styles.hard;
+    default:
+      return "";
   }
 }
 

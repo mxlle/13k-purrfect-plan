@@ -111,14 +111,28 @@
   }
 }
 
-.solutions {
+.solutions,
+.difficulty-box {
   font-size: 0.8rem;
   color: $text-tertiary;
   display: flex;
   gap: 0.4rem;
+}
 
-  &::before {
-    content: "💡 ";
+.difficulty-box {
+  > * {
+    display: flex;
+    gap: 0.25rem;
+
+    &.easy {
+      color: green;
+    }
+    &.medium {
+      color: orange;
+    }
+    &.hard {
+      color: red;
+    }
   }
 }
 

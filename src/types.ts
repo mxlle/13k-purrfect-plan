@@ -2,11 +2,6 @@ import { defineEnum } from "./utils/enums";
 import type { KittenId } from "./logic/data/catId";
 import { MoveLimit } from "./logic/config/move-limit";
 
-export interface Settings {
-  minAmount: number;
-  maxAmount: number;
-}
-
 export type Direction = defineEnum<typeof Direction>;
 export const Direction = defineEnum({
   UP: "up",
@@ -68,3 +63,11 @@ export const ConfigCategory = defineEnum({
   CONSTRAINTS: "Constraints",
 });
 export type ConfigItemId = KittenId | ObjectId | Tool | MoveLimit;
+
+export type Difficulty = (typeof Difficulty)[keyof typeof Difficulty];
+export const Difficulty = Object.freeze({
+  EASY: 1,
+  MEDIUM: 2,
+  HARD: 3,
+  EXTREME: 4,
+});
