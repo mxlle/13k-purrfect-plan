@@ -19,7 +19,7 @@ export const enTranslations: Record<TranslationKey, string> = {
   [TranslationKey.POSSIBLE_SOLUTIONS]: "Remaining solutions",
   [TranslationKey.CHOOSER_TITLE]: "What would you like to add next?",
   [TranslationKey.CHOICE_TOOL]: "New action",
-  [TranslationKey.CHOICE_CONSTRAINT]: "New rule",
+  [TranslationKey.CHOICE_RULE]: "New rule",
   [TranslationKey.CHOICE_KITTEN_BEHAVIOR]: "Kitten personality",
   [TranslationKey.EXPLANATION_MOONY]: "Moony loves the moon and will try to reach it.",
   [TranslationKey.EXPLANATION_IVY]: "Ivy loves to run around the tree.",

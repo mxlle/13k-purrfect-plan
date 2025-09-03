@@ -120,11 +120,11 @@ function getConfigCategoryElement(category: ConfigCategory): HTMLElement {
         contentElem.appendChild(toolElem);
       }
       break;
-    case ConfigCategory.CONSTRAINTS:
-      for (const constraint of Object.values(MoveLimit)) {
-        const constraintElem = createElement({ text: constraint });
-        transformToConfigItemElement(category, constraint, constraintElem);
-        contentElem.appendChild(constraintElem);
+    case ConfigCategory.RULES:
+      for (const rule of Object.values(MoveLimit)) {
+        const ruleElem = createElement({ text: rule });
+        transformToConfigItemElement(category, rule, ruleElem);
+        contentElem.appendChild(ruleElem);
       }
       break;
   }

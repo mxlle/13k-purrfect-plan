@@ -106,7 +106,7 @@ function getChoiceElement(configItem: ConfigItemId, chooseItem: (event: MouseEve
 
   if (isMoveLimit(configItem)) {
     return createElement({
-      text: getTranslation(TranslationKey.CHOICE_CONSTRAINT),
+      text: getTranslation(TranslationKey.CHOICE_RULE),
       onClick: (event) => {
         event.target.innerHTML = configItem;
         chooseItem(event);

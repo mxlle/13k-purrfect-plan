@@ -10,7 +10,7 @@ export interface Config {
   [ConfigCategory.KITTEN_BEHAVIOR]: Record<KittenId, boolean>;
   [ConfigCategory.OBJECTS]: Record<ObjectId, boolean>;
   [ConfigCategory.TOOLS]: Record<Tool, boolean>;
-  [ConfigCategory.CONSTRAINTS]: {
+  [ConfigCategory.RULES]: {
     moveLimit: MoveLimit;
   };
 }
@@ -19,7 +19,7 @@ export const emptyConfig: Config = {
   [ConfigCategory.KITTEN_BEHAVIOR]: Object.fromEntries(ALL_KITTEN_IDS.map((catId) => [catId, false])) as Record<KittenId, boolean>,
   [ConfigCategory.OBJECTS]: Object.fromEntries(Object.values(ObjectId).map((type) => [type, false])) as Record<ObjectId, boolean>,
   [ConfigCategory.TOOLS]: Object.fromEntries(Object.values(Tool).map((tool) => [tool, false])) as Record<Tool, boolean>,
-  [ConfigCategory.CONSTRAINTS]: {
+  [ConfigCategory.RULES]: {
     moveLimit: MoveLimit.MOVE_LIMIT_NONE,
   },
 };
@@ -27,7 +27,7 @@ export const allInConfig: Config = {
   [ConfigCategory.KITTEN_BEHAVIOR]: Object.fromEntries(ALL_KITTEN_IDS.map((catId) => [catId, true])) as Record<KittenId, boolean>,
   [ConfigCategory.OBJECTS]: Object.fromEntries(Object.values(ObjectId).map((type) => [type, true])) as Record<ObjectId, boolean>,
   [ConfigCategory.TOOLS]: Object.fromEntries(Object.values(Tool).map((tool) => [tool, true])) as Record<Tool, boolean>,
-  [ConfigCategory.CONSTRAINTS]: {
+  [ConfigCategory.RULES]: {
     moveLimit: MoveLimit.MOVE_LIMIT_STRICT,
   },
 };
@@ -39,7 +39,7 @@ export function shouldApplyKittenBehavior(gameSetup: GameSetup, catId: CatId): b
 }
 
 export function showMovesInfo(config: Config): boolean {
-  return config[ConfigCategory.CONSTRAINTS].moveLimit !== MoveLimit.MOVE_LIMIT_NONE;
+  return config[ConfigCategory.RULES].moveLimit !== MoveLimit.MOVE_LIMIT_NONE;
 }
 
 export function showMoon(config: Config) {
@@ -47,7 +47,7 @@ export function showMoon(config: Config) {
 }
 
 export function hasMoveLimit(config: Config): boolean {
-  return config[ConfigCategory.CONSTRAINTS].moveLimit === MoveLimit.MOVE_LIMIT_STRICT;
+  return config[ConfigCategory.RULES].moveLimit === MoveLimit.MOVE_LIMIT_STRICT;
 }
 
 export function copyConfig(config: Config): Config {
@@ -55,7 +55,7 @@ export function copyConfig(config: Config): Config {
     [ConfigCategory.KITTEN_BEHAVIOR]: { ...config[ConfigCategory.KITTEN_BEHAVIOR] },
     [ConfigCategory.OBJECTS]: { ...config[ConfigCategory.OBJECTS] },
     [ConfigCategory.TOOLS]: { ...config[ConfigCategory.TOOLS] },
-    [ConfigCategory.CONSTRAINTS]: { ...config[ConfigCategory.CONSTRAINTS] },
+    [ConfigCategory.RULES]: { ...config[ConfigCategory.RULES] },
   };
 }
 
@@ -118,7 +118,7 @@ export function getValidatedConfig(config: Config): Config {
       }
     }
 
-    if (category === ConfigCategory.CONSTRAINTS) {
+    if (category === ConfigCategory.RULES) {
       validatedConfig[category].moveLimit = getHighestMoveLimit(knownConfigItems);
     }
   }

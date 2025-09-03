@@ -59,7 +59,7 @@ export const ConfigCategory = defineEnum({
   KITTEN_BEHAVIOR: "Kitten Behavior",
   OBJECTS: "Objects",
   TOOLS: "Tools",
-  CONSTRAINTS: "Constraints",
+  RULES: "Rules",
 });
 export type ConfigItemId = KittenId | ObjectId | Tool | MoveLimit;
 
