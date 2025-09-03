@@ -45,9 +45,8 @@ export const ALL_TURN_MOVES = [...Object.values(Direction), ...Object.values(Too
 export type OnboardingStep = defineEnum<typeof OnboardingStep>;
 export const OnboardingStep = defineEnum({
   INTRO: 0,
-  INTRO_SECOND_CAT: 1,
-  INTERMEDIATE_OBJECTS: 2,
-  LAST_SETUP: 3,
+  INTERMEDIATE_OBJECTS: 1,
+  LAST_SETUP: 2,
 });
 export type ObjectId = defineEnum<typeof ObjectId>;
 export const ObjectId = defineEnum({

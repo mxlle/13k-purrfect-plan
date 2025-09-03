@@ -29,10 +29,10 @@ export interface OnboardingData {
 const lastSetup: InitialSetup = (() => {
   const { _, M, t, o, c, T, O, C } = getCellTypePlaceholders();
   return [
-    [_, _, M, _, _],
-    [o, _, C, _, _],
+    [_, _, _, _, _],
+    [_, M, C, c, _],
     [_, O, _, T, _],
-    [_, t, _, _, c],
+    [_, t, _, o, _],
     [_, _, _, _, _],
   ];
 })();
@@ -47,21 +47,19 @@ export function getOnboardingData(): OnboardingData | undefined {
 
   switch (step) {
     case OnboardingStep.INTRO:
-    case OnboardingStep.INTRO_SECOND_CAT:
       const introSetup: InitialSetup = (() => {
         const { _, M, t, o, c, T, O, C } = getCellTypePlaceholders();
         return [
           [_, _, _],
           [_, M, _],
-          [_, c, t],
+          [_, c, _],
         ];
       })();
       const isFirstStep = step === OnboardingStep.INTRO;
-      skipPositions = isFirstStep ? [{ row: 2, column: 2 }] : [];
 
       const gameSetupIntro: GameSetup = {
         fieldSize: getFieldSizeFromInitialSetup(introSetup),
-        elementPositions: getElementPositionsFormInitialSetup(introSetup, skipPositions),
+        elementPositions: getElementPositionsFormInitialSetup(introSetup),
         config: {
           ...emptyConfig,
         },
