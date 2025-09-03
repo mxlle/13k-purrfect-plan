@@ -34,4 +34,5 @@ export const TranslationKey = defineEnum({
   LOST: 29,
   MEOW: 30,
   LOADING: 31,
+  HINT: 32,
 });

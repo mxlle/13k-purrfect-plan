@@ -93,7 +93,7 @@ button {
   background-color: $bg-alpha-05;
   padding: 0.5rem 1rem;
   border-radius: $border-radius;
-  white-space: nowrap;
+  hyphens: none;
 
   @include hover {
     background-color: $bg-alpha-10;
@@ -106,6 +106,13 @@ button {
     @include hover {
       background-color: rgba($main-color, 0.7);
     }
+  }
+
+  &.#{$SECONDARY} {
+    font-size: 0.8rem;
+    color: $text-tertiary;
+    border: none;
+    padding: 0.25rem 0.5rem;
   }
 
   &[disabled] {
@@ -155,4 +162,9 @@ ul {
 
 .#{$HIDDEN} {
   display: none !important;
+}
+
+.#{$OPACITY_HIDDEN} {
+  opacity: 0 !important;
+  pointer-events: none !important;
 }

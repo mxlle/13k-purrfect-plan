@@ -1,9 +1,9 @@
 import { createButton, createElement } from "../../utils/html-utils";
 import { CssClass } from "../../utils/css-class";
-import { ConfigCategory, Difficulty, Direction, isTool, RECOVERY_TIME_MAP, Tool, TurnMove } from "../../types";
+import { ConfigCategory, Difficulty, Direction, isSpecialAction, isTool, RECOVERY_TIME_MAP, Tool, TurnMove } from "../../types";
 
 import styles from "./controls-component.module.scss";
-import { isValidMove, isWinConditionMet, performMove } from "../../logic/game-logic";
+import { getBestNextMove, isValidMove, isWinConditionMet, performMove } from "../../logic/game-logic";
 import { getArrowComponent } from "../arrow-component/arrow-component";
 import {
   ActiveRecording,
@@ -29,8 +29,10 @@ let turnMovesContainer: HTMLElement | undefined;
 let turnMovesComponent: HTMLElement | undefined;
 // let solutionsComponent: HTMLElement | undefined;
 let difficultyComponent: HTMLElement | undefined;
-// let redoButton: HTMLElement | undefined;
+let redoButton: HTMLElement | undefined;
 let toolContainer: HTMLElement | undefined;
+let hintButton: HTMLElement | undefined;
+let highlightedElement: HTMLElement | undefined;
 let recoveryInfoComponent: HTMLElement | undefined;
 let activeRecording: ActiveRecording | undefined;
 let toolsFrozenUntilTurn: number | undefined;
@@ -56,18 +58,19 @@ export function createControlsComponent(): HTMLElement {
     cssClass: styles.difficultyBox,
   });
 
-  // redoButton = createElement({
-  //   tag: "a",
-  //   text: getTranslation(TranslationKey.RESTART_GAME),
-  //   onClick: () => {
-  //     pubSubService.publish(PubSubEvent.START_NEW_GAME, { shouldIncreaseLevel: false });
-  //   },
-  // });
+  redoButton = createElement({
+    tag: "a",
+    text: getTranslation(TranslationKey.RESTART_GAME),
+    cssClass: CssClass.OPACITY_HIDDEN,
+    onClick: () => {
+      pubSubService.publish(PubSubEvent.START_NEW_GAME, { shouldIncreaseLevel: false });
+    },
+  });
 
   turnMovesContainer.appendChild(turnMovesComponent);
   // turnMovesContainer.appendChild(solutionsComponent);
   turnMovesContainer.appendChild(difficultyComponent);
-  // turnMovesContainer.appendChild(redoButton);
+  turnMovesContainer.appendChild(redoButton);
 
   updateTurnMovesComponent();
 
@@ -93,6 +96,25 @@ export function createControlsComponent(): HTMLElement {
   toolContainer.appendChild(getToolButton(Tool.MEOW));
   toolContainer.appendChild(recoveryInfoComponent);
   controlsComponent.appendChild(toolContainer);
+
+  hintButton = createButton({
+    text: `🦉 ${getTranslation(TranslationKey.HINT)}`,
+    onClick: () => {
+      if (!globals.gameState) return;
+
+      hintButton.setAttribute("disabled", "disabled");
+
+      const hint = getBestNextMove(globals.gameState);
+      if (hint !== undefined && !isSpecialAction(hint)) {
+        activateOnboardingHighlight(hint);
+      } else {
+        redoButton.classList.remove(CssClass.OPACITY_HIDDEN);
+        redoButton.classList.add(styles.onboardingHighlight);
+      }
+    },
+  });
+  hintButton.classList.add(CssClass.SECONDARY);
+  controlsComponent.appendChild(hintButton);
 
   updateToolContainer();
 
@@ -207,6 +229,9 @@ function setupEventListeners() {
 
   pubSubService.subscribe(PubSubEvent.GAME_START, () => {
     controlsComponent.classList.remove(styles.disabled);
+    redoButton.classList.remove(styles.onboardingHighlight);
+    redoButton.classList.toggle(CssClass.OPACITY_HIDDEN, true);
+    hintButton.removeAttribute("disabled");
     toolsFrozenUntilTurn = undefined;
     updateRecoveryInfoComponent();
     updateTurnMovesComponent();
@@ -260,7 +285,7 @@ export function addNewGameButtons(isInitialStart = false) {
 
   newGameContainer.appendChild(continueButton);
 
-  if (!isInitialStart && showMovesInfo(globals.gameState.setup.config)) {
+  if (!isInitialStart && hasMoveLimit(globals.gameState.setup.config)) {
     const restartButton = createButton({
       text: getTranslation(TranslationKey.RESTART_GAME),
       onClick: () => {
@@ -288,6 +313,13 @@ async function handleMove(turnMove: TurnMove) {
     return;
   }
 
+  if (highlightedElement) {
+    highlightedElement.classList.remove(styles.onboardingHighlight);
+    highlightedElement = undefined;
+  }
+
+  hintButton.removeAttribute("disabled");
+
   await performMove(globals.gameState, turnMove);
   updateTurnMovesComponent();
 
@@ -312,7 +344,7 @@ function updateTurnMovesComponent(isReset: boolean = false) {
   const parString = par && showMoveLimit && !isReset ? ` / ${par < FALLBACK_PAR ? par : "?"}` : "";
   turnMovesComponent.innerHTML = `${getTranslation(TranslationKey.MOVES)}: ${isReset ? 0 : (globals.gameState?.moves.length ?? 0)}${parString}`;
 
-  // const solutionsCount = getPossibleSolutionsCount(globals.gameState);
+  // const solutionsCount = globals.gameState ? getRemainingSolutions(globals.gameState).length : undefined;
   // if (solutionsComponent) {
   //   solutionsComponent.style.display = showMoveLimit ? "flex" : "none";
   //   solutionsComponent.innerHTML = `${getTranslation(TranslationKey.POSSIBLE_SOLUTIONS)}: ${isReset ? "?" : (solutionsCount ?? "?")}`;
@@ -365,6 +397,10 @@ function updateRecoveryInfoComponent() {
 }
 
 function updateToolContainer() {
+  if (hintButton) {
+    hintButton.classList.toggle(CssClass.HIDDEN, !globals.gameState || !hasMoveLimit(globals.gameState.setup.config));
+  }
+
   if (!toolContainer || !globals.gameState) return;
 
   const shouldHaveTools = Object.values(globals.gameState.setup.config[ConfigCategory.TOOLS]).some(Boolean);
@@ -373,11 +409,6 @@ function updateToolContainer() {
 }
 
 export function activateOnboardingHighlight(action: Direction | Tool) {
-  const actionComponent = getControlButton(action);
-  actionComponent.classList.add(styles.onboardingHighlight);
-
-  actionComponent.addEventListener("click", function listener() {
-    actionComponent.classList.remove(styles.onboardingHighlight);
-    actionComponent.removeEventListener("click", listener);
-  });
+  highlightedElement = getControlButton(action);
+  highlightedElement.classList.add(styles.onboardingHighlight);
 }

@@ -3,7 +3,7 @@ import { TranslationKey } from "./translationKey";
 export const enTranslations: Record<TranslationKey, string> = {
   [TranslationKey.START_GAME]: "Start game",
   [TranslationKey.NEW_GAME]: "New game",
-  [TranslationKey.RESTART_GAME]: "Restart",
+  [TranslationKey.RESTART_GAME]: "Try again",
   [TranslationKey.WIN]: "You win 🎉",
   [TranslationKey.CONTINUE]: "Next",
   [TranslationKey.BACK]: "Back",
@@ -34,4 +34,5 @@ export const enTranslations: Record<TranslationKey, string> = {
   [TranslationKey.LOST]: "Oh no!",
   [TranslationKey.MEOW]: "Meow",
   [TranslationKey.LOADING]: "Loading...",
+  [TranslationKey.HINT]: "Hint",
 };

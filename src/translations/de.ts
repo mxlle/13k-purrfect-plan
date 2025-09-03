@@ -11,7 +11,7 @@ export function getDeTranslationMap(): Record<TranslationKey, string> {
 const deTranslations: Record<TranslationKey, string> = {
   [TranslationKey.START_GAME]: "Spiel starten",
   [TranslationKey.NEW_GAME]: "Neues Spiel",
-  [TranslationKey.RESTART_GAME]: "Wiederholen",
+  [TranslationKey.RESTART_GAME]: "Nochmal versuchen",
   [TranslationKey.WIN]: "Gewonnen 🎉",
   [TranslationKey.CONTINUE]: "Weiter",
   [TranslationKey.BACK]: "Zurück",
@@ -43,4 +43,5 @@ const deTranslations: Record<TranslationKey, string> = {
   [TranslationKey.LOST]: "Oh nein!",
   [TranslationKey.MEOW]: "Miau",
   [TranslationKey.LOADING]: "Laden...",
+  [TranslationKey.HINT]: "Hinweis",
 };
