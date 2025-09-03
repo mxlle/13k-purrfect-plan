@@ -3,7 +3,7 @@ import { shuffleArray } from "../utils/random-utils";
 import { getAllCellPositions, getEmptyFields } from "./checks";
 import { ALL_CAT_IDS } from "./data/catId";
 import { CellPosition, isSameCell } from "./data/cell";
-import { allInConfig, Config, getValidatedConfig, hasMoveLimit, showMoon } from "./config/config";
+import { allInConfig, Config, getValidatedConfig, hasMoveLimit, hasUnknownConfigItems, showMoon } from "./config/config";
 import { DEFAULT_FIELD_SIZE, FieldSize, getMiddleCoordinates } from "./data/field-size";
 import { copyGameSetup, EMPTY_ELEMENT_MAP, GameElementPositions, GameSetup, isValidGameSetup } from "./data/game-elements";
 import { calculatePar, MAX_PAR, MIN_PAR } from "./par";
@@ -11,6 +11,9 @@ import { ALL_OBJECT_IDS, DEFAULT_MOON_POSITION } from "./data/objects";
 import { sleep } from "../utils/promise-utils";
 import { ConfigCategory, Difficulty, ObjectId } from "../types";
 import { getRandomItem } from "../utils/array-utils";
+import { difficultyEmoji } from "./difficulty";
+
+const MAX_ITERATIONS_FOR_RANDOM_PLACEMENT = 10;
 
 export function getInitialGameSetup(
   config: Config = getValidatedConfig(allInConfig),
@@ -106,8 +109,11 @@ export function randomlyPlaceGameElementsOnField(
   if (shouldCalculatePar) {
     const parInfo = calculatePar(copiedGameSetup);
 
-    if ((parInfo.par > MAX_PAR || parInfo.par < MIN_PAR) && iteration < 10) {
-      console.info("not a good setup");
+    if (
+      (parInfo.par > MAX_PAR || parInfo.par < MIN_PAR || (parInfo.difficulty >= Difficulty.HARD && hasUnknownConfigItems())) &&
+      iteration < MAX_ITERATIONS_FOR_RANDOM_PLACEMENT
+    ) {
+      console.info("not a good setup", parInfo.par, difficultyEmoji[parInfo.difficulty]);
 
       return randomlyPlaceGameElementsOnField(copiedGameSetup, shouldCalculatePar, randomMoonPosition, iteration + 1);
     }
