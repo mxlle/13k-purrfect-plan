@@ -5,7 +5,7 @@ import { Difficulty } from "../../types";
 const XP_REP = "🧶";
 const XP_FOR_UNION = 10;
 const XP_FOR_RETRY = -1;
-export const XP_FOR_HINT = -2;
+export const XP_FOR_HINT = -5;
 
 const difficultyBonusXPMap: Record<Difficulty, number> = {
   [Difficulty.EASY]: 0,
