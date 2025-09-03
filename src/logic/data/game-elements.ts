@@ -25,7 +25,7 @@ export interface GameSetup {
   elementPositions: GameElementPositions;
   config: Config;
   possibleSolutions: TurnMove[][];
-  difficulty?: Difficulty;
+  difficulty?: Difficulty | undefined;
 }
 
 export interface GameState {

@@ -22,7 +22,7 @@ import { hasMoveLimit, showMovesInfo } from "../../logic/config/config";
 import { FALLBACK_PAR } from "../../logic/par";
 import { getParFromGameState } from "../../logic/data/game-elements";
 import { getDifficultyRepresention } from "../../logic/difficulty";
-import { getXPString, XP_FOR_HINT } from "../../logic/data/experience-points";
+import { calculateNewXP, getXPString, XP_FOR_HINT } from "../../logic/data/experience-points";
 
 let hasSetupEventListeners = false;
 let controlsComponent: HTMLElement | undefined;
@@ -302,6 +302,20 @@ export function addNewGameButtons(isInitialStart = false) {
       reshowControls();
     },
   });
+
+  if (hasAchievedGoal) {
+    const newXP = calculateNewXP();
+    const xpButton = createButton({
+      text: getTranslation(TranslationKey.COLLECT_XP, getXPString(newXP)),
+      onClick: () => {
+        pubSubService.publish(PubSubEvent.UPDATE_XP, newXP);
+        xpButton.classList.toggle(CssClass.HIDDEN, true);
+        continueButton.classList.toggle(CssClass.HIDDEN, false);
+      },
+    });
+    newGameContainer.appendChild(xpButton);
+    continueButton.classList.toggle(CssClass.HIDDEN, true);
+  }
 
   newGameContainer.appendChild(continueButton);
 

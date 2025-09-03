@@ -8,7 +8,7 @@ import { isOnboarding } from "./logic/onboarding";
 import { DEFAULT_FIELD_SIZE } from "./logic/data/field-size";
 import { CssClass } from "./utils/css-class";
 import { sleep } from "./utils/promise-utils";
-import { calculateNewXP, changeXP, getCurrentXP, getXPString } from "./logic/data/experience-points";
+import { changeXP, getCurrentXP, getXPString } from "./logic/data/experience-points";
 import { animateNumber } from "./utils/custom-animation-util";
 
 let titleElement: HTMLElement;
@@ -74,11 +74,6 @@ function init() {
     result.isWon && document.body.classList.add(CssClass.WON);
     !result.isWon && document.body.classList.add(CssClass.LOST);
 
-    if (result.isWon) {
-      const newXP = calculateNewXP();
-      updateXpWithAnimation(newXP);
-    }
-
     if (import.meta.env.POKI_ENABLED === "true") {
       sleep(300).then(() => pokiSdk.gameplayStop()); // to avoid issue that stop is called before start
     }
@@ -94,7 +89,7 @@ function updateXpWithAnimation(newXP: number) {
   const targetXP = changeXP(newXP);
 
   animateNumber({
-    keyframeDuration: 1000,
+    keyframeDuration: 500,
     initialState: oldXP,
     nextState: () => targetXP,
     onProgress: (current) => {

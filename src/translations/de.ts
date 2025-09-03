@@ -45,4 +45,5 @@ const deTranslations: Record<TranslationKey, string> = {
   [TranslationKey.MEOW]: "Miau",
   [TranslationKey.LOADING]: "Laden...",
   [TranslationKey.HINT]: "Hinweis",
+  [TranslationKey.COLLECT_XP]: "+{0} einsammeln",
 };

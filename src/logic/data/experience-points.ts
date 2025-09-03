@@ -1,10 +1,18 @@
 import { getLocalStorageItem, LocalStorageKey, setLocalStorageItem } from "../../utils/local-storage";
 import { globals } from "../../globals";
+import { Difficulty } from "../../types";
 
 const XP_REP = "🧶";
 const XP_FOR_UNION = 10;
 const XP_FOR_RETRY = -1;
 export const XP_FOR_HINT = -2;
+
+const difficultyBonusXPMap: Record<Difficulty, number> = {
+  [Difficulty.EASY]: 0,
+  [Difficulty.MEDIUM]: 1,
+  [Difficulty.HARD]: 3,
+  [Difficulty.EXTREME]: 5,
+};
 
 export function getCurrentXP(): number {
   const stringValue = getLocalStorageItem(LocalStorageKey.XP);
@@ -27,5 +35,8 @@ export function calculateNewXP(): number {
     return 0;
   }
 
-  return XP_FOR_UNION + globals.failedAttempts * XP_FOR_RETRY;
+  const difficulty = globals.gameState.setup.difficulty;
+  const difficultyBonusXP = difficulty ? difficultyBonusXPMap[difficulty] : 0;
+
+  return XP_FOR_UNION + globals.failedAttempts * XP_FOR_RETRY + difficultyBonusXP;
 }

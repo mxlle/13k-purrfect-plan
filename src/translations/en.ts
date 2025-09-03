@@ -36,4 +36,5 @@ export const enTranslations: Record<TranslationKey, string> = {
   [TranslationKey.MEOW]: "Meow",
   [TranslationKey.LOADING]: "Loading...",
   [TranslationKey.HINT]: "Hint",
+  [TranslationKey.COLLECT_XP]: "Collect +{0}",
 };
