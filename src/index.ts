@@ -8,8 +8,11 @@ import { isOnboarding } from "./logic/onboarding";
 import { DEFAULT_FIELD_SIZE } from "./logic/data/field-size";
 import { CssClass } from "./utils/css-class";
 import { sleep } from "./utils/promise-utils";
+import { calculateNewXP, changeXP, getCurrentXP, getXPString } from "./logic/data/experience-points";
+import { animateNumber } from "./utils/custom-animation-util";
 
 let titleElement: HTMLElement;
+let xpElement: HTMLElement;
 
 // const initializeMuted = getLocalStorageItem(LocalStorageKey.MUTED) === "true";
 
@@ -30,11 +33,11 @@ function init() {
 
   header.append(titleElement);
 
-  if (import.meta.env.DEV) {
-    const btnContainer = createElement({
-      cssClass: "h-btns",
-    });
+  const btnContainer = createElement({
+    cssClass: "h-btns",
+  });
 
+  if (import.meta.env.DEV) {
     // const muteButton = createButton({
     //   text: initializeMuted ? "🔇" : "🔊",
     //   onClick: (event: MouseEvent) => {
@@ -45,10 +48,15 @@ function init() {
     // });
     //
     // btnContainer.append(muteButton);
-    header.append(btnContainer);
 
     btnContainer.append(createButton({ text: "⚙️", onClick: () => toggleConfig(), cssClass: CssClass.ICON_BTN }));
   }
+
+  xpElement = createElement();
+  updateXpElement();
+  btnContainer.append(xpElement);
+
+  header.append(btnContainer);
 
   document.body.append(header);
 
@@ -66,10 +74,39 @@ function init() {
     result.isWon && document.body.classList.add(CssClass.WON);
     !result.isWon && document.body.classList.add(CssClass.LOST);
 
+    if (result.isWon) {
+      const newXP = calculateNewXP();
+      updateXpWithAnimation(newXP);
+    }
+
     if (import.meta.env.POKI_ENABLED === "true") {
       sleep(300).then(() => pokiSdk.gameplayStop()); // to avoid issue that stop is called before start
     }
   });
+
+  pubSubService.subscribe(PubSubEvent.UPDATE_XP, (newXP) => {
+    updateXpWithAnimation(newXP);
+  });
+}
+
+function updateXpWithAnimation(newXP: number) {
+  const oldXP = getCurrentXP();
+  const targetXP = changeXP(newXP);
+
+  animateNumber({
+    keyframeDuration: 1000,
+    initialState: oldXP,
+    nextState: () => targetXP,
+    onProgress: (current) => {
+      updateXpElement(Math.round(current));
+    },
+    exitState: targetXP,
+    iterationCount: 1,
+  });
+}
+
+function updateXpElement(xp: number = getCurrentXP()) {
+  xpElement.innerHTML = getXPString(xp);
 }
 
 // INIT

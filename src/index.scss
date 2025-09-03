@@ -65,12 +65,12 @@ main {
   grid-template-columns: minmax(min-content, 1fr) minmax(360px, 1fr);
   place-items: center;
   margin: 0 auto;
-  width: min-content;
+  max-width: min-content;
 
   @media (orientation: portrait) {
     grid-template-columns: 1fr;
     grid-template-rows: min-content auto;
-    width: auto;
+    max-width: initial;
   }
 }
 
@@ -81,10 +81,11 @@ header {
   align-items: center;
   gap: 1rem;
 
-  //.h-btns {
-  //  display: flex;
-  //  gap: 0.5rem;
-  //}
+  .h-btns {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
 }
 
 button {

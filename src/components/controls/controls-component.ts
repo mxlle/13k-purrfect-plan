@@ -22,6 +22,7 @@ import { hasMoveLimit, showMovesInfo } from "../../logic/config/config";
 import { FALLBACK_PAR } from "../../logic/par";
 import { getParFromGameState } from "../../logic/data/game-elements";
 import { getDifficultyRepresention } from "../../logic/difficulty";
+import { getXPString, XP_FOR_HINT } from "../../logic/data/experience-points";
 
 let hasSetupEventListeners = false;
 let controlsComponent: HTMLElement | undefined;
@@ -31,6 +32,7 @@ let turnMovesComponent: HTMLElement | undefined;
 let difficultyComponent: HTMLElement | undefined;
 let redoButton: HTMLElement | undefined;
 let retryInfo: HTMLElement | undefined;
+let movementContainer: HTMLElement | undefined;
 let toolContainer: HTMLElement | undefined;
 let hintButton: HTMLElement | undefined;
 let highlightedElement: HTMLElement | undefined;
@@ -80,7 +82,7 @@ export function createControlsComponent(): HTMLElement {
 
   controlsComponent.appendChild(turnMovesContainer);
 
-  const movementContainer = createElement({
+  movementContainer = createElement({
     cssClass: styles.movementControls,
   });
 
@@ -102,11 +104,12 @@ export function createControlsComponent(): HTMLElement {
   controlsComponent.appendChild(toolContainer);
 
   hintButton = createButton({
-    text: `🦉 ${getTranslation(TranslationKey.HINT)}`,
+    text: `🦉 ${getTranslation(TranslationKey.HINT)} ${getXPString(XP_FOR_HINT)}`,
     onClick: () => {
       if (!globals.gameState) return;
 
       hintButton.setAttribute("disabled", "disabled");
+      pubSubService.publish(PubSubEvent.UPDATE_XP, XP_FOR_HINT);
 
       const hint = getBestNextMove(globals.gameState);
       if (hint !== undefined && !isSpecialAction(hint)) {
@@ -123,11 +126,23 @@ export function createControlsComponent(): HTMLElement {
   updateToolContainer();
 
   if (!globals.gameState && !isOnboarding()) {
-    controlsComponent.appendChild(addNewGameButtons(true));
-    controlsComponent.classList.add(styles.disabled);
+    showNewGameButtons(true);
   }
 
   return controlsComponent;
+}
+
+function showNewGameButtons(isInitialStart = false) {
+  movementContainer.append(addNewGameButtons(isInitialStart));
+  movementContainer.classList.toggle(styles.disabled, true);
+  toolContainer.classList.toggle(CssClass.OPACITY_HIDDEN, true);
+  hintButton.classList.toggle(CssClass.OPACITY_HIDDEN, true);
+}
+
+function reshowControls() {
+  movementContainer.classList.toggle(styles.disabled, false);
+  toolContainer.classList.toggle(CssClass.OPACITY_HIDDEN, false);
+  hintButton.classList.toggle(CssClass.OPACITY_HIDDEN, false);
 }
 
 async function toggleRecordSoundEffect(btn: HTMLButtonElement, actions: TurnMove[]) {
@@ -224,7 +239,7 @@ function setupEventListeners() {
   pubSubService.subscribe(PubSubEvent.GAME_END, () => {
     if (!controlsComponent) return;
 
-    controlsComponent.appendChild(addNewGameButtons());
+    showNewGameButtons();
   });
 
   pubSubService.subscribe(PubSubEvent.START_NEW_GAME, () => {
@@ -284,6 +299,7 @@ export function addNewGameButtons(isInitialStart = false) {
       pubSubService.publish(PubSubEvent.START_NEW_GAME, { isDoOver: false });
       newGameContainer.remove();
       retryInfo?.classList.toggle(CssClass.HIDDEN, true);
+      reshowControls();
     },
   });
 
@@ -295,6 +311,7 @@ export function addNewGameButtons(isInitialStart = false) {
       onClick: () => {
         pubSubService.publish(PubSubEvent.START_NEW_GAME, { isDoOver: true });
         newGameContainer.remove();
+        reshowControls();
       },
     });
     restartButton.classList.add(CssClass.PRIMARY);

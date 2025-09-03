@@ -13,6 +13,7 @@ export const LocalStorageKey = defineEnum({
   DIFFICULTY_EXTREME: "d8y3",
   SOUND: "sound",
   KNOWN_CONFIG_ELEMENTS: "knownConfig",
+  XP: "xp",
 });
 
 export function setLocalStorageItem(key: LocalStorageKey, value: string | false, postfix?: string) {

@@ -8,6 +8,7 @@ export const PubSubEvent = defineEnum({
   MUTE_MUSIC: 3,
   UNMUTE_MUSIC: 4,
   CLOSE_DIALOG: 5,
+  UPDATE_XP: 6,
 });
 
 type EventDataTypes = {
@@ -17,9 +18,14 @@ type EventDataTypes = {
   [PubSubEvent.MUTE_MUSIC]: undefined;
   [PubSubEvent.UNMUTE_MUSIC]: undefined;
   [PubSubEvent.CLOSE_DIALOG]: boolean;
+  [PubSubEvent.UPDATE_XP]: number;
 };
 
-type PubSubEventWithData = typeof PubSubEvent.START_NEW_GAME | typeof PubSubEvent.GAME_END;
+type PubSubEventWithData =
+  | typeof PubSubEvent.START_NEW_GAME
+  | typeof PubSubEvent.GAME_END
+  | typeof PubSubEvent.CLOSE_DIALOG
+  | typeof PubSubEvent.UPDATE_XP;
 
 type Callback<Event extends PubSubEvent> = (data: EventDataTypes[Event]) => void;
 
