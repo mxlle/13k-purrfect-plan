@@ -103,6 +103,7 @@
 .movesContainer {
   flex-direction: column;
   gap: 0.25rem;
+  justify-self: start;
 }
 
 .moves {

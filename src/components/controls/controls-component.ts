@@ -3,7 +3,7 @@ import { CssClass } from "../../utils/css-class";
 import { ConfigCategory, Difficulty, Direction, isTool, RECOVERY_TIME_MAP, Tool, TurnMove } from "../../types";
 
 import styles from "./controls-component.module.scss";
-import { getPossibleSolutionsCount, isValidMove, isWinConditionMet, performMove } from "../../logic/game-logic";
+import { isValidMove, isWinConditionMet, performMove } from "../../logic/game-logic";
 import { getArrowComponent } from "../arrow-component/arrow-component";
 import {
   ActiveRecording,
@@ -27,9 +27,9 @@ let hasSetupEventListeners = false;
 let controlsComponent: HTMLElement | undefined;
 let turnMovesContainer: HTMLElement | undefined;
 let turnMovesComponent: HTMLElement | undefined;
-let solutionsComponent: HTMLElement | undefined;
+// let solutionsComponent: HTMLElement | undefined;
 let difficultyComponent: HTMLElement | undefined;
-let redoButton: HTMLElement | undefined;
+// let redoButton: HTMLElement | undefined;
 let toolContainer: HTMLElement | undefined;
 let recoveryInfoComponent: HTMLElement | undefined;
 let activeRecording: ActiveRecording | undefined;
@@ -48,26 +48,26 @@ export function createControlsComponent(): HTMLElement {
     cssClass: styles.moves,
   });
 
-  solutionsComponent = createElement({
-    cssClass: styles.solutions,
-  });
+  // solutionsComponent = createElement({
+  //   cssClass: styles.solutions,
+  // });
 
   difficultyComponent = createElement({
     cssClass: styles.difficultyBox,
   });
 
-  redoButton = createElement({
-    tag: "a",
-    text: getTranslation(TranslationKey.RESTART_GAME),
-    onClick: () => {
-      pubSubService.publish(PubSubEvent.START_NEW_GAME, { shouldIncreaseLevel: false });
-    },
-  });
+  // redoButton = createElement({
+  //   tag: "a",
+  //   text: getTranslation(TranslationKey.RESTART_GAME),
+  //   onClick: () => {
+  //     pubSubService.publish(PubSubEvent.START_NEW_GAME, { shouldIncreaseLevel: false });
+  //   },
+  // });
 
   turnMovesContainer.appendChild(turnMovesComponent);
-  turnMovesContainer.appendChild(solutionsComponent);
+  // turnMovesContainer.appendChild(solutionsComponent);
   turnMovesContainer.appendChild(difficultyComponent);
-  turnMovesContainer.appendChild(redoButton);
+  // turnMovesContainer.appendChild(redoButton);
 
   updateTurnMovesComponent();
 
@@ -312,11 +312,11 @@ function updateTurnMovesComponent(isReset: boolean = false) {
   const parString = par && showMoveLimit && !isReset ? ` / ${par < FALLBACK_PAR ? par : "?"}` : "";
   turnMovesComponent.innerHTML = `${getTranslation(TranslationKey.MOVES)}: ${isReset ? 0 : (globals.gameState?.moves.length ?? 0)}${parString}`;
 
-  const solutionsCount = getPossibleSolutionsCount(globals.gameState);
-  if (solutionsComponent) {
-    solutionsComponent.style.display = showMoveLimit ? "flex" : "none";
-    solutionsComponent.innerHTML = `${getTranslation(TranslationKey.POSSIBLE_SOLUTIONS)}: ${isReset ? "?" : (solutionsCount ?? "?")}`;
-  }
+  // const solutionsCount = getPossibleSolutionsCount(globals.gameState);
+  // if (solutionsComponent) {
+  //   solutionsComponent.style.display = showMoveLimit ? "flex" : "none";
+  //   solutionsComponent.innerHTML = `${getTranslation(TranslationKey.POSSIBLE_SOLUTIONS)}: ${isReset ? "?" : (solutionsCount ?? "?")}`;
+  // }
 
   if (difficultyComponent) {
     const difficulty = globals.gameState?.setup.difficulty;
@@ -327,9 +327,9 @@ function updateTurnMovesComponent(isReset: boolean = false) {
     );
   }
 
-  if (redoButton) {
-    redoButton.style.opacity = isReset || solutionsCount > 0 || !showMoveLimit ? "0" : "1";
-  }
+  // if (redoButton) {
+  //   redoButton.style.opacity = isReset || solutionsCount > 0 || !showMoveLimit ? "0" : "1";
+  // }
 }
 
 function getCssClassForDifficulty(difficulty: Difficulty) {
