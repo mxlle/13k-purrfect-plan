@@ -171,12 +171,10 @@ a {
 .flyAwayElement {
   position: absolute;
   top: 0;
-  right: 0.5rem;
+  right: 0;
   transition:
     transform 1s ease-in,
     opacity 1s linear;
-  opacity: 1;
-  font-size: 2em;
 }
 
 @keyframes boxShadowPulse {

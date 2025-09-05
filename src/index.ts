@@ -89,7 +89,7 @@ function updateXpWithAnimation(newXP: number) {
   const targetXP = changeXP(newXP);
 
   animateNumber({
-    keyframeDuration: 500,
+    keyframeDuration: Math.abs(newXP) * 80,
     initialState: oldXP,
     nextState: () => targetXP,
     onProgress: (current) => {

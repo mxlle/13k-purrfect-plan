@@ -22,8 +22,8 @@ import { hasMoveLimit, showMovesInfo } from "../../logic/config/config";
 import { FALLBACK_PAR } from "../../logic/par";
 import { getParFromGameState } from "../../logic/data/game-elements";
 import { getDifficultyRepresention } from "../../logic/difficulty";
-import { calculateNewXP, getXPString, XP_FOR_HINT } from "../../logic/data/experience-points";
-import { sleep } from "../../utils/promise-utils";
+import { calculateNewXP, getXPString, XP_FOR_HINT, XP_REP } from "../../logic/data/experience-points";
+import { requestAnimationFrameWithTimeout, sleep } from "../../utils/promise-utils";
 
 let hasSetupEventListeners = false;
 let controlsComponent: HTMLElement | undefined;
@@ -109,8 +109,8 @@ export function createControlsComponent(): HTMLElement {
     onClick: async () => {
       if (!globals.gameState) return;
 
-      // hintButton.setAttribute("disabled", "disabled");
-      await animateXpFlyAway(XP_FOR_HINT, hintButton);
+      hintButton.setAttribute("disabled", "disabled");
+      await animateXpFlyAway(getXPString(XP_FOR_HINT), hintButton);
       pubSubService.publish(PubSubEvent.UPDATE_XP, XP_FOR_HINT);
 
       const hint = getBestNextMove(globals.gameState);
@@ -310,8 +310,10 @@ export function addNewGameButtons(isInitialStart = false) {
     const xpButton = createButton({
       text: getTranslation(TranslationKey.COLLECT_XP, getXPString(newXP)),
       onClick: async () => {
-        await animateXpFlyAway(newXP, xpButton);
-        pubSubService.publish(PubSubEvent.UPDATE_XP, newXP);
+        sleep(500).then(() => {
+          pubSubService.publish(PubSubEvent.UPDATE_XP, newXP);
+        });
+        await flyMultipleXpAway(newXP, xpButton);
         xpButton.classList.toggle(CssClass.HIDDEN, true);
         continueButton.classList.toggle(CssClass.HIDDEN, false);
       },
@@ -451,16 +453,34 @@ export function activateOnboardingHighlight(action: Direction | Tool) {
   highlightedElement.classList.add(styles.onboardingHighlight);
 }
 
-async function animateXpFlyAway(xp: number, source: HTMLElement) {
-  const flyAwayElement = createElement({ text: (xp > 0 ? "+" : "") + getXPString(xp), cssClass: styles.flyAwayElement });
+async function flyMultipleXpAway(xp: number, source: HTMLElement) {
+  const delay = 500 / xp;
+  for (let i = 0; i < xp; i++) {
+    const mod = i / xp;
+    const xMod = 0.5 + (i % 2 === 0 ? -1 : 1) * mod * 0.3;
+    const hueRotate = xMod * 360;
+    void animateXpFlyAway(XP_REP, source, xMod, hueRotate);
+
+    await requestAnimationFrameWithTimeout(delay);
+  }
+}
+
+async function animateXpFlyAway(text: string, source: HTMLElement, xMod: number = 0.5, hueRotate: number = 0) {
+  console.debug("animateXpFlyAway", { text, xMod });
+  const flyAwayElement = createElement({ text, cssClass: styles.flyAwayElement });
   const sourceRect = source.getBoundingClientRect();
   const diffXFromTopRight = sourceRect.right - document.body.clientWidth;
-  const diffYFromTopRight = sourceRect.top;
+  const diffYFromTopRight = sourceRect.top - sourceRect.height / 2;
+  const additionalOffset = sourceRect.width * xMod * -1;
 
-  flyAwayElement.style.setProperty("transform", `translate(${diffXFromTopRight}px, ${diffYFromTopRight}px)`);
+  flyAwayElement.style.setProperty(
+    "transform",
+    `translate(calc(50% + ${diffXFromTopRight + additionalOffset}px), calc(50% + ${diffYFromTopRight}px)) scale(2)`,
+  );
+  flyAwayElement.style.setProperty("filter", `hue-rotate(${hueRotate}deg)`);
   document.body.appendChild(flyAwayElement);
 
-  await sleep(0);
+  await requestAnimationFrameWithTimeout(0);
 
   flyAwayElement.classList.add(CssClass.OPACITY_HIDDEN);
   flyAwayElement.style.removeProperty("transform");

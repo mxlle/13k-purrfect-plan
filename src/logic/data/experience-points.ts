@@ -2,7 +2,7 @@ import { getLocalStorageItem, LocalStorageKey, setLocalStorageItem } from "../..
 import { globals } from "../../globals";
 import { Difficulty } from "../../types";
 
-const XP_REP = "🧶";
+export const XP_REP = "🧶";
 const XP_FOR_UNION = 10;
 const XP_FOR_RETRY = -1;
 export const XP_FOR_HINT = -5;
