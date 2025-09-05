@@ -18,7 +18,7 @@ import { TranslationKey } from "../../translations/translationKey";
 import { globals } from "../../globals";
 import { isOnboarding } from "../../logic/onboarding";
 
-import { hasMoveLimit, showMovesInfo } from "../../logic/config/config";
+import { hasMoveLimit, hasUnknownConfigItems, showMovesInfo } from "../../logic/config/config";
 import { FALLBACK_PAR } from "../../logic/par";
 import { getParFromGameState } from "../../logic/data/game-elements";
 import { getDifficultyRepresention } from "../../logic/difficulty";
@@ -296,7 +296,13 @@ export function addNewGameButtons(isInitialStart = false) {
   const newGameContainer = createElement({ cssClass: styles.newGameContainer });
 
   const continueButton = createButton({
-    text: getTranslation(isInitialStart ? TranslationKey.START_GAME : isOnboarding() ? TranslationKey.CONTINUE : TranslationKey.NEW_GAME),
+    text: getTranslation(
+      isInitialStart
+        ? TranslationKey.START_GAME
+        : isOnboarding() || hasUnknownConfigItems()
+          ? TranslationKey.CONTINUE
+          : TranslationKey.NEW_GAME,
+    ),
     onClick: () => {
       pubSubService.publish(PubSubEvent.START_NEW_GAME, { isDoOver: false });
       newGameContainer.remove();

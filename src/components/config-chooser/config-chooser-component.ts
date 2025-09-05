@@ -28,6 +28,10 @@ export async function createConfigChooserComponent(): Promise<ConfigItemId | fal
   const choices = getNextChoice();
   const choiceElements = choices.map((choice, index) => {
     function chooseItem(event: MouseEvent) {
+      if (selectedConfigItem) {
+        return;
+      }
+
       explanationElement.innerHTML = getTranslation(explanationMap[choice]);
       explanationElement.classList.add(styles.active);
       header.innerHTML = getTranslation(TranslationKey.YOUR_CHOICE);
