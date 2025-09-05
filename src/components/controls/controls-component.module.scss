@@ -168,6 +168,17 @@ a {
   }
 }
 
+.flyAwayElement {
+  position: absolute;
+  top: 0;
+  right: 0.5rem;
+  transition:
+    transform 1s ease-in,
+    opacity 1s linear;
+  opacity: 1;
+  font-size: 2em;
+}
+
 @keyframes boxShadowPulse {
   0% {
     box-shadow: 0 0 0 0 rgba($text-primary, 0.5);

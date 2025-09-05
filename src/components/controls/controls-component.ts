@@ -23,6 +23,7 @@ import { FALLBACK_PAR } from "../../logic/par";
 import { getParFromGameState } from "../../logic/data/game-elements";
 import { getDifficultyRepresention } from "../../logic/difficulty";
 import { calculateNewXP, getXPString, XP_FOR_HINT } from "../../logic/data/experience-points";
+import { sleep } from "../../utils/promise-utils";
 
 let hasSetupEventListeners = false;
 let controlsComponent: HTMLElement | undefined;
@@ -104,11 +105,12 @@ export function createControlsComponent(): HTMLElement {
   controlsComponent.appendChild(toolContainer);
 
   hintButton = createButton({
-    text: `🦉 ${getTranslation(TranslationKey.HINT)} ${getXPString(XP_FOR_HINT)}`,
-    onClick: () => {
+    text: `${getTranslation(TranslationKey.HINT)} ${getXPString(XP_FOR_HINT)}`,
+    onClick: async () => {
       if (!globals.gameState) return;
 
-      hintButton.setAttribute("disabled", "disabled");
+      // hintButton.setAttribute("disabled", "disabled");
+      await animateXpFlyAway(XP_FOR_HINT, hintButton);
       pubSubService.publish(PubSubEvent.UPDATE_XP, XP_FOR_HINT);
 
       const hint = getBestNextMove(globals.gameState);
@@ -307,7 +309,8 @@ export function addNewGameButtons(isInitialStart = false) {
     const newXP = calculateNewXP();
     const xpButton = createButton({
       text: getTranslation(TranslationKey.COLLECT_XP, getXPString(newXP)),
-      onClick: () => {
+      onClick: async () => {
+        await animateXpFlyAway(newXP, xpButton);
         pubSubService.publish(PubSubEvent.UPDATE_XP, newXP);
         xpButton.classList.toggle(CssClass.HIDDEN, true);
         continueButton.classList.toggle(CssClass.HIDDEN, false);
@@ -446,4 +449,25 @@ function updateToolContainer() {
 export function activateOnboardingHighlight(action: Direction | Tool) {
   highlightedElement = getControlButton(action);
   highlightedElement.classList.add(styles.onboardingHighlight);
+}
+
+async function animateXpFlyAway(xp: number, source: HTMLElement) {
+  const flyAwayElement = createElement({ text: (xp > 0 ? "+" : "") + getXPString(xp), cssClass: styles.flyAwayElement });
+  const sourceRect = source.getBoundingClientRect();
+  const diffXFromTopRight = sourceRect.right - document.body.clientWidth;
+  const diffYFromTopRight = sourceRect.top;
+
+  flyAwayElement.style.setProperty("transform", `translate(${diffXFromTopRight}px, ${diffYFromTopRight}px)`);
+  document.body.appendChild(flyAwayElement);
+
+  await sleep(0);
+
+  flyAwayElement.classList.add(CssClass.OPACITY_HIDDEN);
+  flyAwayElement.style.removeProperty("transform");
+
+  await sleep(500);
+
+  sleep(500).then(() => {
+    flyAwayElement.remove();
+  });
 }
