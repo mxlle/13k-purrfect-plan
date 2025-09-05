@@ -464,7 +464,7 @@ async function flyMultipleXpAway(xp: number, source: HTMLElement) {
   for (let i = 0; i < xp; i++) {
     const mod = i / xp;
     const xMod = 0.5 + (i % 2 === 0 ? -1 : 1) * mod * 0.3;
-    const hueRotate = xMod * 360;
+    const hueRotate = mod * 360;
     void animateXpFlyAway(XP_REP, source, xMod, hueRotate);
 
     await requestAnimationFrameWithTimeout(delay);
