@@ -26,8 +26,8 @@ export function changeXP(newXP: number) {
   return newTotalXP;
 }
 
-export function getXPString(xp: number = getCurrentXP()): string {
-  return `${xp !== 0 ? `${xp} ${XP_REP}` : ""}`;
+export function getXpInnerHtml(xp: number = getCurrentXP()): string {
+  return `${xp !== 0 ? `${xp}&nbsp;${XP_REP}` : ""}`;
 }
 
 export function calculateNewXP(): number {

@@ -1,7 +1,7 @@
 import { createButton, createElement, resetTransform } from "../../utils/html-utils";
 import { getTranslation } from "../../translations/i18n";
 import { TranslationKey } from "../../translations/translationKey";
-import { getXPString, XP_REP } from "../../logic/data/experience-points";
+import { getXpInnerHtml, XP_REP } from "../../logic/data/experience-points";
 import { requestAnimationFrameWithTimeout, sleep } from "../../utils/promise-utils";
 import { PubSubEvent, pubSubService } from "../../utils/pub-sub-service";
 import { CssClass } from "../../utils/css-class";
@@ -9,7 +9,7 @@ import styles from "./xp-components.module.scss";
 
 export function getCollectXpButton(newXp: number, afterCollect: () => void): HTMLElement {
   const xpButton = createButton({
-    text: getTranslation(TranslationKey.COLLECT_XP, getXPString(newXp)),
+    html: getTranslation(TranslationKey.COLLECT_XP, getXpInnerHtml(newXp)),
     onClick: async () => {
       sleep(500).then(() => {
         pubSubService.publish(PubSubEvent.UPDATE_XP, newXp);
@@ -35,9 +35,9 @@ async function flyMultipleXpAway(xp: number, source: HTMLElement) {
   }
 }
 
-export async function animateXpFlyAway(text: string, source: HTMLElement, xMod: number = 0.5, hueRotate: number = 0) {
-  // console.debug("animateXpFlyAway", { text, xMod });
-  const flyAwayElement = createElement({ text, cssClass: styles.flyAwayElement });
+export async function animateXpFlyAway(html: string, source: HTMLElement, xMod: number = 0.5, hueRotate: number = 0) {
+  // console.debug("animateXpFlyAway", { html, xMod });
+  const flyAwayElement = createElement({ html, cssClass: styles.flyAwayElement });
   const sourceRect = source.getBoundingClientRect();
   const diffXFromTopRight = sourceRect.right - document.body.clientWidth;
   const diffYFromTopRight = sourceRect.top - sourceRect.height / 2;

@@ -13,7 +13,7 @@ import { isOnboarding } from "../../../logic/onboarding";
 
 import { hasMoveLimit, hasUnknownConfigItems } from "../../../logic/config/config";
 import { getParFromGameState } from "../../../logic/data/game-elements";
-import { calculateNewXP, getXPString, XP_FOR_HINT } from "../../../logic/data/experience-points";
+import { calculateNewXP, getXpInnerHtml, XP_FOR_HINT } from "../../../logic/data/experience-points";
 import {
   getGameInfoComponent,
   hideRetryInfo,
@@ -46,12 +46,12 @@ export function getControlsComponent(): HTMLElement {
   toolContainer.append(getToolButton(Tool.MEOW), recoveryInfoComponent);
 
   hintButton = createButton({
-    text: `${getTranslation(TranslationKey.HINT)} ${getXPString(XP_FOR_HINT)}`,
+    html: `${getTranslation(TranslationKey.HINT)} ${getXpInnerHtml(XP_FOR_HINT)}`,
     onClick: async () => {
       if (!globals.gameState) return;
 
       hintButton.setAttribute("disabled", "disabled");
-      await animateXpFlyAway(getXPString(XP_FOR_HINT), hintButton);
+      await animateXpFlyAway(getXpInnerHtml(XP_FOR_HINT), hintButton);
       pubSubService.publish(PubSubEvent.UPDATE_XP, XP_FOR_HINT);
 
       const hint = getBestNextMove(globals.gameState);
