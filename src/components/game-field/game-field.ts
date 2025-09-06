@@ -49,7 +49,6 @@ let startButton: HTMLElement | undefined;
 const cellElements: HTMLElement[][] = [];
 
 const TIMEOUT_BETWEEN_GAMES = 300;
-const TIMEOUT_CELL_APPEAR = -1;
 
 export async function initializeEmptyGameField(fieldSize: FieldSize) {
   if (gameFieldElem) {
@@ -87,14 +86,14 @@ async function shuffleFieldAnimation(config: Config) {
 
 export async function startNewGame(options: { isDoOver: boolean }) {
   const notYetAllConfigItems = hasUnknownConfigItems();
-  let newConfigItem: ConfigItemId | false = false;
+  let newConfigItem: ConfigItemId | boolean = false;
 
   if (isWinConditionMet(globals.gameState) && !options.isDoOver) {
     increaseOnboardingStepIfApplicable();
+  }
 
-    if (notYetAllConfigItems && !isOnboarding()) {
-      newConfigItem = await createConfigChooserComponent();
-    }
+  if (notYetAllConfigItems && !isOnboarding()) {
+    newConfigItem = await createConfigChooserComponent();
   }
 
   removeAllSpeechBubbles();
@@ -222,7 +221,7 @@ export function generateGameFieldElement(fieldSize: FieldSize) {
   return gameField;
 }
 
-function addOnboardingSuggestionIfApplicable(onboardingData: OnboardingData | undefined, newConfigItem: ConfigItemId | false) {
+function addOnboardingSuggestionIfApplicable(onboardingData: OnboardingData | undefined, newConfigItem: ConfigItemId | boolean) {
   if (onboardingData?.highlightedAction && !isSpecialAction(onboardingData?.highlightedAction)) {
     activateOnboardingHighlight(onboardingData?.highlightedAction);
   } else if (newConfigItem && isTool(newConfigItem)) {

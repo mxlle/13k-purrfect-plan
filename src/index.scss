@@ -173,3 +173,10 @@ ul {
   opacity: 0 !important;
   pointer-events: none !important;
 }
+
+a {
+  font-size: 0.8rem;
+  color: $main-color-tertiary;
+  text-decoration: underline;
+  cursor: pointer;
+}

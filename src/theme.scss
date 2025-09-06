@@ -1,6 +1,9 @@
 @use "./names" as *;
+@use "sass:color";
 
 $main-color: #e02890;
+$main-color-secondary: color.mix($main-color, white, 80%);
+$main-color-tertiary: color.mix($main-color, white, 50%);
 $danger-color: #bd2751;
 $danger-color-contrast: var(--d-clr, #e06d80);
 $success-color: #227744;

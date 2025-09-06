@@ -18,10 +18,10 @@
   position: relative;
   height: min(40vh, 40vw);
   width: min(40vh, 40vw);
-  cursor: pointer;
   display: grid;
   place-items: center;
   background-color: $bg-alpha-05;
+  color: $main-color-secondary;
   border-radius: $border-radius;
   padding: 0.25rem;
   transition:
@@ -30,6 +30,15 @@
 
   @media (min-height: 750px) {
     font-size: 1.5em;
+  }
+
+  &.selected {
+    transform: translateX(var(--t-x, 0)) scale(1.2);
+  }
+
+  &:not(.selected):hover {
+    cursor: pointer;
+    background-color: $bg-alpha-10;
   }
 
   :global(.#{$CAT_BOX}) {

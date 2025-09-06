@@ -1,6 +1,6 @@
 import { createDialog, Dialog } from "../dialog/dialog";
 import { createElement } from "../../utils/html-utils";
-import { explanationMap, getNextUnknownConfigItems, updateKnownConfigItems } from "../../logic/config/config";
+import { allConfigItems, explanationMap, getNextUnknownConfigItems, updateKnownConfigItems } from "../../logic/config/config";
 import { shuffleArray } from "../../utils/random-utils";
 import { getCatElement, isCatId } from "../../logic/data/cats";
 import { ConfigItemId, isTool } from "../../types";
@@ -11,17 +11,26 @@ import { getTranslation } from "../../translations/i18n";
 import { TranslationKey } from "../../translations/translationKey";
 import { getCatIdClass } from "../cat-component/cat-component";
 import { sleep } from "../../utils/promise-utils";
+import { CssClass } from "../../utils/css-class";
 
 let chooserDialog: Dialog | undefined;
 
-export async function createConfigChooserComponent(): Promise<ConfigItemId | false> {
-  let selectedConfigItem: ConfigItemId | undefined;
+export async function createConfigChooserComponent(): Promise<ConfigItemId | boolean> {
+  let selectedConfigItem: ConfigItemId | true | undefined;
 
   const chooserContainer = createElement({ cssClass: styles.container });
   const header = createElement({ text: getTranslation(TranslationKey.CHOOSER_TITLE) });
   chooserContainer.append(header);
 
   const explanationElement = createElement({ cssClass: styles.explanation, text: getTranslation(TranslationKey.EXPLANATION_EMPTY) });
+  const skipTutorialLink = createElement({
+    tag: "a",
+    text: getTranslation(TranslationKey.SKIP_TUTORIAL),
+    onClick: () => {
+      selectedConfigItem = true;
+      chooserDialog?.close(true);
+    },
+  });
 
   const choicesContainer = createElement({ cssClass: styles.choices });
   const choices = getNextChoice();
@@ -31,6 +40,7 @@ export async function createConfigChooserComponent(): Promise<ConfigItemId | fal
         return;
       }
 
+      skipTutorialLink.remove();
       explanationElement.innerHTML = getTranslation(explanationMap[choice]);
       explanationElement.classList.add(styles.active);
       header.innerHTML = getTranslation(TranslationKey.YOUR_CHOICE);
@@ -42,12 +52,12 @@ export async function createConfigChooserComponent(): Promise<ConfigItemId | fal
 
       // transform chosen to middle and fade out other
       if (choices.length === 2) {
-        chosenElement.style.transform =
-          index === 0 ? "translateX(calc(50% + 1rem)) scale(1.2)" : "translateX(calc(-50% - 1rem)) scale(1.2)";
-        otherSibling.style.opacity = "0";
+        chosenElement.style.setProperty("--t-x", index === 0 ? "calc(50% + 1rem)" : "calc(-50% - 1rem)");
+        otherSibling.classList.add(CssClass.OPACITY_HIDDEN);
       } else {
         chosenElement.style.transform = "scale(1.2)";
       }
+      chosenElement.classList.add(styles.selected);
     }
 
     return getChoiceElement(choice, chooseItem);
@@ -58,15 +68,18 @@ export async function createConfigChooserComponent(): Promise<ConfigItemId | fal
     choicesContainer.append(choiceElement);
   });
 
-  chooserContainer.append(choicesContainer);
-  chooserContainer.append(explanationElement);
+  chooserContainer.append(choicesContainer, explanationElement, skipTutorialLink);
 
   chooserDialog = createDialog(chooserContainer, { submitButtonText: getTranslation(TranslationKey.CONFIRM), showCloseButton: false });
   chooserDialog.toggleSubmitDisabled(true);
 
-  return chooserDialog.open().then((isConfirmed): ConfigItemId | false => {
+  return chooserDialog.open().then((isConfirmed): ConfigItemId | boolean => {
     if (isConfirmed && selectedConfigItem) {
-      updateKnownConfigItems([selectedConfigItem]);
+      if (selectedConfigItem === true) {
+        updateKnownConfigItems(allConfigItems);
+      } else {
+        updateKnownConfigItems([selectedConfigItem]);
+      }
     }
 
     sleep(600).then(() => chooserDialog?.destroy());

@@ -37,4 +37,5 @@ export const TranslationKey = defineEnum({
   HINT: 32,
   RETRIES: 33,
   COLLECT_XP: 34,
+  SKIP_TUTORIAL: 35,
 });
