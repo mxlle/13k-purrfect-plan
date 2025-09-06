@@ -1,9 +1,11 @@
 import { ALL_TURN_MOVES, Difficulty, isDirection, TurnMove } from "../types";
-import { calculateNewPositions, isValidMove, isWinConditionMet } from "./game-logic";
 import { shuffleArray } from "../utils/random-utils";
 import { copyGameState, deepCopyElementsMap, GameSetup, GameState, getInitialGameState } from "./data/game-elements";
 import { difficultyEmoji } from "./difficulty";
 import { removeDuplicates } from "../utils/array-utils";
+import { isValidMove } from "./gameplay/movement";
+import { isWinConditionMet } from "./checks";
+import { calculateNewPositions } from "./gameplay/calculate-new-positions";
 
 interface ParInfo {
   par: number;

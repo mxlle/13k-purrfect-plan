@@ -85,3 +85,16 @@ export function getCellTypePlaceholders() {
     c: CatId.MOONY,
   };
 }
+
+export function newCellPositionFromDirection(fromCell: CellPosition, direction: Direction): CellPosition {
+  switch (direction) {
+    case Direction.UP:
+      return { ...fromCell, row: fromCell.row - 1 };
+    case Direction.DOWN:
+      return { ...fromCell, row: fromCell.row + 1 };
+    case Direction.LEFT:
+      return { ...fromCell, column: fromCell.column - 1 };
+    case Direction.RIGHT:
+      return { ...fromCell, column: fromCell.column + 1 };
+  }
+}

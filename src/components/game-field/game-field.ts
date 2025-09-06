@@ -24,7 +24,7 @@ import { ConfigCategory, ConfigItemId, isSpecialAction, isTool, ObjectId, Specia
 import { allInConfig, Config, getValidatedConfig, hasUnknownConfigItems } from "../../logic/config/config";
 import { DEFAULT_FIELD_SIZE, FieldSize } from "../../logic/data/field-size";
 import { ALL_OBJECT_IDS } from "../../logic/data/objects";
-import { isValidCellPosition } from "../../logic/checks";
+import { isValidCellPosition, isWinConditionMet } from "../../logic/checks";
 import { serializeGame } from "../../logic/serializer";
 import {
   determineGameSetup,
@@ -35,12 +35,12 @@ import {
   getInitialGameState,
   isValidGameSetup,
 } from "../../logic/data/game-elements";
-import { calculateNewPositions, isWinConditionMet } from "../../logic/game-logic";
 import { createConfigChooserComponent } from "../config-chooser/config-chooser-component";
 import { removeAllSpeechBubbles } from "../speech-bubble/speech-bubble";
 import { getTranslation } from "../../translations/i18n";
 import { TranslationKey } from "../../translations/translationKey";
 import { isCatId } from "../../logic/data/cats";
+import { calculateNewPositions } from "../../logic/gameplay/calculate-new-positions";
 
 let mainContainer: HTMLElement | undefined;
 let gameFieldElem: HTMLElement | undefined;

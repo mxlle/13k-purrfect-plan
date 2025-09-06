@@ -3,7 +3,7 @@ import { CssClass } from "../../../utils/css-class";
 import { ConfigCategory, Direction, isSpecialAction, isTool, RECOVERY_TIME_MAP, Tool, TurnMove } from "../../../types";
 
 import styles from "./controls-component.module.scss";
-import { getBestNextMove, isValidMove, isWinConditionMet, performMove } from "../../../logic/game-logic";
+import { performMove } from "../../../logic/gameplay/perform-move";
 import { getArrowComponent } from "../../arrow-component/arrow-component";
 import { PubSubEvent, pubSubService } from "../../../utils/pub-sub-service";
 import { getTranslation } from "../../../translations/i18n";
@@ -21,6 +21,9 @@ import {
   updateGameInfoComponent,
 } from "../game-info/game-info-component";
 import { animateXpFlyAway, getCollectXpButton } from "../../xp-components/xp-components";
+import { isValidMove } from "../../../logic/gameplay/movement";
+import { getBestNextMove } from "../../../logic/gameplay/hint";
+import { isWinConditionMet } from "../../../logic/checks";
 
 let hasSetupEventListeners = false;
 const controlsComponent: HTMLElement = createElement({ cssClass: styles.controls });

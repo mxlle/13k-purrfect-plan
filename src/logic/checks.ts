@@ -1,9 +1,32 @@
-import { ALL_KITTEN_IDS, KittenId } from "./data/catId";
+import { ALL_KITTEN_IDS, CatId, KittenId } from "./data/catId";
 import { CellPosition, isSameCell } from "./data/cell";
 import { FieldSize } from "./data/field-size";
 import { ObjectId } from "../types";
-import { GameElementId, GameSetup, GameState } from "./data/game-elements";
+import { GameElementId, GameSetup, GameState, getParFromGameState } from "./data/game-elements";
 import { isCatId, isMom } from "./data/cats";
+import { hasMoveLimit } from "./config/config";
+
+export function isWinConditionMet(gameState: GameState | null): boolean {
+  if (!gameState) {
+    return false;
+  }
+
+  const momPosition = gameState.currentPositions[CatId.MOTHER];
+
+  return ALL_KITTEN_IDS.every((catId) => {
+    const kittenPosition = gameState.currentPositions[catId];
+
+    return isSameCell(momPosition, kittenPosition);
+  });
+}
+
+export function isMoveLimitExceeded(gameState: GameState | null): boolean {
+  if (!gameState || !hasMoveLimit(gameState.setup.config)) {
+    return false;
+  }
+
+  return gameState.moves.length >= getParFromGameState(gameState) && !isWinConditionMet(gameState);
+}
 
 export function getKittensOnCell(gameState: GameState, cell: CellPosition): KittenId[] {
   return ALL_KITTEN_IDS.filter((catId) => isSameCell(gameState.currentPositions[catId], cell));

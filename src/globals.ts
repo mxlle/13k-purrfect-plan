@@ -1,6 +1,6 @@
 import { getLocalStorageItem, LocalStorageKey } from "./utils/local-storage";
 import { GameElementPositions, GameState } from "./logic/data/game-elements";
-import { hasLost, isWinConditionMet } from "./logic/game-logic";
+import { isMoveLimitExceeded, isWinConditionMet } from "./logic/checks";
 
 interface GameGlobals {
   previousOnboardingStep: number | undefined;
@@ -39,5 +39,5 @@ function getNumFromParam(param: string, fallback: number) {
 }
 
 export function isGameInProgress(): boolean {
-  return globals.gameState !== undefined && !isWinConditionMet(globals.gameState) && !hasLost(globals.gameState);
+  return globals.gameState !== undefined && !isWinConditionMet(globals.gameState) && !isMoveLimitExceeded(globals.gameState);
 }
