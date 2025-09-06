@@ -22,4 +22,9 @@ export function getArrowComponent(direction: Direction): HTMLElement {
   return arrow;
 }
 
+export function updateArrowComponent(arrow: HTMLElement, direction: Direction) {
+  arrow.classList.remove(...Object.values(cssClassByDirection));
+  arrow.classList.add(cssClassByDirection[direction]);
+}
+
 export { styles };

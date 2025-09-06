@@ -1,5 +1,4 @@
 import { sleep } from "./promise-utils";
-import { CssClass } from "./css-class";
 
 export function addCanvasToBody() {
   const canvas = createElement({
@@ -89,6 +88,10 @@ export function removeBodyClasses(...classes: string[]) {
 
 export function setBodyStyleProperty(prop: string, value: string | null) {
   document.body.style.setProperty(prop, value);
+}
+
+export function resetTransform(element: HTMLElement) {
+  element.style.transform = "";
 }
 
 export function setElementToWindowSize(element) {

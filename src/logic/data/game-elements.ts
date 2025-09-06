@@ -3,10 +3,12 @@ import { getCatElement } from "./cats";
 import { getObjectElement, isObjectId } from "./objects";
 import { CellPosition } from "./cell";
 import { FieldSize, getMiddleCoordinates } from "./field-size";
-import { Config } from "../config/config";
+import { Config, hasUnknownConfigItems } from "../config/config";
 import { Difficulty, ObjectId, TurnMove } from "../../types";
 import { FALLBACK_PAR, MAX_PAR } from "../par";
-import { getDefaultPlacedObjects, isOnboarding } from "../onboarding";
+import { getDefaultPlacedObjects, isOnboarding, OnboardingData } from "../onboarding";
+import { deserializeGame } from "../serializer";
+import { globals } from "../../globals";
 
 export type GameElementId = CatId | ObjectId;
 
@@ -32,6 +34,40 @@ export interface GameState {
   currentPositions: GameElementPositions;
   representations: GameElementRepresentations;
   moves: TurnMove[];
+}
+
+export function determineGameSetup(options: { isDoOver: boolean }, onboardingData: OnboardingData | undefined): GameSetup | null {
+  const existingGameState = globals.gameState;
+  const isInitialStart = !existingGameState;
+  const gameSetupFromHash = location.hash.replace("#", "");
+
+  let gameSetupFromUrl: GameSetup | undefined;
+  if (isInitialStart && gameSetupFromHash && !onboardingData && !hasUnknownConfigItems()) {
+    try {
+      gameSetupFromUrl = deserializeGame(decodeURI(gameSetupFromHash));
+      console.debug("Loaded game setup from hash:", gameSetupFromUrl);
+
+      if (!isValidGameSetup(gameSetupFromUrl)) {
+        console.warn("Invalid game setup in URL hash, ignoring it.");
+        gameSetupFromUrl = undefined;
+      }
+    } catch (error) {
+      console.error("Failed to parse game setup from hash:", error);
+    }
+  }
+
+  let gameSetup: GameSetup | null;
+  if (gameSetupFromUrl) {
+    gameSetup = gameSetupFromUrl;
+  } else {
+    if (options.isDoOver && globals.gameState) {
+      gameSetup = globals.gameState.setup;
+    } else {
+      gameSetup = onboardingData ? onboardingData.gameSetup : null;
+    }
+  }
+
+  return gameSetup;
 }
 
 export function isValidGameSetup(setup: GameSetup): boolean {

@@ -1,9 +1,9 @@
 import styles from "./game-field.module.scss";
 import { activateOnboardingHighlight, getControlsComponent } from "../controls/controls-component";
-import { getArrowComponent, styles as arrowStyles } from "../arrow-component/arrow-component";
+import { getArrowComponent, styles as arrowStyles, updateArrowComponent } from "../arrow-component/arrow-component";
 import { getCatIdClass } from "../cat-component/cat-component";
 
-import { createElement } from "../../utils/html-utils";
+import { createElement, resetTransform } from "../../utils/html-utils";
 import { globals } from "../../globals";
 import { requestAnimationFrameWithTimeout } from "../../utils/promise-utils";
 import { generateRandomGameSetup, getInitialGameSetup, randomlyPlaceGameElementsOnField } from "../../logic/initialize";
@@ -25,8 +25,9 @@ import { allInConfig, Config, getValidatedConfig, hasUnknownConfigItems } from "
 import { DEFAULT_FIELD_SIZE, FieldSize } from "../../logic/data/field-size";
 import { ALL_OBJECT_IDS } from "../../logic/data/objects";
 import { isValidCellPosition } from "../../logic/checks";
-import { deserializeGame, serializeGame } from "../../logic/serializer";
+import { serializeGame } from "../../logic/serializer";
 import {
+  determineGameSetup,
   GameElementId,
   GameElementPositions,
   GameSetup,
@@ -39,6 +40,7 @@ import { createConfigChooserComponent } from "../config-chooser/config-chooser-c
 import { removeAllSpeechBubbles } from "../speech-bubble/speech-bubble";
 import { getTranslation } from "../../translations/i18n";
 import { TranslationKey } from "../../translations/translationKey";
+import { isCatId } from "../../logic/data/cats";
 
 let mainContainer: HTMLElement | undefined;
 let gameFieldElem: HTMLElement | undefined;
@@ -84,7 +86,6 @@ async function shuffleFieldAnimation(config: Config) {
 }
 
 export async function startNewGame(options: { isDoOver: boolean }) {
-  const isInitialStart = !globals.gameState;
   const notYetAllConfigItems = hasUnknownConfigItems();
   let newConfigItem: ConfigItemId | false = false;
 
@@ -107,46 +108,21 @@ export async function startNewGame(options: { isDoOver: boolean }) {
 
     if (!isSameLevel() && !wasLastOnboardingStep()) {
       console.debug("Was different setup, removing game field");
-      gameFieldElem.remove();
-      gameFieldElem = undefined;
-      controlsElem?.remove();
-      controlsElem = undefined;
+      resetGameField();
     }
   }
-
-  console.debug("Starting new game, onboarding step", globals.onboardingStep);
 
   const onboardingData: OnboardingData | undefined = getOnboardingData();
-  const gameSetupFromHash = location.hash.replace("#", "");
 
-  let gameSetupFromUrl: GameSetup | undefined;
-  if (isInitialStart && gameSetupFromHash && !onboardingData && !notYetAllConfigItems) {
-    try {
-      gameSetupFromUrl = deserializeGame(decodeURI(gameSetupFromHash));
-      console.debug("Loaded game setup from hash:", gameSetupFromUrl);
-
-      if (!isValidGameSetup(gameSetupFromUrl)) {
-        console.warn("Invalid game setup in URL hash, ignoring it.");
-        gameSetupFromUrl = undefined;
-      }
-    } catch (error) {
-      console.error("Failed to parse game setup from hash:", error);
-    }
+  let gameSetup = determineGameSetup(options, onboardingData);
+  if (gameSetup === null) {
+    gameSetup = await generateRandomGameWhileAnimating(getValidatedConfig(allInConfig));
   }
 
-  let gameSetup: GameSetup;
-  if (gameSetupFromUrl) {
-    gameSetup = gameSetupFromUrl;
-  } else {
-    if (options.isDoOver && globals.gameState) {
-      gameSetup = globals.gameState.setup;
-    } else {
-      gameSetup = onboardingData ? onboardingData.gameSetup : await generateRandomGameWhileAnimating(getValidatedConfig(allInConfig));
+  if (import.meta.env.DEV) {
+    if (!isValidGameSetup(gameSetup)) {
+      throw new Error("Generated or provided game setup is invalid, cannot start game.", { cause: gameSetup });
     }
-  }
-
-  if (!isValidGameSetup(gameSetup)) {
-    throw new Error("Generated or provided game setup is invalid, cannot start game.", { cause: gameSetup });
   }
 
   globals.failedAttempts = options.isDoOver ? globals.failedAttempts + 1 : 0;
@@ -188,6 +164,13 @@ export async function refreshFieldWithSetup(
   await initializeElementsOnGameField(globals.gameState, globals.nextPositionsIfWait, isInitialStart, shouldResetToMiddle);
 }
 
+function resetGameField() {
+  gameFieldElem.remove();
+  gameFieldElem = undefined;
+  controlsElem?.remove();
+  controlsElem = undefined;
+}
+
 function appendGameField() {
   if (!gameFieldElem) {
     console.warn("No game field element to append");
@@ -204,11 +187,9 @@ function appendGameField() {
     });
   }
 
-  mainContainer.append(gameFieldElem);
-
   controlsElem = getControlsComponent();
 
-  mainContainer.append(controlsElem);
+  mainContainer.append(gameFieldElem, controlsElem);
 }
 
 export function getCellElement(cell: CellPosition): HTMLElement {
@@ -255,8 +236,8 @@ export async function initializeElementsOnGameField(
   isInitialStart: boolean,
   shouldResetToInitialPosition: boolean,
 ) {
-  for (const catId of ALL_CAT_IDS) {
-    const representation = gameState.representations[catId];
+  for (const elementId of [...ALL_CAT_IDS, ...ALL_OBJECT_IDS]) {
+    const representation = gameState.representations[elementId];
 
     if (representation) {
       const cellElement = getCellElement(representation.initialPosition);
@@ -265,24 +246,14 @@ export async function initializeElementsOnGameField(
       if (!cellElement.contains(representation.htmlElement)) {
         cellElement.append(representation.htmlElement);
       } else if (shouldResetToInitialPosition) {
-        representation.htmlElement.style.transform = "translate(0, 0)";
+        resetTransform(representation.htmlElement);
       }
 
-      representation.htmlElement.classList.toggle(getCatIdClass(catId), gameState.setup.config[ConfigCategory.KITTEN_BEHAVIOR][catId]);
-    }
-  }
-
-  for (const objId of ALL_OBJECT_IDS) {
-    const representation = gameState.representations[objId];
-
-    if (representation) {
-      const cellElement = getCellElement(representation.initialPosition);
-
-      // append if not already there
-      if (!cellElement.contains(representation.htmlElement)) {
-        cellElement.append(representation.htmlElement);
-      } else if (shouldResetToInitialPosition) {
-        representation.htmlElement.style.transform = "translate(0, 0)";
+      if (isCatId(elementId)) {
+        representation.htmlElement.classList.toggle(
+          getCatIdClass(elementId),
+          gameState.setup.config[ConfigCategory.KITTEN_BEHAVIOR][elementId],
+        );
       }
     }
   }
@@ -304,23 +275,24 @@ export function updateAllPositions(gameState: GameState, nextPositionsIfWait: Ga
     representation.htmlElement.style.transform = `translate(${diff.column * 100}%, ${diff.row * 100}%)`;
 
     if (gameElementId === ObjectId.MOON) {
-      if (!isValidCellPosition(gameState, position, ObjectId.MOON) && !hasWon) {
-        representation.htmlElement.style.opacity = "0";
-        document.body.classList.toggle(CssClass.DARKNESS, true);
-      } else {
-        representation.htmlElement.style.opacity = "1";
-        document.body.classList.toggle(CssClass.DARKNESS, false);
-      }
+      const isMoonSet = !isValidCellPosition(gameState, position, ObjectId.MOON) && !hasWon;
+      document.body.classList.toggle(CssClass.DARKNESS, isMoonSet);
+      representation.htmlElement.classList.toggle(CssClass.OPACITY_HIDDEN, isMoonSet);
     }
 
     if (ALL_KITTEN_IDS.includes(gameElementId as any) && nextPositionsIfWait) {
-      const existingArrow = representation.htmlElement.querySelector(`.${arrowStyles.arrow}`);
-      existingArrow?.remove();
-
       const nextPosition = nextPositionsIfWait[gameElementId as GameElementId];
-      if (nextPosition) {
-        const direction = getDirection(position, nextPosition);
-        direction && representation.htmlElement.append(getArrowComponent(direction));
+      const direction = nextPosition ? getDirection(position, nextPosition) : undefined;
+      const existingArrow = representation.htmlElement.querySelector(`.${arrowStyles.arrow}`) as HTMLElement | undefined;
+
+      if (direction) {
+        if (existingArrow) {
+          updateArrowComponent(existingArrow, direction);
+        } else {
+          representation.htmlElement.append(getArrowComponent(direction));
+        }
+      } else {
+        existingArrow?.remove();
       }
     }
   }

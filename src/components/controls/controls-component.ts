@@ -1,4 +1,4 @@
-import { createButton, createElement } from "../../utils/html-utils";
+import { createButton, createElement, resetTransform } from "../../utils/html-utils";
 import { CssClass } from "../../utils/css-class";
 import { ConfigCategory, Difficulty, Direction, isSpecialAction, isTool, RECOVERY_TIME_MAP, Tool, TurnMove } from "../../types";
 
@@ -363,7 +363,7 @@ async function flyMultipleXpAway(xp: number, source: HTMLElement) {
 }
 
 async function animateXpFlyAway(text: string, source: HTMLElement, xMod: number = 0.5, hueRotate: number = 0) {
-  console.debug("animateXpFlyAway", { text, xMod });
+  // console.debug("animateXpFlyAway", { text, xMod });
   const flyAwayElement = createElement({ text, cssClass: styles.flyAwayElement });
   const sourceRect = source.getBoundingClientRect();
   const diffXFromTopRight = sourceRect.right - document.body.clientWidth;
@@ -380,7 +380,8 @@ async function animateXpFlyAway(text: string, source: HTMLElement, xMod: number 
   await requestAnimationFrameWithTimeout(0);
 
   flyAwayElement.classList.add(CssClass.OPACITY_HIDDEN);
-  flyAwayElement.style.removeProperty("transform");
+
+  resetTransform(flyAwayElement);
 
   await sleep(500);
 
