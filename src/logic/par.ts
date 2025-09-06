@@ -25,13 +25,19 @@ interface ParOptions {
 }
 
 export function calculatePar(gameSetup: GameSetup, options: ParOptions = { returnAllSolutions: true }): ParInfo {
-  const performanceStart = performance.now();
+  let performanceStart;
+  if (import.meta.env.DEV) {
+    performanceStart = performance.now();
+  }
   const gameState = getInitialGameState(gameSetup);
   console.debug("Starting par calculation...");
   const parInfo = calculateParInner(gameState, options);
   const difficulty = calculateDifficulty(gameState, parInfo);
-  const performanceEnd = performance.now();
-  const performanceTime = performanceEnd - performanceStart;
+  let performanceTime;
+  if (import.meta.env.DEV) {
+    const performanceEnd = performance.now();
+    performanceTime = performanceEnd - performanceStart;
+  }
   console.info(
     "Calculated par:",
     parInfo.par,

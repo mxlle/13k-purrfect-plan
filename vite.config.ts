@@ -32,6 +32,7 @@ export default defineConfig(({ mode, command }) => {
   const poki = mode === "poki";
   const js13k = mode === "js13k";
   const analyze = true;
+  const analyzeOutputJson = false;
 
   const getCssIdentifier = memoize(idGenerator(), 2);
 
@@ -66,6 +67,7 @@ export default defineConfig(({ mode, command }) => {
           entryFileNames: "[hash].js",
         },
       },
+      modulePreload: { polyfill: false }, // todo - check if this is fine
     },
     css: {
       modules: {
@@ -99,13 +101,24 @@ export default defineConfig(({ mode, command }) => {
           tags: js13k ? [] : [{ injectTo: "head", tag: "link", attrs: { rel: "manifest", href: "src/manifest.json" } }],
         },
       }),
-      visualizer({
-        filename: "dist-analyzation/stats.html",
-        template: "treemap",
-        gzipSize: true,
-        brotliSize: true,
-        open: false, // set to true to auto-open after build
-      }),
+      analyze &&
+        !analyzeOutputJson &&
+        visualizer({
+          filename: "dist-analyzation/stats.html",
+          template: "treemap",
+          gzipSize: true,
+          brotliSize: true,
+          open: false, // set to true to auto-open after build
+        }),
+      analyze &&
+        analyzeOutputJson &&
+        visualizer({
+          filename: "dist-analyzation/stats.json",
+          template: "raw-data",
+          gzipSize: true,
+          brotliSize: true,
+          open: false,
+        }),
     ],
   };
 });

@@ -23,6 +23,40 @@ export function getCellDifference(cell1: CellPosition, cell2: CellPosition): Cel
   };
 }
 
+export function getCellDifferenceTotal(cell1: CellPosition, cell2: CellPosition): number {
+  const diff = getCellDifference(cell1, cell2);
+  return Math.abs(diff.row) + Math.abs(diff.column);
+}
+
+export function getEightNeighborsClockwise(cell: CellPosition): CellPosition[] {
+  const neighbors: CellPosition[] = [];
+
+  for (let rowIndex = cell.row - 1; rowIndex <= cell.row + 1; rowIndex++) {
+    neighbors.push({ row: rowIndex, column: cell.column + 1 });
+  }
+
+  neighbors.push({ row: cell.row + 1, column: cell.column });
+
+  for (let rowIndex = cell.row + 1; rowIndex >= cell.row - 1; rowIndex--) {
+    neighbors.push({ row: rowIndex, column: cell.column - 1 });
+  }
+
+  neighbors.push({ row: cell.row - 1, column: cell.column });
+
+  return neighbors;
+}
+
+export function getFourNeighbors(cell: CellPosition): CellPosition[] {
+  const { row, column } = cell;
+
+  return [
+    { row, column: column - 1 },
+    { row, column: column + 1 },
+    { row: row - 1, column },
+    { row: row + 1, column },
+  ];
+}
+
 export function getDirection(from: CellPosition, to: CellPosition): Direction | null {
   const diff = getCellDifference(to, from);
 

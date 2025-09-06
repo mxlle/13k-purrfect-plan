@@ -12,9 +12,8 @@ import {
 } from "../types";
 import { PubSubEvent, pubSubService } from "../utils/pub-sub-service";
 import { getKittensElsewhere, getKittensOnCell, isValidCellPosition } from "./checks";
-import { ALL_CAT_IDS, ALL_KITTEN_IDS, CatId } from "./data/catId";
-import { CAT_NAMES } from "./data/cats";
-import { CellPosition, isSameCell } from "./data/cell";
+import { ALL_KITTEN_IDS, CatId } from "./data/catId";
+import { CellPosition, getCellDifferenceTotal, getEightNeighborsClockwise, getFourNeighbors, isSameCell } from "./data/cell";
 import { updateAllPositions } from "../components/game-field/game-field";
 import { sleep } from "../utils/promise-utils";
 import { hasMoveLimit, shouldApplyKittenBehavior, showMovesInfo } from "./config/config";
@@ -260,54 +259,19 @@ function doMoonyMove(gameState: GameState): CellPosition {
 function doIvyMove(gameState: GameState): CellPosition {
   // if next to a tree, then move clockwise around it
   const catId = CatId.IVY;
-  const { row, column } = gameState.currentPositions[catId];
+  const catPosition = gameState.currentPositions[catId];
   const treePosition = gameState.currentPositions[ObjectId.TREE];
 
   if (treePosition) {
-    const rowDiff = treePosition.row - row;
-    const columnDiff = treePosition.column - column;
+    const neighbors = getEightNeighborsClockwise(treePosition);
 
-    if (Math.abs(rowDiff) <= 1 && Math.abs(columnDiff) <= 1) {
-      let newRow = row;
-      let newColumn = column;
+    const indexOfCatInNeighbors = neighbors.findIndex((cell) => isSameCell(cell, catPosition));
 
-      if (rowDiff === 1) {
-        // cat above tree
-        if (columnDiff === -1) {
-          newRow = row + 1; // move down
-        } else {
-          newColumn = column + 1; // move right
-        }
-
-        return { row: newRow, column: newColumn };
-      }
-
-      if (rowDiff === -1) {
-        // cat below tree
-        if (columnDiff === 1) {
-          newRow = row - 1; // move up
-        } else {
-          newColumn = column - 1; // move left
-        }
-
-        return { row: newRow, column: newColumn };
-      }
-
-      if (columnDiff === 1) {
-        // cat to the left of tree
-        newRow = row - 1; // move up
-        return { row: newRow, column };
-      }
-
-      if (columnDiff === -1) {
-        // cat to the right of tree
-        newRow = row + 1; // move down
-        return { row: newRow, column };
-      }
-    } else {
-      // If not next to a tree, just move towards the tree
-      return moveCatTowardsCell(gameState, catId, treePosition);
+    if (indexOfCatInNeighbors !== -1) {
+      return neighbors[(indexOfCatInNeighbors + 1) % neighbors.length];
     }
+
+    return moveCatTowardsCell(gameState, catId, treePosition);
   }
 }
 
@@ -332,74 +296,25 @@ function moveCatTowardsCell(gameState: GameState, catId: CatId, targetCell: Cell
     return catPosition;
   }
 
-  const verticalPathCell = { row: catPosition.row + getDirectionalDiff(rowDiff), column: catPosition.column };
-  const horizontalPathCell = { row: catPosition.row, column: catPosition.column + getDirectionalDiff(columnDiff) };
+  const validNeighbors = getFourNeighbors(catPosition).filter((cell) => isValidCellPosition(gameState, cell, catId));
+  const sortedNeighbors = validNeighbors.sort((a, b) => {
+    const diffA = getCellDifferenceTotal(a, targetCell);
+    const diffB = getCellDifferenceTotal(b, targetCell);
 
-  if (
-    isValidCellPosition(gameState, horizontalPathCell, catId) &&
-    !isSameCell(horizontalPathCell, catPosition) &&
-    (Math.abs(columnDiff) >= Math.abs(rowDiff) || !isValidCellPosition(gameState, verticalPathCell, catId))
-  ) {
-    // Move horizontal firsts
-    return horizontalPathCell;
-  }
-
-  if (isValidCellPosition(gameState, verticalPathCell, catId) && !isSameCell(verticalPathCell, catPosition)) {
-    return verticalPathCell;
-  }
-
-  // no move will bring the cat closer, navigate around the obstacle
-  if (rowDiff === 0) {
-    const alternativeRoute1 = { row: catPosition.row + 1, column: catPosition.column };
-    const alternativeRoute2 = { row: catPosition.row - 1, column: catPosition.column };
-
-    if (isValidCellPosition(gameState, alternativeRoute1, catId)) {
-      return alternativeRoute1;
+    if (diffA === diffB) {
+      return a.column === catPosition.column ? 1 : -1;
     }
 
-    if (isValidCellPosition(gameState, alternativeRoute2, catId)) {
-      return alternativeRoute2;
-    }
-  }
+    return diffA - diffB;
+  });
 
-  if (columnDiff === 0) {
-    const alternativeRoute1 = { row: catPosition.row, column: catPosition.column + 1 };
-    const alternativeRoute2 = { row: catPosition.row, column: catPosition.column - 1 };
-
-    if (isValidCellPosition(gameState, alternativeRoute1, catId)) {
-      return alternativeRoute1;
-    }
-
-    if (isValidCellPosition(gameState, alternativeRoute2, catId)) {
-      return alternativeRoute2;
-    }
-  }
-
-  return catPosition;
-}
-
-function getDirectionalDiff(diff: number): -1 | 0 | 1 {
-  if (diff === 0) {
-    return 0;
-  }
-
-  return diff > 0 ? 1 : -1;
+  return sortedNeighbors[0] ?? catPosition;
 }
 
 export function moveCat(gameState: GameState, catId: CatId, direction: Direction): CellPosition {
   const newPosition = newCellPositionFromDirection(gameState.currentPositions[catId], direction);
-  return moveCatToCell(gameState, catId, newPosition);
-}
-
-export function moveCatToCell(gameState: GameState, catId: CatId, cell: CellPosition): CellPosition {
-  const isValidMove = isValidCellPosition(gameState, cell, catId);
-
-  if (!isValidMove) {
-    console.warn(`Invalid move for cat ${CAT_NAMES[catId]} to cell (${cell.row}, ${cell.column})`);
-    return gameState.currentPositions[catId];
-  }
-
-  return { ...cell };
+  const isValidMove = isValidCellPosition(gameState, newPosition, catId);
+  return isValidMove ? newPosition : gameState.currentPositions[catId];
 }
 
 export function isWinConditionMet(gameState: GameState | null): boolean {
@@ -409,14 +324,10 @@ export function isWinConditionMet(gameState: GameState | null): boolean {
 
   const momPosition = gameState.currentPositions[CatId.MOTHER];
 
-  if (!momPosition) {
-    return false;
-  }
+  return ALL_KITTEN_IDS.every((catId) => {
+    const kittenPosition = gameState.currentPositions[catId];
 
-  return ALL_CAT_IDS.every((catId) => {
-    const catPosition = gameState.currentPositions[catId];
-
-    return catPosition === null || isSameCell(momPosition, catPosition);
+    return isSameCell(momPosition, kittenPosition);
   });
 }
 

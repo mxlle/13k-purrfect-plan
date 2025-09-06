@@ -45,10 +45,18 @@ export function createCatElement(catId: CatId): HTMLElement {
 }
 
 export function meow(catId: CatId): Promise<void> {
+  if (!import.meta.env.DEV) {
+    return Promise.resolve();
+  }
+
   return playSoundForAction(Tool.MEOW, playbackRateMap[catId]);
 }
 
 export async function kittenMeows(kittens: KittenId[], doubleMeow?: boolean): Promise<void> {
+  if (!import.meta.env.DEV) {
+    return Promise.resolve();
+  }
+
   if (!hasSoundForAction(Tool.MEOW)) return;
 
   for (const kitten of kittens) {
