@@ -1,5 +1,5 @@
 import styles from "./game-field.module.scss";
-import { activateOnboardingHighlight, createControlsComponent } from "../controls/controls-component";
+import { activateOnboardingHighlight, getControlsComponent } from "../controls/controls-component";
 import { getArrowComponent, styles as arrowStyles } from "../arrow-component/arrow-component";
 import { getCatIdClass } from "../cat-component/cat-component";
 
@@ -229,7 +229,7 @@ function appendGameField() {
     mainContainer.append(configElem);
   }
 
-  controlsElem = createControlsComponent();
+  controlsElem = getControlsComponent();
 
   mainContainer.append(controlsElem);
 }
