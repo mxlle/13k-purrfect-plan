@@ -1,0 +1,46 @@
+@use "../../../names" as *;
+@use "../../../theme" as *;
+
+.movesContainer {
+  flex-direction: column;
+  gap: 0.25rem;
+  justify-self: start;
+}
+
+.moves {
+  &::before {
+    content: "⏳ ";
+  }
+}
+
+.difficulty-box,
+.retry-info {
+  font-size: 0.8rem;
+  color: $text-tertiary;
+  display: flex;
+  gap: 0.4rem;
+}
+
+.difficulty-box {
+  > * {
+    display: flex;
+    gap: 0.25rem;
+
+    &.easy {
+      color: green;
+    }
+    &.medium {
+      color: orange;
+    }
+    &.hard {
+      color: red;
+    }
+  }
+}
+
+a {
+  font-size: 0.8rem;
+  color: $main-color;
+  text-decoration: underline;
+  cursor: pointer;
+}

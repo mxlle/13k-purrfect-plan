@@ -1,30 +1,30 @@
-import { createButton, createElement, resetTransform } from "../../utils/html-utils";
-import { CssClass } from "../../utils/css-class";
-import { ConfigCategory, Difficulty, Direction, isSpecialAction, isTool, RECOVERY_TIME_MAP, Tool, TurnMove } from "../../types";
+import { createButton, createElement } from "../../../utils/html-utils";
+import { CssClass } from "../../../utils/css-class";
+import { ConfigCategory, Direction, isSpecialAction, isTool, RECOVERY_TIME_MAP, Tool, TurnMove } from "../../../types";
 
 import styles from "./controls-component.module.scss";
-import { getBestNextMove, isValidMove, isWinConditionMet, performMove } from "../../logic/game-logic";
-import { getArrowComponent } from "../arrow-component/arrow-component";
-import { PubSubEvent, pubSubService } from "../../utils/pub-sub-service";
-import { getTranslation } from "../../translations/i18n";
-import { TranslationKey } from "../../translations/translationKey";
-import { globals } from "../../globals";
-import { isOnboarding } from "../../logic/onboarding";
+import { getBestNextMove, isValidMove, isWinConditionMet, performMove } from "../../../logic/game-logic";
+import { getArrowComponent } from "../../arrow-component/arrow-component";
+import { PubSubEvent, pubSubService } from "../../../utils/pub-sub-service";
+import { getTranslation } from "../../../translations/i18n";
+import { TranslationKey } from "../../../translations/translationKey";
+import { globals } from "../../../globals";
+import { isOnboarding } from "../../../logic/onboarding";
 
-import { hasMoveLimit, hasUnknownConfigItems, showMovesInfo } from "../../logic/config/config";
-import { FALLBACK_PAR } from "../../logic/par";
-import { getParFromGameState } from "../../logic/data/game-elements";
-import { getDifficultyRepresention } from "../../logic/difficulty";
-import { calculateNewXP, getXPString, XP_FOR_HINT, XP_REP } from "../../logic/data/experience-points";
-import { requestAnimationFrameWithTimeout, sleep } from "../../utils/promise-utils";
+import { hasMoveLimit, hasUnknownConfigItems } from "../../../logic/config/config";
+import { getParFromGameState } from "../../../logic/data/game-elements";
+import { calculateNewXP, getXPString, XP_FOR_HINT } from "../../../logic/data/experience-points";
+import {
+  getGameInfoComponent,
+  hideRetryInfo,
+  toggleDoOverButtonVisibility,
+  updateGameInfoComponent,
+} from "../game-info/game-info-component";
+import { animateXpFlyAway, getCollectXpButton } from "../../xp-components/xp-components";
 
 let hasSetupEventListeners = false;
 const controlsComponent: HTMLElement = createElement({ cssClass: styles.controls });
-const turnMovesContainer: HTMLElement = createElement({ cssClass: styles.movesContainer });
-const turnMovesComponent: HTMLElement = createElement({ cssClass: styles.moves });
-const difficultyComponent: HTMLElement = createElement({ cssClass: styles.difficultyBox });
-const retryInfo: HTMLElement = createElement({ cssClass: styles.retryInfo });
-let redoButton: HTMLElement | undefined;
+
 const movementContainer: HTMLElement = createElement({ cssClass: styles.movementControls });
 const toolContainer: HTMLElement = createElement({ cssClass: styles.toolControls });
 let hintButton: HTMLElement | undefined;
@@ -34,19 +34,6 @@ let toolsFrozenUntilTurn: number | undefined;
 
 export function getControlsComponent(): HTMLElement {
   setupEventListeners();
-
-  redoButton = createElement({
-    tag: "a",
-    text: getTranslation(TranslationKey.RESTART_GAME),
-    cssClass: CssClass.OPACITY_HIDDEN,
-    onClick: () => {
-      pubSubService.publish(PubSubEvent.START_NEW_GAME, { isDoOver: true });
-    },
-  });
-
-  turnMovesContainer.append(turnMovesComponent, difficultyComponent, retryInfo, redoButton);
-
-  updateTurnMovesComponent();
 
   const moveButtons = getAllMoveButtons();
   moveButtons.forEach((button) => movementContainer.append(button));
@@ -68,8 +55,7 @@ export function getControlsComponent(): HTMLElement {
       if (hint !== undefined && !isSpecialAction(hint)) {
         activateOnboardingHighlight(hint);
       } else {
-        redoButton.classList.remove(CssClass.OPACITY_HIDDEN);
-        redoButton.classList.add(styles.onboardingHighlight);
+        toggleDoOverButtonVisibility(true);
       }
     },
   });
@@ -77,7 +63,9 @@ export function getControlsComponent(): HTMLElement {
 
   updateToolContainer();
 
-  controlsComponent.append(turnMovesContainer, movementContainer, toolContainer, hintButton);
+  controlsComponent.append(getGameInfoComponent(), movementContainer, toolContainer, hintButton);
+
+  updateGameInfoComponent();
 
   if (!globals.gameState && !isOnboarding()) {
     showNewGameButtons(true);
@@ -154,17 +142,16 @@ function setupEventListeners() {
   });
 
   pubSubService.subscribe(PubSubEvent.START_NEW_GAME, () => {
-    updateTurnMovesComponent(true);
+    updateGameInfoComponent(true);
   });
 
   pubSubService.subscribe(PubSubEvent.GAME_START, () => {
     controlsComponent.classList.remove(styles.disabled);
-    redoButton.classList.remove(styles.onboardingHighlight);
-    redoButton.classList.toggle(CssClass.OPACITY_HIDDEN, true);
+    toggleDoOverButtonVisibility(false);
     hintButton.removeAttribute("disabled");
     toolsFrozenUntilTurn = undefined;
     updateRecoveryInfoComponent();
-    updateTurnMovesComponent();
+    updateGameInfoComponent();
     updateToolContainer();
     updateMoveButtonsDisabledState();
   });
@@ -215,23 +202,15 @@ export function addNewGameButtons(isInitialStart = false) {
     onClick: () => {
       pubSubService.publish(PubSubEvent.START_NEW_GAME, { isDoOver: false });
       newGameContainer.remove();
-      retryInfo?.classList.toggle(CssClass.HIDDEN, true);
+      hideRetryInfo();
       reshowControls();
     },
   });
 
   if (hasAchievedGoal) {
     const newXP = calculateNewXP();
-    const xpButton = createButton({
-      text: getTranslation(TranslationKey.COLLECT_XP, getXPString(newXP)),
-      onClick: async () => {
-        sleep(500).then(() => {
-          pubSubService.publish(PubSubEvent.UPDATE_XP, newXP);
-        });
-        await flyMultipleXpAway(newXP, xpButton);
-        xpButton.classList.toggle(CssClass.HIDDEN, true);
-        continueButton.classList.toggle(CssClass.HIDDEN, false);
-      },
+    const xpButton = getCollectXpButton(newXP, () => {
+      continueButton.classList.toggle(CssClass.HIDDEN, false);
     });
     newGameContainer.append(xpButton);
     continueButton.classList.toggle(CssClass.HIDDEN, true);
@@ -271,7 +250,7 @@ async function handleMove(turnMove: TurnMove) {
   hintButton.removeAttribute("disabled");
 
   await performMove(globals.gameState, turnMove);
-  updateTurnMovesComponent();
+  updateGameInfoComponent();
 
   if (isTool(turnMove)) {
     toolsFrozenUntilTurn = globals.gameState.moves.length + RECOVERY_TIME_MAP[turnMove];
@@ -279,41 +258,6 @@ async function handleMove(turnMove: TurnMove) {
 
   updateRecoveryInfoComponent();
   updateMoveButtonsDisabledState();
-}
-
-function updateTurnMovesComponent(isReset: boolean = false) {
-  const showMoves = globals.gameState && showMovesInfo(globals.gameState.setup.config);
-  const showMoveLimit = globals.gameState && hasMoveLimit(globals.gameState.setup.config);
-
-  // console.debug("updateTurnMovesComponent", { showMoves, showMoveLimit, isReset, moves: globals.gameState?.moves });
-
-  turnMovesContainer.style.display = showMoves ? "flex" : "none";
-  const par = getParFromGameState(globals.gameState);
-  const parString = par && showMoveLimit && !isReset ? ` / ${par < FALLBACK_PAR ? par : "?"}` : "";
-  turnMovesComponent.innerHTML = `${getTranslation(TranslationKey.MOVES)}: ${isReset ? 0 : (globals.gameState?.moves.length ?? 0)}${parString}`;
-
-  const difficulty = globals.gameState?.setup.difficulty;
-  difficultyComponent.style.display = showMoveLimit && difficulty ? "flex" : "none";
-  difficultyComponent.innerHTML = `${getTranslation(TranslationKey.DIFFICULTY)}: `;
-  difficultyComponent.append(
-    isReset ? "?" : createElement({ cssClass: getCssClassForDifficulty(difficulty), text: getDifficultyRepresention(difficulty) }),
-  );
-
-  retryInfo.classList.toggle(CssClass.HIDDEN, globals.failedAttempts === 0);
-  retryInfo.innerHTML = `${getTranslation(TranslationKey.RETRIES)}: ${Array.from({ length: globals.failedAttempts }, () => "I").join("")}`;
-}
-
-function getCssClassForDifficulty(difficulty: Difficulty) {
-  switch (difficulty) {
-    case Difficulty.EASY:
-      return styles.easy;
-    case Difficulty.MEDIUM:
-      return styles.medium;
-    case Difficulty.HARD:
-      return styles.hard;
-    default:
-      return "";
-  }
 }
 
 function updateRecoveryInfoComponent() {
@@ -348,44 +292,4 @@ function updateToolContainer() {
 export function activateOnboardingHighlight(action: Direction | Tool) {
   highlightedElement = getControlButton(action);
   highlightedElement.classList.add(styles.onboardingHighlight);
-}
-
-async function flyMultipleXpAway(xp: number, source: HTMLElement) {
-  const delay = 500 / xp;
-  for (let i = 0; i < xp; i++) {
-    const mod = i / xp;
-    const xMod = 0.5 + (i % 2 === 0 ? -1 : 1) * mod * 0.3;
-    const hueRotate = mod * 360;
-    void animateXpFlyAway(XP_REP, source, xMod, hueRotate);
-
-    await requestAnimationFrameWithTimeout(delay);
-  }
-}
-
-async function animateXpFlyAway(text: string, source: HTMLElement, xMod: number = 0.5, hueRotate: number = 0) {
-  // console.debug("animateXpFlyAway", { text, xMod });
-  const flyAwayElement = createElement({ text, cssClass: styles.flyAwayElement });
-  const sourceRect = source.getBoundingClientRect();
-  const diffXFromTopRight = sourceRect.right - document.body.clientWidth;
-  const diffYFromTopRight = sourceRect.top - sourceRect.height / 2;
-  const additionalOffset = sourceRect.width * xMod * -1;
-
-  flyAwayElement.style.setProperty(
-    "transform",
-    `translate(calc(50% + ${diffXFromTopRight + additionalOffset}px), calc(50% + ${diffYFromTopRight}px)) scale(2)`,
-  );
-  flyAwayElement.style.setProperty("filter", `hue-rotate(${hueRotate}deg)`);
-  document.body.append(flyAwayElement);
-
-  await requestAnimationFrameWithTimeout(0);
-
-  flyAwayElement.classList.add(CssClass.OPACITY_HIDDEN);
-
-  resetTransform(flyAwayElement);
-
-  await sleep(500);
-
-  sleep(500).then(() => {
-    flyAwayElement.remove();
-  });
 }

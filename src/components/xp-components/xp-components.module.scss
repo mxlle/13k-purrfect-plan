@@ -1,0 +1,8 @@
+.flyAwayElement {
+  position: absolute;
+  top: 0;
+  right: 0;
+  transition:
+    transform 1s ease-in,
+    opacity 1s linear;
+}

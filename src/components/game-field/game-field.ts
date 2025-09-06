@@ -1,5 +1,5 @@
 import styles from "./game-field.module.scss";
-import { activateOnboardingHighlight, getControlsComponent } from "../controls/controls-component";
+import { activateOnboardingHighlight, getControlsComponent } from "../controls-and-info/controls/controls-component";
 import { getArrowComponent, styles as arrowStyles, updateArrowComponent } from "../arrow-component/arrow-component";
 import { getCatIdClass } from "../cat-component/cat-component";
 

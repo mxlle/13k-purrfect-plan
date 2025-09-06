@@ -1,5 +1,5 @@
-@use "../../names" as *;
-@use "../../theme" as *;
+@use "../../../names" as *;
+@use "../../../theme" as *;
 
 .controls {
   display: grid;
@@ -91,51 +91,6 @@
   }
 }
 
-.movesContainer {
-  flex-direction: column;
-  gap: 0.25rem;
-  justify-self: start;
-}
-
-.moves {
-  &::before {
-    content: "⏳ ";
-  }
-}
-
-.solutions,
-.difficulty-box,
-.retry-info {
-  font-size: 0.8rem;
-  color: $text-tertiary;
-  display: flex;
-  gap: 0.4rem;
-}
-
-.difficulty-box {
-  > * {
-    display: flex;
-    gap: 0.25rem;
-
-    &.easy {
-      color: green;
-    }
-    &.medium {
-      color: orange;
-    }
-    &.hard {
-      color: red;
-    }
-  }
-}
-
-a {
-  font-size: 0.8rem;
-  color: $main-color;
-  text-decoration: underline;
-  cursor: pointer;
-}
-
 .toolControls {
   display: grid;
   place-items: center;
@@ -165,15 +120,6 @@ a {
   .recovery-info {
     grid-area: 1 / 1;
   }
-}
-
-.flyAwayElement {
-  position: absolute;
-  top: 0;
-  right: 0;
-  transition:
-    transform 1s ease-in,
-    opacity 1s linear;
 }
 
 @keyframes boxShadowPulse {

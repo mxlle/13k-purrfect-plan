@@ -4,10 +4,10 @@ import {
   requestMicrophoneAccess,
   saveRecording,
   startRecording,
-} from "../../audio/sound-control/sound-control";
-import { TurnMove } from "../../types";
-import { createButton } from "../../utils/html-utils";
-import { CssClass } from "../../utils/css-class";
+} from "../../../audio/sound-control/sound-control";
+import { TurnMove } from "../../../types";
+import { createButton } from "../../../utils/html-utils";
+import { CssClass } from "../../../utils/css-class";
 
 let activeRecording: ActiveRecording | undefined;
 
