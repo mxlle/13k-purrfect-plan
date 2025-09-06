@@ -37,6 +37,7 @@ typings/
 # build / generate output
 .nuxt
 dist
+dist-analyzation
 out
 dist.zip
 

@@ -11,6 +11,7 @@ import { mapEntries, memoize } from "./src/utils/utils";
 import { ConfigCategory, Direction, ObjectId, OnboardingStep, SpecialAction, Tool } from "./src/types";
 import { CatId } from "./src/logic/data/catId";
 import { MoveLimit } from "./src/logic/config/move-limit";
+import { visualizer } from "rollup-plugin-visualizer";
 
 const replaceEnum = (name: string, object: object) => mapEntries(object, ([key, value]) => [`${name}.${key}`, JSON.stringify(value)]);
 
@@ -30,6 +31,7 @@ export default defineConfig(({ mode, command }) => {
   const production = command === "build";
   const poki = mode === "poki";
   const js13k = mode === "js13k";
+  const analyze = true;
 
   const getCssIdentifier = memoize(idGenerator(), 2);
 
@@ -96,6 +98,13 @@ export default defineConfig(({ mode, command }) => {
         inject: {
           tags: js13k ? [] : [{ injectTo: "head", tag: "link", attrs: { rel: "manifest", href: "src/manifest.json" } }],
         },
+      }),
+      visualizer({
+        filename: "dist-analyzation/stats.html",
+        template: "treemap",
+        gzipSize: true,
+        brotliSize: true,
+        open: false, // set to true to auto-open after build
       }),
     ],
   };
