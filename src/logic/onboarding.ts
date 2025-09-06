@@ -1,12 +1,11 @@
-import { ConfigCategory, Direction, ObjectId, OnboardingStep, TurnMove } from "../types";
+import { Direction, ObjectId, OnboardingStep, TurnMove } from "../types";
 import { globals } from "../globals";
 import { LocalStorageKey, setLocalStorageItem } from "../utils/local-storage";
 import { ALL_CAT_IDS, CatId } from "./data/catId";
 import { CellPosition, containsCell, EMPTY_CELL, getCellTypePlaceholders } from "./data/cell";
-import { allInConfig, emptyConfig, getValidatedConfig } from "./config/config";
+import { emptyConfig } from "./config/config";
 import { FieldSize } from "./data/field-size";
 import { EMPTY_ELEMENT_MAP, GameElementPositions, GameSetup } from "./data/game-elements";
-import { calculatePar } from "./par";
 import { isCatId } from "./data/cats";
 
 export function isOnboarding() {
@@ -43,7 +42,6 @@ export function getDefaultPlacedObjects() {
 
 export function getOnboardingData(): OnboardingData | undefined {
   const step = globals.onboardingStep;
-  let skipPositions: CellPosition[] = [];
 
   switch (step) {
     case OnboardingStep.INTRO:
@@ -55,7 +53,6 @@ export function getOnboardingData(): OnboardingData | undefined {
           [_, c, _],
         ];
       })();
-      const isFirstStep = step === OnboardingStep.INTRO;
 
       const gameSetupIntro: GameSetup = {
         fieldSize: getFieldSizeFromInitialSetup(introSetup),
@@ -67,11 +64,8 @@ export function getOnboardingData(): OnboardingData | undefined {
       };
 
       return {
-        gameSetup: {
-          ...gameSetupIntro,
-          possibleSolutions: calculatePar(gameSetupIntro).possibleSolutions,
-        },
-        highlightedAction: isFirstStep ? Direction.DOWN : undefined,
+        gameSetup: gameSetupIntro,
+        highlightedAction: Direction.DOWN,
       };
     case OnboardingStep.INTERMEDIATE_OBJECTS:
       const intermediateSetup: InitialSetup = (() => {
@@ -86,34 +80,24 @@ export function getOnboardingData(): OnboardingData | undefined {
 
       const gameSetupIntermediate: GameSetup = {
         fieldSize: getFieldSizeFromInitialSetup(intermediateSetup),
-        elementPositions: getElementPositionsFormInitialSetup(intermediateSetup, skipPositions),
-        config: {
-          ...emptyConfig,
-          [ConfigCategory.OBJECTS]: {
-            ...emptyConfig[ConfigCategory.OBJECTS],
-            [ObjectId.TREE]: true,
-            [ObjectId.MOON]: true,
-          },
-        },
+        elementPositions: getElementPositionsFormInitialSetup(intermediateSetup),
+        config: emptyConfig,
         possibleSolutions: [],
       };
 
       return {
-        gameSetup: { ...gameSetupIntermediate, possibleSolutions: calculatePar(gameSetupIntermediate).possibleSolutions },
+        gameSetup: gameSetupIntermediate,
       };
     case OnboardingStep.LAST_SETUP:
       const gameSetupLast: GameSetup = {
         fieldSize: getFieldSizeFromInitialSetup(lastSetup),
         elementPositions: getElementPositionsFormInitialSetup(lastSetup, [{ row: 1, column: 2 }]),
-        config: getValidatedConfig(allInConfig),
+        config: emptyConfig,
         possibleSolutions: [],
       };
 
       return {
-        gameSetup: {
-          ...gameSetupLast,
-          possibleSolutions: calculatePar(gameSetupLast).possibleSolutions,
-        },
+        gameSetup: gameSetupLast,
       };
     default:
       return undefined;
