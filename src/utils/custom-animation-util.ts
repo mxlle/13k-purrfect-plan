@@ -27,80 +27,40 @@ const calcNumberTween: CalcTweenStateFn<number> = (from: number, to: number, pro
 interface AnimateOptions<T> {
   /** Duration of each keyframe */
   keyframeDuration: number;
-  /** Function to get the next state, knowing the previous state */
-  nextState: (prev?: T) => T;
   /** Initial state, as default calling nextState */
-  initialState?: T;
+  initialState: T;
   /** Exit state, as default not calling onProgress again */
-  exitState?: T;
-  /** Easing function, linear by default */
-  easing?: EasingFunction;
+  exitState: T;
   /** Callback for each progress */
   onProgress: (state: T) => void;
   /** Function to calculate the tween state */
   calcTweenState: CalcTweenStateFn<T>;
-  /** Number of iterations, infinite by default */
-  iterationCount?: number;
 }
 
-export interface AnimationInterval {
-  cancel: () => void;
-}
-
-function createAnimationInterval<T>({
-  keyframeDuration = 300,
-  nextState,
-  easing = easeLinear,
-  onProgress,
-  calcTweenState,
-  initialState = nextState(),
-  exitState,
-  iterationCount = Infinity,
-}: AnimateOptions<T>): AnimationInterval {
-  let fromState: T,
-    toState: T = initialState,
-    counter: number = 0,
-    animationFrameHandler: number;
-
-  function cancel(): void {
-    clearInterval(intervalHandler);
-    cancelAnimationFrame(animationFrameHandler); // here we could consider in the future to keep the last keyframe running
-
-    // update the state one more time to the exit state
-    onProgress(exitState ?? toState);
-  }
-
+function startAnimation<T>({ keyframeDuration = 300, onProgress, calcTweenState, initialState, exitState }: AnimateOptions<T>): void {
   function startKeyframe(): void {
-    if (counter >= iterationCount) {
-      cancel();
-
-      return;
-    }
-
-    counter++;
-    fromState = toState;
-    toState = nextState(fromState);
     const startTime = Number(document.timeline.currentTime ?? Date.now());
     (function drawFrame(time: number): void {
       const progress = (time - startTime) / keyframeDuration;
       const progressClamped = Math.min(1, progress);
-      const easedProgress = easing(progressClamped);
-      onProgress(calcTweenState(fromState, toState, easedProgress));
+      const easedProgress = easeInOutQuad(progressClamped);
+      onProgress(calcTweenState(initialState, exitState, easedProgress));
 
       if (progress < 1) {
-        animationFrameHandler = requestAnimationFrame(drawFrame);
+        requestAnimationFrame(drawFrame);
+      } else {
+        if (exitState) {
+          onProgress(exitState);
+        }
       }
     })(startTime);
   }
 
-  const intervalHandler = setInterval(startKeyframe, keyframeDuration);
   startKeyframe();
-
-  return { cancel };
 }
 
 /**
  * Animate a number
  */
-export const animateNumber = <T extends number>(options: Omit<AnimateOptions<T>, "calcTweenState">): AnimationInterval =>
-  createAnimationInterval({ calcTweenState: calcNumberTween, ...options } as AnimateOptions<T>);
+export const animateNumber = <T extends number>(options: Omit<AnimateOptions<T>, "calcTweenState">): void =>
+  startAnimation({ calcTweenState: calcNumberTween, ...options } as AnimateOptions<T>);

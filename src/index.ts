@@ -87,12 +87,10 @@ function updateXpWithAnimation(newXP: number) {
   animateNumber({
     keyframeDuration: Math.abs(newXP) * 80,
     initialState: oldXP,
-    nextState: () => targetXP,
+    exitState: targetXP,
     onProgress: (current) => {
       updateXpElement(Math.round(current));
     },
-    exitState: targetXP,
-    iterationCount: 1,
   });
 }
 
