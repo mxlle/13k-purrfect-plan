@@ -63,7 +63,7 @@ function randomlyPlaceObjectsOnField(gameSetup: GameSetup, randomMoonPosition: b
 
   const newCellForTree = getRandomItem(cellsAllowedForTree);
   const newCellForPuddle = getRandomItem(cellsAllowedForPuddle.filter((cell) => !isSameCell(cell, newCellForTree)));
-  const newCellForMoon = getRandomItem(cellsAllowedForMoon);
+  const newCellForMoon = showMoon(gameSetup.config) ? getRandomItem(cellsAllowedForMoon) : null;
 
   return {
     ...EMPTY_ELEMENT_MAP(),
