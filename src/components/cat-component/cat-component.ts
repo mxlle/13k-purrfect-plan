@@ -8,6 +8,8 @@ import { isMom } from "../../logic/data/cats";
 import { hasSoundForAction, playSoundForAction } from "../../audio/sound-control/sound-control";
 import { Tool } from "../../types";
 import { sleep } from "../../utils/promise-utils";
+import { getTranslation } from "../../translations/i18n";
+import { TranslationKey } from "../../translations/translationKey";
 
 export { styles };
 
@@ -65,4 +67,8 @@ export function getCatIdClass(catId: CatId): string {
     [CatId.IVY]: styles.ivy,
     [CatId.SPLASHY]: styles.splashy,
   }[catId];
+}
+
+export function getMeowTextWithIcon(): string {
+  return `💬 ${getTranslation(TranslationKey.MEOW)}`;
 }

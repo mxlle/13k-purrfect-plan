@@ -9,7 +9,7 @@ import { isMoveLimit } from "../../logic/config/move-limit";
 import styles from "./config-chooser-component.module.scss";
 import { getTranslation } from "../../translations/i18n";
 import { TranslationKey } from "../../translations/translationKey";
-import { getCatIdClass } from "../cat-component/cat-component";
+import { getCatIdClass, getMeowTextWithIcon } from "../cat-component/cat-component";
 import { sleep } from "../../utils/promise-utils";
 import { CssClass } from "../../utils/css-class";
 
@@ -115,7 +115,7 @@ function getChoiceElement(configItem: ConfigItemId, chooseItem: (event: MouseEve
     return createElement({
       text: getTranslation(TranslationKey.CHOICE_TOOL),
       onClick: (event) => {
-        event.target.innerHTML = getTranslation(TranslationKey.MEOW);
+        event.target.innerHTML = getMeowTextWithIcon();
         chooseItem(event);
       },
     });

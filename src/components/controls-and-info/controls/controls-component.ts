@@ -24,6 +24,7 @@ import { animateXpFlyAway, getCollectXpButton } from "../../xp-components/xp-com
 import { isValidMove } from "../../../logic/gameplay/movement";
 import { getBestNextMove } from "../../../logic/gameplay/hint";
 import { isWinConditionMet } from "../../../logic/checks";
+import { getMeowTextWithIcon } from "../../cat-component/cat-component";
 
 let hasSetupEventListeners = false;
 const controlsComponent: HTMLElement = createElement({ cssClass: styles.controls });
@@ -128,7 +129,7 @@ export function getMoveButton(direction: Direction): HTMLElement {
 }
 
 export function getToolButton(tool: Tool) {
-  return (buttons[tool] ??= createButton({ text: getTranslation(TranslationKey.MEOW), onClick: () => handleMove(tool) }));
+  return (buttons[tool] ??= createButton({ text: getMeowTextWithIcon(), onClick: () => handleMove(tool) }));
 }
 
 export function getControlButton(type: Direction | Tool): HTMLElement {
