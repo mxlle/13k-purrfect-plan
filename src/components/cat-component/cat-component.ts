@@ -1,7 +1,7 @@
 import { CatId, KittenId } from "../../logic/data/catId";
 import { createElement } from "../../utils/html-utils";
 import { CssClass } from "../../utils/css-class";
-import catSvg from "./black-cat-pink-eyes.svg";
+import catSvg from "./black-cat-pink-eyes-2.svg";
 
 import styles from "./cat-component.module.scss";
 import { isMom } from "../../logic/data/cats";
