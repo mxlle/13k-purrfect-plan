@@ -5,6 +5,11 @@ export interface CellPosition {
   column: number;
 }
 
+export interface CellDifference {
+  rowDiff: number;
+  columnDiff: number;
+}
+
 export function isSameCell(cell1: CellPosition, cell2: CellPosition) {
   return cell1.row === cell2.row && cell1.column === cell2.column;
 }
@@ -13,16 +18,19 @@ export function containsCell(cells: CellPosition[], cell: CellPosition): boolean
   return cells.some((c) => isSameCell(c, cell));
 }
 
-export function getCellDifference(cell1: CellPosition, cell2: CellPosition): CellPosition {
+export function getCellDifference(cell1: CellPosition, cell2: CellPosition): CellDifference {
   return {
-    row: cell1.row - cell2.row,
-    column: cell1.column - cell2.column,
+    rowDiff: cell1.row - cell2.row,
+    columnDiff: cell1.column - cell2.column,
   };
 }
 
-export function getCellDifferenceTotal(cell1: CellPosition, cell2: CellPosition): number {
+export function getCellDifferenceAbsolute(cell1: CellPosition, cell2: CellPosition): CellDifference {
   const diff = getCellDifference(cell1, cell2);
-  return Math.abs(diff.row) + Math.abs(diff.column);
+  return {
+    rowDiff: Math.abs(diff.rowDiff),
+    columnDiff: Math.abs(diff.columnDiff),
+  };
 }
 
 export function getEightNeighborsClockwise(cell: CellPosition): CellPosition[] {
@@ -57,13 +65,13 @@ export function getFourNeighbors(cell: CellPosition): CellPosition[] {
 export function getDirection(from: CellPosition, to: CellPosition): Direction | null {
   const diff = getCellDifference(to, from);
 
-  if (diff.row === 0 && diff.column > 0) {
+  if (diff.rowDiff === 0 && diff.columnDiff > 0) {
     return Direction.RIGHT;
-  } else if (diff.row === 0 && diff.column < 0) {
+  } else if (diff.rowDiff === 0 && diff.columnDiff < 0) {
     return Direction.LEFT;
-  } else if (diff.column === 0 && diff.row > 0) {
+  } else if (diff.columnDiff === 0 && diff.rowDiff > 0) {
     return Direction.DOWN;
-  } else if (diff.column === 0 && diff.row < 0) {
+  } else if (diff.columnDiff === 0 && diff.rowDiff < 0) {
     return Direction.UP;
   }
 

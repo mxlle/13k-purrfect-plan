@@ -272,7 +272,7 @@ export function updateAllPositions(gameState: GameState, nextPositionsIfWait: Ga
     if (representation === null || position === null) continue;
 
     const diff = getCellDifference(position, representation.initialPosition);
-    representation.htmlElement.style.transform = `translate(${diff.column * 100}%, ${diff.row * 100}%)`;
+    representation.htmlElement.style.transform = `translate(${diff.columnDiff * 100}%, ${diff.rowDiff * 100}%)`;
 
     if (gameElementId === ObjectId.MOON) {
       const isMoonSet = !isValidCellPosition(gameState, position, ObjectId.MOON) && !hasWon;

@@ -1,7 +1,7 @@
 import { GameState } from "../data/game-elements";
 import { ConfigCategory, Direction, isSpecialAction, isTool, RECOVERY_TIME_MAP, TurnMove } from "../../types";
 import { CatId } from "../data/catId";
-import { CellPosition, getCellDifferenceTotal, getFourNeighbors, newCellPositionFromDirection } from "../data/cell";
+import { CellPosition, getCellDifferenceAbsolute, getFourNeighbors, isSameCell, newCellPositionFromDirection } from "../data/cell";
 import { isValidCellPosition } from "../checks";
 
 export function isValidMove(gameState: GameState, turnMove: TurnMove): boolean {
@@ -35,23 +35,26 @@ export function isValidMove(gameState: GameState, turnMove: TurnMove): boolean {
 
 export function moveCatTowardsCell(gameState: GameState, catId: CatId, targetCell: CellPosition): CellPosition {
   const catPosition = gameState.currentPositions[catId];
-  const rowDiff = targetCell.row - catPosition.row;
-  const columnDiff = targetCell.column - catPosition.column;
 
-  if (rowDiff === 0 && columnDiff === 0) {
+  if (isSameCell(catPosition, targetCell)) {
     return catPosition;
   }
 
   const validNeighbors = getFourNeighbors(catPosition).filter((cell) => isValidCellPosition(gameState, cell, catId));
   const sortedNeighbors = validNeighbors.sort((a, b) => {
-    const diffA = getCellDifferenceTotal(a, targetCell);
-    const diffB = getCellDifferenceTotal(b, targetCell);
+    const aDiff = getCellDifferenceAbsolute(a, targetCell);
+    const bDiff = getCellDifferenceAbsolute(b, targetCell);
+    const aDiffTotal = aDiff.rowDiff + aDiff.columnDiff;
+    const bDiffTotal = bDiff.rowDiff + bDiff.columnDiff;
 
-    if (diffA === diffB) {
-      return a.column === catPosition.column ? 1 : -1;
+    if (aDiffTotal === bDiffTotal) {
+      const aMaxDiff = Math.max(aDiff.rowDiff, aDiff.columnDiff);
+      const bMaxDiff = Math.max(bDiff.rowDiff, bDiff.columnDiff);
+
+      return aMaxDiff - bMaxDiff || a.row - b.row || a.column - b.column;
     }
 
-    return diffA - diffB;
+    return aDiffTotal - bDiffTotal;
   });
 
   return sortedNeighbors[0] ?? catPosition;
