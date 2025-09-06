@@ -19,7 +19,7 @@ export function serializeGame(gameSetup: GameSetup): string {
     .join("");
 }
 
-export function deserializeGame(serializedGame: string): GameSetup {
+export function deserializeGame(serializedGame: string, options?: { skipParCalculation?: boolean; removeMoon?: boolean }): GameSetup {
   console.info("Deserializing game:", serializedGame);
 
   const elementPositions: GameElementPositions = EMPTY_ELEMENT_MAP();
@@ -33,12 +33,20 @@ export function deserializeGame(serializedGame: string): GameSetup {
     };
   }
 
+  if (options?.removeMoon) {
+    elementPositions[ObjectId.MOON] = null;
+  }
+
   const gameSetup: GameSetup = {
     fieldSize: DEFAULT_FIELD_SIZE,
     elementPositions,
     config: allInConfig,
     possibleSolutions: [],
   };
+
+  if (options?.skipParCalculation) {
+    return gameSetup;
+  }
 
   const parInfo = calculatePar(gameSetup);
 

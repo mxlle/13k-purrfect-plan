@@ -1,12 +1,10 @@
-import { Direction, ObjectId, OnboardingStep, TurnMove } from "../types";
+import { Direction, OnboardingStep, TurnMove } from "../types";
 import { globals } from "../globals";
 import { LocalStorageKey, setLocalStorageItem } from "../utils/local-storage";
-import { ALL_CAT_IDS, CatId } from "./data/catId";
-import { CellPosition, containsCell, EMPTY_CELL, getCellTypePlaceholders } from "./data/cell";
 import { emptyConfig } from "./config/config";
 import { FieldSize } from "./data/field-size";
-import { EMPTY_ELEMENT_MAP, GameElementPositions, GameSetup } from "./data/game-elements";
-import { isCatId } from "./data/cats";
+import { GameElementPositions, GameSetup } from "./data/game-elements";
+import { deserializeGame } from "./serializer";
 
 export function isOnboarding() {
   return globals.onboardingStep !== -1;
@@ -25,83 +23,53 @@ export interface OnboardingData {
   highlightedAction?: TurnMove;
 }
 
-const lastSetup: InitialSetup = (() => {
-  const { _, M, t, o, c, T, O, C } = getCellTypePlaceholders();
-  return [
-    [_, _, _, _, _],
-    [_, M, C, c, _],
-    [_, O, _, T, _],
-    [_, t, _, o, _],
-    [_, _, _, _, _],
-  ];
-})();
+const serializedGameOnboardingMap: Record<OnboardingStep, string> = {
+  [OnboardingStep.INTRO]: "🟣11🟡21🟢21🔵21",
+  [OnboardingStep.INTERMEDIATE_OBJECTS]: "🟣12🟡32🟢31🔵32🌳22💧21",
+  [OnboardingStep.LAST_SETUP]: "🟣11🟡13🟢31🔵33🌳23💧21🌙12",
+};
 
-export function getDefaultPlacedObjects() {
-  return getElementPositionsFormInitialSetup(lastSetup);
+const onboardingFieldSizeMap: Record<OnboardingStep, FieldSize> = {
+  [OnboardingStep.INTRO]: 3,
+  [OnboardingStep.INTERMEDIATE_OBJECTS]: 4,
+  [OnboardingStep.LAST_SETUP]: 5,
+};
+
+let defaultPlacedObjects: GameElementPositions | undefined;
+export function getDefaultPlacedObjects(options?: { skipMoon?: boolean }) {
+  if (defaultPlacedObjects) {
+    return defaultPlacedObjects;
+  }
+
+  const deserializedGame = deserializeGame(serializedGameOnboardingMap[OnboardingStep.LAST_SETUP], {
+    skipParCalculation: true,
+    ...options,
+  });
+  defaultPlacedObjects = deserializedGame.elementPositions;
+
+  return defaultPlacedObjects;
 }
 
 export function getOnboardingData(): OnboardingData | undefined {
   const step = globals.onboardingStep;
 
-  switch (step) {
-    case OnboardingStep.INTRO:
-      const introSetup: InitialSetup = (() => {
-        const { _, M, t, o, c, T, O, C } = getCellTypePlaceholders();
-        return [
-          [_, _, _],
-          [_, M, _],
-          [_, c, _],
-        ];
-      })();
+  const serializedGame = serializedGameOnboardingMap[step];
 
-      const gameSetupIntro: GameSetup = {
-        fieldSize: getFieldSizeFromInitialSetup(introSetup),
-        elementPositions: getElementPositionsFormInitialSetup(introSetup),
-        config: {
-          ...emptyConfig,
-        },
-        possibleSolutions: [],
-      };
-
-      return {
-        gameSetup: gameSetupIntro,
-        highlightedAction: Direction.DOWN,
-      };
-    case OnboardingStep.INTERMEDIATE_OBJECTS:
-      const intermediateSetup: InitialSetup = (() => {
-        const { _, M, t, o, c, T, O, C } = getCellTypePlaceholders();
-        return [
-          [_, _, _, _],
-          [_, _, M, _],
-          [_, O, T, _],
-          [_, t, c, _],
-        ];
-      })();
-
-      const gameSetupIntermediate: GameSetup = {
-        fieldSize: getFieldSizeFromInitialSetup(intermediateSetup),
-        elementPositions: getElementPositionsFormInitialSetup(intermediateSetup),
-        config: emptyConfig,
-        possibleSolutions: [],
-      };
-
-      return {
-        gameSetup: gameSetupIntermediate,
-      };
-    case OnboardingStep.LAST_SETUP:
-      const gameSetupLast: GameSetup = {
-        fieldSize: getFieldSizeFromInitialSetup(lastSetup),
-        elementPositions: getElementPositionsFormInitialSetup(lastSetup, [{ row: 1, column: 2 }]),
-        config: emptyConfig,
-        possibleSolutions: [],
-      };
-
-      return {
-        gameSetup: gameSetupLast,
-      };
-    default:
-      return undefined;
+  if (!serializedGame) {
+    return undefined;
   }
+
+  const deserializedGame = deserializeGame(serializedGame, { skipParCalculation: true, removeMoon: true });
+
+  return {
+    gameSetup: {
+      fieldSize: onboardingFieldSizeMap[step],
+      elementPositions: deserializedGame.elementPositions,
+      possibleSolutions: [],
+      config: emptyConfig,
+    },
+    highlightedAction: step === OnboardingStep.INTRO ? Direction.DOWN : undefined,
+  };
 }
 
 export function increaseOnboardingStepIfApplicable() {
@@ -120,36 +88,4 @@ export function increaseOnboardingStepIfApplicable() {
 
   globals.onboardingStep = step;
   setLocalStorageItem(LocalStorageKey.ONBOARDING_STEP, step.toString());
-}
-
-type InitialSetup = (ObjectId | CatId | typeof EMPTY_CELL)[][];
-
-function getFieldSizeFromInitialSetup(initialSetup: InitialSetup): FieldSize {
-  return initialSetup.length as FieldSize;
-}
-
-function getElementPositionsFormInitialSetup(initialSetup: InitialSetup, skipPositions: CellPosition[] = []): GameElementPositions {
-  const elementPositions: GameElementPositions = EMPTY_ELEMENT_MAP();
-  let lastCatPosition: CellPosition | null = null;
-
-  initialSetup.forEach((row, rowIndex) => {
-    row.forEach((cell, columnIndex) => {
-      if (containsCell(skipPositions, { row: rowIndex, column: columnIndex })) return;
-      if (cell === EMPTY_CELL) return;
-
-      elementPositions[cell] = { row: rowIndex, column: columnIndex };
-
-      if (isCatId(cell)) {
-        lastCatPosition = { row: rowIndex, column: columnIndex };
-      }
-    });
-  });
-
-  for (const catId of ALL_CAT_IDS) {
-    if (elementPositions[catId] === null) {
-      elementPositions[catId] = lastCatPosition;
-    }
-  }
-
-  return elementPositions;
 }

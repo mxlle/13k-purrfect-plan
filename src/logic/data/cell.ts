@@ -1,12 +1,9 @@
-import { CatId } from "./catId";
-import { Direction, ObjectId } from "../../types";
+import { Direction } from "../../types";
 
 export interface CellPosition {
   row: number;
   column: number;
 }
-
-export const EMPTY_CELL = " " as const;
 
 export function isSameCell(cell1: CellPosition, cell2: CellPosition) {
   return cell1.row === cell2.row && cell1.column === cell2.column;
@@ -71,19 +68,6 @@ export function getDirection(from: CellPosition, to: CellPosition): Direction | 
   }
 
   return null; // Not a straight line
-}
-
-export function getCellTypePlaceholders() {
-  return {
-    _: EMPTY_CELL,
-    T: ObjectId.TREE,
-    O: ObjectId.PUDDLE,
-    C: ObjectId.MOON,
-    M: CatId.MOTHER,
-    t: CatId.IVY,
-    o: CatId.SPLASHY,
-    c: CatId.MOONY,
-  };
 }
 
 export function newCellPositionFromDirection(fromCell: CellPosition, direction: Direction): CellPosition {
