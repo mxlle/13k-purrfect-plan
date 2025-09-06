@@ -1,3 +1,6 @@
+@use "../../names" as *;
+@use "../../theme" as *;
+
 .container,
 .choices {
   display: flex;
@@ -9,6 +12,31 @@
 
 .choices {
   flex-direction: row;
+}
+
+.configItem {
+  position: relative;
+  height: min(40vh, 40vw);
+  width: min(40vh, 40vw);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  background-color: $bg-alpha-05;
+  border-radius: $border-radius;
+  padding: 0.25rem;
+  transition:
+    transform 0.3s,
+    opacity 0.3s;
+
+  @media (min-height: 750px) {
+    font-size: 1.5em;
+  }
+
+  :global(.#{$CAT_BOX}) {
+    height: 50%;
+    width: 50%;
+    pointer-events: none;
+  }
 }
 
 .explanation {

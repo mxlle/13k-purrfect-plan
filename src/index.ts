@@ -1,8 +1,8 @@
 import "./index.scss";
 
-import { createButton, createElement } from "./utils/html-utils";
+import { createElement } from "./utils/html-utils";
 import { PubSubEvent, pubSubService } from "./utils/pub-sub-service";
-import { initializeEmptyGameField, startNewGame, toggleConfig } from "./components/game-field/game-field";
+import { initializeEmptyGameField, startNewGame } from "./components/game-field/game-field";
 import { initPoki, pokiSdk } from "./poki-integration";
 import { isOnboarding } from "./logic/onboarding";
 import { DEFAULT_FIELD_SIZE } from "./logic/data/field-size";
@@ -37,20 +37,16 @@ function init() {
     cssClass: "h-btns",
   });
 
-  if (import.meta.env.DEV) {
-    // const muteButton = createButton({
-    //   text: initializeMuted ? "🔇" : "🔊",
-    //   onClick: (event: MouseEvent) => {
-    //     const isActive = togglePlayer();
-    //     (event.target as HTMLElement).textContent = isActive ? "🔊" : "🔇";
-    //   },
-    //   cssClass: CssClass.ICON_BTN,
-    // });
-    //
-    // btnContainer.append(muteButton);
-
-    btnContainer.append(createButton({ text: "⚙️", onClick: () => toggleConfig(), cssClass: CssClass.ICON_BTN }));
-  }
+  // const muteButton = createButton({
+  //   text: initializeMuted ? "🔇" : "🔊",
+  //   onClick: (event: MouseEvent) => {
+  //     const isActive = togglePlayer();
+  //     (event.target as HTMLElement).textContent = isActive ? "🔊" : "🔇";
+  //   },
+  //   cssClass: CssClass.ICON_BTN,
+  // });
+  //
+  // btnContainer.append(muteButton);
 
   xpElement = createElement();
   updateXpElement();

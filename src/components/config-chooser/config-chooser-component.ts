@@ -7,7 +7,6 @@ import { ConfigItemId, isTool } from "../../types";
 import { isMoveLimit } from "../../logic/config/move-limit";
 
 import styles from "./config-chooser-component.module.scss";
-import configStyles from "../config/config-component.module.scss";
 import { getTranslation } from "../../translations/i18n";
 import { TranslationKey } from "../../translations/translationKey";
 import { getCatIdClass } from "../cat-component/cat-component";
@@ -53,8 +52,9 @@ export async function createConfigChooserComponent(): Promise<ConfigItemId | fal
 
     return getChoiceElement(choice, chooseItem);
   });
+
   choiceElements.forEach((choiceElement) => {
-    choiceElement.classList.add(configStyles.configItem, configStyles.chooser);
+    choiceElement.classList.add(styles.configItem);
     choicesContainer.append(choiceElement);
   });
 

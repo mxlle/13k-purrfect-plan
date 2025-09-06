@@ -6,7 +6,6 @@ import { FieldSize, getMiddleCoordinates } from "./field-size";
 import { Config } from "../config/config";
 import { Difficulty, ObjectId, TurnMove } from "../../types";
 import { FALLBACK_PAR, MAX_PAR } from "../par";
-import { globals } from "../../globals";
 import { getDefaultPlacedObjects, isOnboarding } from "../onboarding";
 
 export type GameElementId = CatId | ObjectId;
@@ -111,11 +110,4 @@ export function copyGameState(state: GameState): GameState {
     representations: deepCopyElementsMap(state.representations),
     moves: [...state.moves],
   };
-}
-
-export function gameElementClickHandler(gameElementId: GameElementId) {
-  console.log("select game element", gameElementId);
-  if (globals.configMode) {
-    globals.selectedGameElement = gameElementId;
-  }
 }

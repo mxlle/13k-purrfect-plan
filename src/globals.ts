@@ -1,5 +1,5 @@
 import { getLocalStorageItem, LocalStorageKey } from "./utils/local-storage";
-import { GameElementId, GameElementPositions, GameState } from "./logic/data/game-elements";
+import { GameElementPositions, GameState } from "./logic/data/game-elements";
 import { hasLost, isWinConditionMet } from "./logic/game-logic";
 
 interface GameGlobals {
@@ -8,8 +8,6 @@ interface GameGlobals {
   gameState: GameState | undefined;
   nextPositionsIfWait: GameElementPositions | undefined;
   language: string;
-  configMode: boolean;
-  selectedGameElement?: GameElementId;
   failedAttempts: number;
 }
 
@@ -21,7 +19,6 @@ const defaultGlobals: GameGlobals = {
   gameState: undefined,
   nextPositionsIfWait: undefined,
   language: "en",
-  configMode: false,
   failedAttempts: 0,
 };
 

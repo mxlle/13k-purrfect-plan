@@ -27,7 +27,6 @@ import { ALL_OBJECT_IDS } from "../../logic/data/objects";
 import { isValidCellPosition } from "../../logic/checks";
 import { deserializeGame, serializeGame } from "../../logic/serializer";
 import {
-  copyGameSetup,
   GameElementId,
   GameElementPositions,
   GameSetup,
@@ -36,7 +35,6 @@ import {
   isValidGameSetup,
 } from "../../logic/data/game-elements";
 import { calculateNewPositions, isWinConditionMet } from "../../logic/game-logic";
-import { getConfigComponent } from "../config/config-component";
 import { createConfigChooserComponent } from "../config-chooser/config-chooser-component";
 import { removeAllSpeechBubbles } from "../speech-bubble/speech-bubble";
 import { getTranslation } from "../../translations/i18n";
@@ -45,21 +43,11 @@ import { TranslationKey } from "../../translations/translationKey";
 let mainContainer: HTMLElement | undefined;
 let gameFieldElem: HTMLElement | undefined;
 let controlsElem: HTMLElement | undefined;
-let configElem: HTMLElement | undefined;
 let startButton: HTMLElement | undefined;
 const cellElements: HTMLElement[][] = [];
 
 const TIMEOUT_BETWEEN_GAMES = 300;
 const TIMEOUT_CELL_APPEAR = -1;
-
-export function toggleConfig() {
-  globals.configMode = !globals.configMode;
-  configElem?.classList.toggle(CssClass.HIDDEN);
-
-  if (!globals.configMode) {
-    globals.selectedGameElement = undefined;
-  }
-}
 
 export async function initializeEmptyGameField(fieldSize: FieldSize) {
   if (gameFieldElem) {
@@ -115,9 +103,7 @@ export async function startNewGame(options: { isDoOver: boolean }) {
 
   if (gameFieldElem) {
     // reset old game field
-    // await cleanGameField(globals.gameFieldData);
     if (import.meta.env.POKI_ENABLED === "true") await handlePokiCommercial();
-    // await requestAnimationFrameWithTimeout(TIMEOUT_BETWEEN_GAMES);
 
     if (!isSameLevel() && !wasLastOnboardingStep()) {
       console.debug("Was different setup, removing game field");
@@ -125,8 +111,6 @@ export async function startNewGame(options: { isDoOver: boolean }) {
       gameFieldElem = undefined;
       controlsElem?.remove();
       controlsElem = undefined;
-      configElem?.remove();
-      configElem = undefined;
     }
   }
 
@@ -222,13 +206,6 @@ function appendGameField() {
 
   mainContainer.append(gameFieldElem);
 
-  if (import.meta.env.DEV) {
-    configElem = getConfigComponent();
-    configElem.classList.add(CssClass.HIDDEN);
-
-    mainContainer.append(configElem);
-  }
-
   controlsElem = getControlsComponent();
 
   mainContainer.append(controlsElem);
@@ -256,26 +233,12 @@ export function generateGameFieldElement(fieldSize: FieldSize) {
 
       rowElem.append(cellElement);
       rowElements.push(cellElement);
-
-      if (import.meta.env.DEV) {
-        cellElement.addEventListener("click", () => cellClickHandler({ row: rowIndex, column: columnIndex }));
-      }
     }
 
     cellElements.push(rowElements);
   }
 
   return gameField;
-}
-
-function cellClickHandler(cellPosition: CellPosition) {
-  console.debug("Cell clicked", cellPosition);
-  if (globals.configMode && globals.selectedGameElement && globals.gameState) {
-    const newSetup = copyGameSetup(globals.gameState.setup);
-    newSetup.elementPositions[globals.selectedGameElement] = cellPosition;
-    void refreshFieldWithSetup(newSetup, undefined, false, false);
-    globals.selectedGameElement = undefined;
-  }
 }
 
 function addOnboardingSuggestionIfApplicable(onboardingData: OnboardingData | undefined, newConfigItem: ConfigItemId | false) {

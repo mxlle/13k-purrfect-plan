@@ -3,7 +3,6 @@ import { CssClass } from "../../utils/css-class";
 import { ObjectId } from "../../types";
 
 import styles from "./object-component.module.scss";
-import { gameElementClickHandler } from "../../logic/data/game-elements";
 
 export { styles };
 
@@ -20,13 +19,6 @@ export function createObjectElement(objectId: ObjectId): HTMLElement {
 
   const objectElem = createElement({
     cssClass: `${cellTypeToCssClass[objectId]}`,
-    onClick: (mouseEvent) => {
-      if (import.meta.env.DEV) {
-        gameElementClickHandler(objectId);
-        mouseEvent.preventDefault();
-        mouseEvent.stopPropagation();
-      }
-    },
   });
 
   objectBox.append(objectElem);
