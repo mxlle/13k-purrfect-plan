@@ -1,6 +1,6 @@
 import { createButton, createElement } from "../../../utils/html-utils";
 import { CssClass } from "../../../utils/css-class";
-import { ConfigCategory, Direction, isTool, Tool, TurnMove } from "../../../types";
+import { ALL_TOOLS, Direction, isTool, Tool, TurnMove } from "../../../types";
 
 import styles from "./controls-component.module.scss";
 import { performMove } from "../../../logic/gameplay/perform-move";
@@ -10,7 +10,7 @@ import { getTranslation } from "../../../translations/i18n";
 import { TranslationKey } from "../../../translations/translationKey";
 import { globals } from "../../../globals";
 
-import { getToolText, hasMoveLimit } from "../../../logic/config/config";
+import { getToolText, hasMoveLimit, isKnownTool } from "../../../logic/config/config";
 import { getXpInnerHtml, XP_FOR_HINT } from "../../../logic/data/experience-points";
 import { toggleDoOverButtonVisibility, updateGameInfoComponent } from "../game-info/game-info-component";
 import { animateXpFlyAway } from "../../xp-components/xp-components";
@@ -77,6 +77,7 @@ export function updateControlsOnGameStart() {
   updateRecoveryInfoComponent();
   updateToolContainer();
   updateMoveButtonsDisabledState();
+  reshowControls();
 }
 
 export function showNewGameButtonsAndHideControls(newGameButtonContainer: HTMLElement) {
@@ -86,7 +87,7 @@ export function showNewGameButtonsAndHideControls(newGameButtonContainer: HTMLEl
   hintButton.classList.toggle(CssClass.OPACITY_HIDDEN, true);
 }
 
-export function reshowControls() {
+function reshowControls() {
   movementContainer.classList.toggle(styles.disabled, false);
   toolContainer.classList.toggle(CssClass.OPACITY_HIDDEN, false);
   hintButton.classList.toggle(CssClass.OPACITY_HIDDEN, false);
@@ -197,9 +198,13 @@ export function updateToolContainer() {
 
   if (!globals.gameState) return;
 
-  const shouldHaveTools = Object.values(globals.gameState.setup.config[ConfigCategory.TOOLS]).some(Boolean);
+  const shouldHaveTools = ALL_TOOLS.some((tool) => isKnownTool(globals.gameState.setup.config, tool));
 
-  toolContainer.classList.toggle(styles.hidden, !shouldHaveTools);
+  toolContainer.classList.toggle(CssClass.HIDDEN, !shouldHaveTools);
+
+  for (const tool of ALL_TOOLS) {
+    getToolButton(tool).classList.toggle(CssClass.HIDDEN, !isKnownTool(globals.gameState.setup.config, tool));
+  }
 }
 
 export function activateOnboardingHighlight(action: Direction | Tool) {

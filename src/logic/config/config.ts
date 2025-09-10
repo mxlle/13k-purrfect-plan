@@ -51,6 +51,10 @@ export function hasMoveLimit(config: Config): boolean {
   return config[ConfigCategory.RULES].moveLimit === MoveLimit.MOVE_LIMIT_STRICT;
 }
 
+export function isKnownTool(config: Config, toolId: Tool): boolean {
+  return config[ConfigCategory.TOOLS][toolId];
+}
+
 export function copyConfig(config: Config): Config {
   return {
     [ConfigCategory.KITTEN_BEHAVIOR]: { ...config[ConfigCategory.KITTEN_BEHAVIOR] },

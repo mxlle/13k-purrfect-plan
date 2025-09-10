@@ -21,7 +21,6 @@ import {
   initHintButton,
   initMovementContainer,
   initToolContainer,
-  reshowControls,
   setupKeyboardEventListeners,
   showNewGameButtonsAndHideControls,
   updateControlsOnGameStart,
@@ -95,7 +94,6 @@ function addNewGameButtons(isInitialStart = false) {
       pubSubService.publish(PubSubEvent.START_NEW_GAME, { isDoOver: false });
       newGameContainer.remove();
       hideRetryInfo();
-      reshowControls();
     },
   });
 
@@ -117,7 +115,6 @@ function addNewGameButtons(isInitialStart = false) {
       onClick: () => {
         pubSubService.publish(PubSubEvent.START_NEW_GAME, { isDoOver: true });
         newGameContainer.remove();
-        reshowControls();
       },
     });
 
