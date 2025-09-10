@@ -13,7 +13,7 @@ import { ConfigCategory, Difficulty, ObjectId } from "../types";
 import { getRandomItem } from "../utils/array-utils";
 import { difficultyEmoji } from "./difficulty";
 
-const MAX_ITERATIONS_FOR_RANDOM_PLACEMENT = 10;
+const MAX_ITERATIONS_FOR_RANDOM_PLACEMENT = 13;
 
 export function getInitialGameSetup(
   config: Config = getValidatedConfig(allInConfig),
@@ -46,7 +46,18 @@ export async function generateRandomGameSetup(config: Config, fieldSize: FieldSi
 
   const tempGameSetup = getInitialGameSetup(config, fieldSize);
 
+  let performanceStart: number | undefined;
+  if (import.meta.env.DEV) {
+    performanceStart = performance.now();
+  }
+
   const finalGameSetup = randomlyPlaceGameElementsOnField(tempGameSetup, hasMoveLimit(config), false);
+
+  if (import.meta.env.DEV) {
+    const performanceEnd = performance.now();
+    const performanceTime = performanceEnd - performanceStart;
+    console.info("Random game setup generation time:", Math.round(performanceTime), "ms");
+  }
 
   return { ...finalGameSetup };
 }
@@ -109,6 +120,8 @@ export function randomlyPlaceGameElementsOnField(
       console.info("not a good setup", parInfo.par, difficultyEmoji[parInfo.difficulty]);
 
       return randomlyPlaceGameElementsOnField(copiedGameSetup, shouldCalculatePar, randomMoonPosition, iteration + 1);
+    } else {
+      console.info("found setup, iterations: ", iteration);
     }
 
     possibleSolutions = parInfo.possibleSolutions;
