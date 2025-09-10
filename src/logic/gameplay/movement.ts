@@ -1,8 +1,8 @@
 import { GameState } from "../data/game-elements";
-import { ConfigCategory, Direction, isSpecialAction, isTool, RECOVERY_TIME_MAP, TurnMove } from "../../types";
+import { ConfigCategory, Direction, isTool, TurnMove } from "../../types";
 import { CatId } from "../data/catId";
 import { CellPosition, getCellDifferenceAbsolute, getFourNeighbors, isSameCell, newCellPositionFromDirection } from "../data/cell";
-import { isValidCellPosition } from "../checks";
+import { getRemainingToolRecoveryTime, isValidCellPosition } from "../checks";
 
 export function isValidMove(gameState: GameState, turnMove: TurnMove): boolean {
   const motherPosition = gameState.currentPositions[CatId.MOTHER];
@@ -12,20 +12,12 @@ export function isValidMove(gameState: GameState, turnMove: TurnMove): boolean {
     return false;
   }
 
-  if (isSpecialAction(turnMove)) {
-    return true;
-  }
-
   if (isTool(turnMove)) {
     if (!gameState.setup.config[ConfigCategory.TOOLS][turnMove]) {
       return false;
     }
 
-    const recoveryTime = RECOVERY_TIME_MAP[turnMove];
-    // If the move is a tool, check if it can be used based on the recovery time
-    const lastIndex = gameState.moves.lastIndexOf(turnMove);
-
-    return lastIndex === -1 || gameState.moves.length - lastIndex > recoveryTime;
+    return getRemainingToolRecoveryTime(gameState, turnMove) === 0;
   }
 
   const newPosition = newCellPositionFromDirection(motherPosition, turnMove);

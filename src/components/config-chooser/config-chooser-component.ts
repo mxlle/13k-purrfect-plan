@@ -1,6 +1,6 @@
 import { createDialog, Dialog } from "../dialog/dialog";
 import { createElement } from "../../utils/html-utils";
-import { allConfigItems, explanationMap, getNextUnknownConfigItems, updateKnownConfigItems } from "../../logic/config/config";
+import { allConfigItems, explanationMap, getNextUnknownConfigItems, getToolText, updateKnownConfigItems } from "../../logic/config/config";
 import { shuffleArray } from "../../utils/random-utils";
 import { getCatElement, isCatId } from "../../logic/data/cats";
 import { ConfigItemId, isTool } from "../../types";
@@ -9,7 +9,7 @@ import { isMoveLimit } from "../../logic/config/move-limit";
 import styles from "./config-chooser-component.module.scss";
 import { getTranslation } from "../../translations/i18n";
 import { TranslationKey } from "../../translations/translationKey";
-import { getCatIdClass, getMeowTextWithIcon } from "../cat-component/cat-component";
+import { getCatIdClass } from "../cat-component/cat-component";
 import { sleep } from "../../utils/promise-utils";
 import { CssClass } from "../../utils/css-class";
 
@@ -115,7 +115,7 @@ function getChoiceElement(configItem: ConfigItemId, chooseItem: (event: MouseEve
     return createElement({
       text: getTranslation(TranslationKey.CHOICE_TOOL),
       onClick: (event) => {
-        event.target.innerHTML = getMeowTextWithIcon();
+        event.target.innerHTML = getToolText(configItem);
         chooseItem(event);
       },
     });

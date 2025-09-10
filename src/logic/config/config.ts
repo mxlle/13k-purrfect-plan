@@ -1,10 +1,11 @@
 import { ALL_KITTEN_IDS, CatId, type KittenId } from "../data/catId";
-import { ConfigCategory, ConfigItemId, ObjectId, Tool } from "../../types";
+import { ALL_TOOLS, ConfigCategory, ConfigItemId, ObjectId, Tool } from "../../types";
 import { GameSetup } from "../data/game-elements";
 import { getHighestMoveLimit, MoveLimit } from "./move-limit";
 import { TranslationKey } from "../../translations/translationKey";
 import { getArrayFromStorage, LocalStorageKey, setLocalStorageItem } from "../../utils/local-storage";
 import { ALL_OBJECT_IDS } from "../data/objects";
+import { getTranslation } from "../../translations/i18n";
 
 export interface Config {
   [ConfigCategory.KITTEN_BEHAVIOR]: Record<KittenId, boolean>;
@@ -18,7 +19,7 @@ export interface Config {
 export const emptyConfig: Config = {
   [ConfigCategory.KITTEN_BEHAVIOR]: Object.fromEntries(ALL_KITTEN_IDS.map((catId) => [catId, false])) as Record<KittenId, boolean>,
   [ConfigCategory.OBJECTS]: Object.fromEntries(ALL_OBJECT_IDS.map((type) => [type, false])) as Record<ObjectId, boolean>,
-  [ConfigCategory.TOOLS]: Object.fromEntries(Object.values(Tool).map((tool) => [tool, false])) as Record<Tool, boolean>,
+  [ConfigCategory.TOOLS]: Object.fromEntries(ALL_TOOLS.map((tool) => [tool, false])) as Record<Tool, boolean>,
   [ConfigCategory.RULES]: {
     moveLimit: MoveLimit.MOVE_LIMIT_NONE,
   },
@@ -26,7 +27,7 @@ export const emptyConfig: Config = {
 export const allInConfig: Config = {
   [ConfigCategory.KITTEN_BEHAVIOR]: Object.fromEntries(ALL_KITTEN_IDS.map((catId) => [catId, true])) as Record<KittenId, boolean>,
   [ConfigCategory.OBJECTS]: Object.fromEntries(ALL_OBJECT_IDS.map((type) => [type, true])) as Record<ObjectId, boolean>,
-  [ConfigCategory.TOOLS]: Object.fromEntries(Object.values(Tool).map((tool) => [tool, true])) as Record<Tool, boolean>,
+  [ConfigCategory.TOOLS]: Object.fromEntries(ALL_TOOLS.map((tool) => [tool, true])) as Record<Tool, boolean>,
   [ConfigCategory.RULES]: {
     moveLimit: MoveLimit.MOVE_LIMIT_STRICT,
   },
@@ -64,6 +65,7 @@ export const explanationMap: Record<ConfigItemId, TranslationKey | undefined> = 
   [CatId.IVY]: TranslationKey.EXPLANATION_IVY,
   [CatId.SPLASHY]: TranslationKey.EXPLANATION_SPLASHY,
   [Tool.MEOW]: TranslationKey.EXPLANATION_MEOW,
+  [Tool.WAIT]: TranslationKey.EXPLANATION_WAIT,
   [MoveLimit.MOVE_LIMIT_NONE]: undefined,
   [MoveLimit.MOVE_LIMIT_SIMPLE]: TranslationKey.EXPLANATION_MOVE_LIMIT_1,
   [MoveLimit.MOVE_LIMIT_STRICT]: TranslationKey.EXPLANATION_MOVE_LIMIT_2,
@@ -77,6 +79,7 @@ export const preconditions: Record<ConfigItemId, ConfigItemId[]> = {
   [CatId.IVY]: [ObjectId.TREE],
   [CatId.SPLASHY]: [ObjectId.PUDDLE, Tool.MEOW],
   [Tool.MEOW]: [],
+  [Tool.WAIT]: [Tool.MEOW, CatId.IVY],
   [MoveLimit.MOVE_LIMIT_NONE]: [],
   [MoveLimit.MOVE_LIMIT_SIMPLE]: [ObjectId.MOON],
   [MoveLimit.MOVE_LIMIT_STRICT]: [ObjectId.MOON, MoveLimit.MOVE_LIMIT_SIMPLE],
@@ -124,4 +127,8 @@ export function getValidatedConfig(config: Config): Config {
   }
 
   return validatedConfig;
+}
+
+export function getToolText(tool: Tool) {
+  return tool === Tool.MEOW ? `💬&nbsp;${getTranslation(TranslationKey.MEOW)}` : `💤&nbsp;${getTranslation(TranslationKey.WAIT)}`;
 }

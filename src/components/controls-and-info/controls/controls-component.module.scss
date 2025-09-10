@@ -11,6 +11,7 @@
   grid-template-rows: repeat(3, auto);
   align-items: center;
   justify-items: center;
+  place-self: center;
   width: fit-content;
   position: relative;
 
@@ -34,7 +35,7 @@
       height: 3.5rem;
       margin: -0.25rem;
 
-      @media (max-height: 600px) {
+      @media (max-height: 700px) {
         width: 3rem;
         height: 3rem;
       }
@@ -65,31 +66,43 @@
 .toolControls {
   display: grid;
   place-items: center;
-
-  &.disabled {
-    button {
-      pointer-events: none;
-      opacity: 0.5;
-      filter: grayscale(80%);
-    }
-
-    :last-child {
-      &::before {
-        content: "⏳ ";
-      }
-    }
-  }
-  &.hidden {
-    display: none !important;
-  }
+  gap: 0.5rem;
 
   button {
-    grid-area: 1 / 1;
-    color: $main-color;
+    display: grid;
+    font-size: 0.9em;
+    width: 100%;
+
+    &.disabled {
+      pointer-events: none;
+
+      .recovery-info {
+        display: block;
+      }
+
+      > span {
+        opacity: 0.1;
+        filter: grayscale(80%);
+      }
+    }
+
+    > span {
+      grid-area: 1 / 1;
+      color: $main-color;
+    }
+
+    @media (max-height: 700px) {
+      font-size: 0.7em;
+    }
   }
 
   .recovery-info {
+    display: none;
     grid-area: 1 / 1;
+
+    &::before {
+      content: "⏳ ";
+    }
   }
 }
 

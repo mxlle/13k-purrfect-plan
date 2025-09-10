@@ -1,4 +1,4 @@
-import { isTool, SpecialAction, Tool, TurnMove } from "../../types";
+import { isTool, Tool, TurnMove } from "../../types";
 import { PubSubEvent, pubSubService } from "../../utils/pub-sub-service";
 import { getKittensOnCell, isMoveLimitExceeded, isWinConditionMet } from "../checks";
 import { ALL_KITTEN_IDS, CatId } from "../data/catId";
@@ -56,7 +56,7 @@ export async function performMove(gameState: GameState, turnMove: TurnMove) {
 
     await toolStartPromise;
 
-    globals.nextPositionsIfWait = calculateNewPositions(gameState, SpecialAction.WAIT);
+    globals.nextPositionsIfWait = calculateNewPositions(gameState, Tool.WAIT);
 
     const isWon = isWinConditionMet(gameState);
     const isLost = isMoveLimitExceeded(gameState);

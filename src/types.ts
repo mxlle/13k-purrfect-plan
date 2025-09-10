@@ -13,34 +13,30 @@ export const Direction = defineEnum({
 export type Tool = defineEnum<typeof Tool>;
 export const Tool = defineEnum({
   MEOW: "meow",
+  WAIT: "wait",
 });
 
 type RecoveryTurnCount = number;
 
 export const RECOVERY_TIME_MAP: Record<Tool, RecoveryTurnCount> = {
-  [Tool.MEOW]: 2,
+  [Tool.MEOW]: 3,
+  [Tool.WAIT]: 0,
 };
 
-export type SpecialAction = defineEnum<typeof SpecialAction>;
-export const SpecialAction = defineEnum({
-  WAIT: "wait",
-});
+export type TurnMove = Direction | Tool;
 
-export type TurnMove = Direction | Tool | SpecialAction;
+export const ALL_DIRECTIONS: Direction[] = Object.values(Direction);
+export const ALL_TOOLS: Tool[] = Object.values(Tool);
 
 export function isDirection(move: TurnMove): move is Direction {
-  return Object.values(Direction).includes(move as Direction);
+  return ALL_DIRECTIONS.includes(move as Direction);
 }
 
 export function isTool(move: unknown): move is Tool {
-  return Object.values(Tool).includes(move as Tool);
+  return ALL_TOOLS.includes(move as Tool);
 }
 
-export function isSpecialAction(move: TurnMove): move is SpecialAction {
-  return Object.values(SpecialAction).includes(move as SpecialAction);
-}
-
-export const ALL_TURN_MOVES = [...Object.values(Direction), ...Object.values(Tool)] as const;
+export const ALL_TURN_MOVES = [...ALL_DIRECTIONS, ...ALL_TOOLS] as const;
 
 export type OnboardingStep = defineEnum<typeof OnboardingStep>;
 export const OnboardingStep = defineEnum({

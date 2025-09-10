@@ -20,7 +20,7 @@ import { CssClass } from "../../utils/css-class";
 import { ALL_KITTEN_IDS } from "../../logic/data/catId";
 import { CellPosition, getCellDifference, getDirection } from "../../logic/data/cell";
 import { PubSubEvent, pubSubService } from "../../utils/pub-sub-service";
-import { ConfigCategory, ConfigItemId, isSpecialAction, isTool, ObjectId, SpecialAction } from "../../types";
+import { ConfigCategory, ConfigItemId, isTool, ObjectId, Tool } from "../../types";
 import { allInConfig, Config, getValidatedConfig, hasUnknownConfigItems } from "../../logic/config/config";
 import { DEFAULT_FIELD_SIZE, FieldSize } from "../../logic/data/field-size";
 import { isValidCellPosition, isWinConditionMet } from "../../logic/checks";
@@ -76,7 +76,7 @@ async function shuffleFieldAnimation(config: Config) {
 
   for (let i = 0; i < 2; i++) {
     const randomState = getInitialGameState(randomlyPlaceGameElementsOnField(getInitialGameSetup(config), false, true));
-    const nextPositionsIfWait = calculateNewPositions(randomState, SpecialAction.WAIT);
+    const nextPositionsIfWait = calculateNewPositions(randomState, Tool.WAIT);
     await initializeElementsOnGameField(randomState, nextPositionsIfWait, false, true);
     await requestAnimationFrameWithTimeout(TIMEOUT_BETWEEN_GAMES);
   }
@@ -145,7 +145,7 @@ export async function refreshFieldWithSetup(
   shouldResetToMiddle: boolean,
 ) {
   globals.gameState = getInitialGameState(gameSetup);
-  globals.nextPositionsIfWait = calculateNewPositions(globals.gameState, SpecialAction.WAIT);
+  globals.nextPositionsIfWait = calculateNewPositions(globals.gameState, Tool.WAIT);
   const serializedGameSetup = serializeGame(gameSetup);
   location.hash = onboardingData || hasUnknownConfigItems() ? "" : `#${serializedGameSetup}`;
   document.body.style.setProperty("--s-cnt", gameSetup.fieldSize.toString());
@@ -214,7 +214,7 @@ export function generateGameFieldElement(fieldSize: FieldSize) {
 }
 
 function addOnboardingSuggestionIfApplicable(onboardingData: OnboardingData | undefined, newConfigItem: ConfigItemId | boolean) {
-  if (onboardingData?.highlightedAction && !isSpecialAction(onboardingData?.highlightedAction)) {
+  if (onboardingData?.highlightedAction) {
     activateOnboardingHighlight(onboardingData?.highlightedAction);
   } else if (newConfigItem && isTool(newConfigItem)) {
     activateOnboardingHighlight(newConfigItem);

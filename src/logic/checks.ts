@@ -1,7 +1,7 @@
 import { ALL_KITTEN_IDS, CatId, KittenId } from "./data/catId";
 import { CellPosition, isSameCell } from "./data/cell";
 import { FieldSize } from "./data/field-size";
-import { ObjectId } from "../types";
+import { ObjectId, RECOVERY_TIME_MAP, Tool } from "../types";
 import { GameElementId, GameSetup, GameState, getParFromGameState } from "./data/game-elements";
 import { isCatId, isMom } from "./data/cats";
 import { hasMoveLimit } from "./config/config";
@@ -69,4 +69,12 @@ export function isValidCellPosition(gameState: GameState, position: CellPosition
   const targetIsPuddle = !!gameState.currentPositions[ObjectId.PUDDLE] && isSameCell(position, gameState.currentPositions[ObjectId.PUDDLE]);
 
   return !targetIsTree && (!targetIsPuddle || !isCatId(elementToBeMoved) || !isMom(elementToBeMoved)); // mom doesn't move into the puddle
+}
+
+export function getRemainingToolRecoveryTime(gameState: GameState, tool: Tool): number {
+  const recoveryTime = RECOVERY_TIME_MAP[tool];
+  const lastIndex = gameState.moves.lastIndexOf(tool);
+  const remainingTime = lastIndex === -1 ? 0 : recoveryTime - (gameState.moves.length - lastIndex);
+
+  return Math.max(0, remainingTime);
 }

@@ -1,6 +1,6 @@
 import { createButton, createElement } from "../../../utils/html-utils";
 import { CssClass } from "../../../utils/css-class";
-import { ConfigCategory, Direction, isSpecialAction, isTool, RECOVERY_TIME_MAP, Tool, TurnMove } from "../../../types";
+import { ConfigCategory, Direction, isTool, Tool, TurnMove } from "../../../types";
 
 import styles from "./controls-component.module.scss";
 import { performMove } from "../../../logic/gameplay/perform-move";
@@ -10,20 +10,19 @@ import { getTranslation } from "../../../translations/i18n";
 import { TranslationKey } from "../../../translations/translationKey";
 import { globals } from "../../../globals";
 
-import { hasMoveLimit } from "../../../logic/config/config";
+import { getToolText, hasMoveLimit } from "../../../logic/config/config";
 import { getXpInnerHtml, XP_FOR_HINT } from "../../../logic/data/experience-points";
 import { toggleDoOverButtonVisibility, updateGameInfoComponent } from "../game-info/game-info-component";
 import { animateXpFlyAway } from "../../xp-components/xp-components";
 import { isValidMove } from "../../../logic/gameplay/movement";
 import { getBestNextMove } from "../../../logic/gameplay/hint";
-import { getMeowTextWithIcon } from "../../cat-component/cat-component";
+import { getRemainingToolRecoveryTime } from "../../../logic/checks";
 
 const movementContainer: HTMLElement = createElement({ cssClass: styles.movementControls });
 const toolContainer: HTMLElement = createElement({ cssClass: styles.toolControls });
 let hintButton: HTMLButtonElement | undefined;
 let highlightedElement: HTMLElement | undefined;
 const recoveryInfoComponent: HTMLElement = createElement({ cssClass: styles.recoveryInfo });
-let toolsFrozenUntilTurn: number | undefined;
 
 const allDirections = [Direction.UP, Direction.RIGHT, Direction.DOWN, Direction.LEFT];
 
@@ -39,7 +38,9 @@ export function initMovementContainer(): HTMLElement {
 export function initToolContainer(): HTMLElement {
   toolContainer.innerHTML = "";
   // toolContainer.append(createRecordButton([Tool.MEOW]));
-  toolContainer.append(getToolButton(Tool.MEOW), recoveryInfoComponent);
+  const meowButton = getToolButton(Tool.MEOW);
+  meowButton.append(recoveryInfoComponent);
+  toolContainer.append(meowButton, getToolButton(Tool.WAIT));
 
   return toolContainer;
 }
@@ -60,7 +61,7 @@ export function initHintButton(): HTMLButtonElement {
       pubSubService.publish(PubSubEvent.UPDATE_XP, XP_FOR_HINT);
 
       const hint = getBestNextMove(globals.gameState);
-      if (hint !== undefined && !isSpecialAction(hint)) {
+      if (hint !== undefined) {
         activateOnboardingHighlight(hint);
       } else {
         toggleDoOverButtonVisibility(true);
@@ -73,7 +74,6 @@ export function initHintButton(): HTMLButtonElement {
 
 export function updateControlsOnGameStart() {
   hintButton.removeAttribute("disabled");
-  toolsFrozenUntilTurn = undefined;
   updateRecoveryInfoComponent();
   updateToolContainer();
   updateMoveButtonsDisabledState();
@@ -124,7 +124,7 @@ function getMoveButton(direction: Direction): HTMLElement {
 }
 
 function getToolButton(tool: Tool) {
-  return (buttons[tool] ??= createButton({ text: getMeowTextWithIcon(), onClick: () => handleMove(tool) }));
+  return (buttons[tool] ??= createButton({ html: `<span>${getToolText(tool)}</span>`, onClick: () => handleMove(tool) }));
 }
 
 function getControlButton(type: Direction | Tool): HTMLElement {
@@ -161,10 +161,6 @@ export function setupKeyboardEventListeners() {
 }
 
 async function handleMove(turnMove: TurnMove) {
-  if (isTool(turnMove) && toolsFrozenUntilTurn) {
-    return;
-  }
-
   if (highlightedElement) {
     highlightedElement.classList.remove(styles.onboardingHighlight);
     highlightedElement = undefined;
@@ -175,29 +171,23 @@ async function handleMove(turnMove: TurnMove) {
   await performMove(globals.gameState, turnMove);
   updateGameInfoComponent();
 
-  if (isTool(turnMove)) {
-    toolsFrozenUntilTurn = globals.gameState.moves.length + RECOVERY_TIME_MAP[turnMove];
-  }
-
   updateRecoveryInfoComponent();
   updateMoveButtonsDisabledState();
 }
 
 function updateRecoveryInfoComponent() {
-  if (!toolsFrozenUntilTurn) {
+  if (!globals.gameState) return;
+
+  const remainingRecoveryTime = getRemainingToolRecoveryTime(globals.gameState, Tool.MEOW);
+
+  if (!remainingRecoveryTime) {
     recoveryInfoComponent.innerHTML = "";
-    toolContainer.classList.remove(styles.disabled);
+    getToolButton(Tool.MEOW).classList.remove(styles.disabled);
     return;
   }
 
-  const turnsLeft = toolsFrozenUntilTurn - globals.gameState.moves.length;
-  recoveryInfoComponent.innerHTML = `${turnsLeft}`;
-  toolContainer.classList.toggle(styles.disabled, turnsLeft > 0);
-
-  if (turnsLeft <= 0) {
-    recoveryInfoComponent.innerHTML = "";
-    toolsFrozenUntilTurn = undefined;
-  }
+  recoveryInfoComponent.innerHTML = `${remainingRecoveryTime}`;
+  getToolButton(Tool.MEOW).classList.toggle(styles.disabled, remainingRecoveryTime > 0);
 }
 
 export function updateToolContainer() {

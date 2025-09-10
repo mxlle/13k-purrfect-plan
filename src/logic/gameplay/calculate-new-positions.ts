@@ -22,7 +22,10 @@ export function calculateNewPositions(gameState: GameState, turnMove: TurnMove):
 
   if (isTool(turnMove)) {
     newElementPositions = executeTool(gameState, turnMove);
-  } else {
+  }
+
+  // regular movement, except for meow
+  if (turnMove !== Tool.MEOW) {
     newElementPositions = deepCopyElementsMap(gameState.currentPositions);
 
     if (isDirection(turnMove)) {

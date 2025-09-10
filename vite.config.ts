@@ -8,7 +8,7 @@ import { CssClass } from "./src/utils/css-class";
 import { PubSubEvent } from "./src/utils/pub-sub-service";
 import { LocalStorageKey } from "./src/utils/local-storage";
 import { mapEntries, memoize } from "./src/utils/utils";
-import { ConfigCategory, Direction, ObjectId, OnboardingStep, SpecialAction, Tool } from "./src/types";
+import { ConfigCategory, Direction, ObjectId, OnboardingStep, Tool } from "./src/types";
 import { CatId } from "./src/logic/data/catId";
 import { MoveLimit } from "./src/logic/config/move-limit";
 import { visualizer } from "rollup-plugin-visualizer";
@@ -86,7 +86,6 @@ export default defineConfig(({ mode, command }) => {
           ...replaceEnum("LocalStorageKey", LocalStorageKey),
           ...replaceEnum("Direction", Direction),
           ...replaceEnum("Tool", Tool),
-          ...replaceEnum("SpecialAction", SpecialAction),
           ...replaceEnum("CatId", CatId),
           ...replaceEnum("ObjectId", ObjectId),
           ...replaceEnum("ConfigCategory", ConfigCategory),
