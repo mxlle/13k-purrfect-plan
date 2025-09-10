@@ -41,8 +41,6 @@ export function initToolContainer(): HTMLElement {
   // toolContainer.append(createRecordButton([Tool.MEOW]));
   toolContainer.append(getToolButton(Tool.MEOW), recoveryInfoComponent);
 
-  updateToolContainer();
-
   return toolContainer;
 }
 
@@ -202,7 +200,7 @@ function updateRecoveryInfoComponent() {
   }
 }
 
-function updateToolContainer() {
+export function updateToolContainer() {
   if (hintButton) {
     hintButton.classList.toggle(CssClass.HIDDEN, !globals.gameState || !hasMoveLimit(globals.gameState.setup.config));
   }

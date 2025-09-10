@@ -25,6 +25,7 @@ import {
   setupKeyboardEventListeners,
   showNewGameButtonsAndHideControls,
   updateControlsOnGameStart,
+  updateToolContainer,
 } from "./controls/controls-component";
 
 let hasSetupEventListeners = false;
@@ -39,6 +40,7 @@ export function getControlsAndInfoComponent(): HTMLElement {
 
   controlsAndInfoComponent.append(getGameInfoComponent(), movementContainer, toolContainer, hintButton);
 
+  updateToolContainer();
   updateGameInfoComponent();
 
   if (!globals.gameState && !isOnboarding()) {

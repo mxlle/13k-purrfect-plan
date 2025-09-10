@@ -5,13 +5,6 @@
   animation: boxShadowPulse 2s ease-in-out infinite;
 }
 
-.disabled > * {
-  &:not(.newGameContainer) {
-    pointer-events: none;
-    opacity: 0;
-  }
-}
-
 .movementControls {
   display: grid;
   grid-template-columns: repeat(3, auto);
@@ -28,6 +21,11 @@
 
   > button {
     color: $main-color;
+  }
+
+  &.disabled > * {
+    pointer-events: none;
+    opacity: 0;
   }
 
   :global(.#{$ICON_BTN}) {
