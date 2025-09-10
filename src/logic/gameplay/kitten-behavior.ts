@@ -1,19 +1,19 @@
 import { GameState } from "../data/game-elements";
 import { CellPosition, getEightNeighborsClockwise, isSameCell } from "../data/cell";
-import { CatId } from "../data/catId";
+import { CatId, KittenId } from "../data/catId";
 import { ObjectId } from "../../types";
 import { moveCatTowardsCell } from "./movement";
-import { shouldApplyKittenBehavior } from "../config/config";
+import { isConfigItemEnabled } from "../config/config";
 
 export function handleKittenBehavior(
   gameState: GameState,
-  kitten: CatId,
+  kitten: KittenId,
   previousMotherPosition: CellPosition,
   newMotherPosition: CellPosition,
 ): CellPosition {
   const previousPosition = { ...gameState.currentPositions[kitten] };
 
-  if (!shouldApplyKittenBehavior(gameState.setup, kitten)) {
+  if (!isConfigItemEnabled(kitten)) {
     return previousPosition;
   }
 

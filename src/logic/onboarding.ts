@@ -1,7 +1,6 @@
 import { Direction, OnboardingStep, TurnMove } from "../types";
 import { globals } from "../globals";
 import { LocalStorageKey, setLocalStorageItem } from "../utils/local-storage";
-import { emptyConfig } from "./config/config";
 import { FieldSize } from "./data/field-size";
 import { GameElementPositions, GameSetup } from "./data/game-elements";
 import { deserializeGame } from "./serializer";
@@ -66,7 +65,6 @@ export function getOnboardingData(): OnboardingData | undefined {
       fieldSize: onboardingFieldSizeMap[step],
       elementPositions: deserializedGame.elementPositions,
       possibleSolutions: [],
-      config: emptyConfig,
     },
     highlightedAction: step === OnboardingStep.INTRO ? Direction.DOWN : undefined,
   };

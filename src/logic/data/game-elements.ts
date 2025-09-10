@@ -3,7 +3,7 @@ import { getCatElement } from "./cats";
 import { ALL_OBJECT_IDS, getObjectElement, isObjectId } from "./objects";
 import { CellPosition } from "./cell";
 import { FieldSize, getMiddleCoordinates } from "./field-size";
-import { Config, hasUnknownConfigItems } from "../config/config";
+import { hasUnknownConfigItems } from "../config/config";
 import { Difficulty, ObjectId, TurnMove } from "../../types";
 import { FALLBACK_PAR, MAX_PAR } from "../par";
 import { getDefaultPlacedObjects, isOnboarding, OnboardingData } from "../onboarding";
@@ -24,7 +24,6 @@ export type GameElementRepresentations = Record<GameElementId, GameElementRepres
 export interface GameSetup {
   fieldSize: FieldSize;
   elementPositions: GameElementPositions;
-  config: Config;
   possibleSolutions: TurnMove[][];
   difficulty?: Difficulty | undefined;
 }
@@ -134,7 +133,6 @@ export function copyGameSetup(setup: GameSetup): GameSetup {
   return {
     fieldSize: setup.fieldSize,
     elementPositions: deepCopyElementsMap(setup.elementPositions),
-    config: { ...setup.config },
     possibleSolutions: setup.possibleSolutions.map((solution) => [...solution]),
   };
 }

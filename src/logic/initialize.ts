@@ -3,27 +3,24 @@ import { shuffleArray } from "../utils/random-utils";
 import { getAllCellPositions, getEmptyFields } from "./checks";
 import { ALL_CAT_IDS } from "./data/catId";
 import { isSameCell } from "./data/cell";
-import { allInConfig, Config, getValidatedConfig, hasMoveLimit, hasUnknownConfigItems, showMoon } from "./config/config";
+import { hasMoveLimit, hasUnknownConfigItems, showMoon } from "./config/config";
 import { DEFAULT_FIELD_SIZE, FieldSize, getMiddleCoordinates } from "./data/field-size";
 import { copyGameSetup, EMPTY_ELEMENT_MAP, GameElementPositions, GameSetup, isValidGameSetup } from "./data/game-elements";
 import { calculatePar, MAX_PAR, MIN_PAR } from "./par";
 import { ALL_OBJECT_IDS, DEFAULT_MOON_POSITION } from "./data/objects";
 import { sleep } from "../utils/promise-utils";
-import { ConfigCategory, Difficulty, ObjectId } from "../types";
+import { Difficulty, ObjectId } from "../types";
 import { getRandomItem } from "../utils/array-utils";
 import { difficultyEmoji } from "./difficulty";
 
 const MAX_ITERATIONS_FOR_RANDOM_PLACEMENT = 13;
 
-export function getInitialGameSetup(
-  config: Config = getValidatedConfig(allInConfig),
-  fieldSize: FieldSize = DEFAULT_FIELD_SIZE,
-): GameSetup {
+export function getInitialGameSetup(fieldSize: FieldSize = DEFAULT_FIELD_SIZE): GameSetup {
   const placedObjects = getDefaultPlacedObjects();
   const elementPositions: GameElementPositions = EMPTY_ELEMENT_MAP();
 
   for (const obj of ALL_OBJECT_IDS) {
-    if ((obj === ObjectId.MOON && !showMoon(config)) || config[ConfigCategory.OBJECTS][obj] === false) {
+    if (obj === ObjectId.MOON && !showMoon()) {
       continue;
     }
     elementPositions[obj] = { ...placedObjects[obj] };
@@ -36,22 +33,21 @@ export function getInitialGameSetup(
   return {
     fieldSize,
     elementPositions,
-    config: getValidatedConfig(config),
     possibleSolutions: [],
   };
 }
 
-export async function generateRandomGameSetup(config: Config, fieldSize: FieldSize = DEFAULT_FIELD_SIZE): Promise<GameSetup> {
+export async function generateRandomGameSetup(fieldSize: FieldSize = DEFAULT_FIELD_SIZE): Promise<GameSetup> {
   await sleep(0);
 
-  const tempGameSetup = getInitialGameSetup(config, fieldSize);
+  const tempGameSetup = getInitialGameSetup(fieldSize);
 
   let performanceStart: number | undefined;
   if (import.meta.env.DEV) {
     performanceStart = performance.now();
   }
 
-  const finalGameSetup = randomlyPlaceGameElementsOnField(tempGameSetup, hasMoveLimit(config), false);
+  const finalGameSetup = randomlyPlaceGameElementsOnField(tempGameSetup, hasMoveLimit(), false);
 
   if (import.meta.env.DEV) {
     const performanceEnd = performance.now();
@@ -74,7 +70,7 @@ function randomlyPlaceObjectsOnField(gameSetup: GameSetup, randomMoonPosition: b
 
   const newCellForTree = getRandomItem(cellsAllowedForTree);
   const newCellForPuddle = getRandomItem(cellsAllowedForPuddle.filter((cell) => !isSameCell(cell, newCellForTree)));
-  const newCellForMoon = showMoon(gameSetup.config) ? getRandomItem(cellsAllowedForMoon) : null;
+  const newCellForMoon = showMoon() ? getRandomItem(cellsAllowedForMoon) : null;
 
   return {
     ...EMPTY_ELEMENT_MAP(),

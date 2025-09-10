@@ -3,7 +3,7 @@ import { Direction, isTool, TurnMove } from "../../types";
 import { CatId } from "../data/catId";
 import { CellPosition, getCellDifferenceAbsolute, getFourNeighbors, isSameCell, newCellPositionFromDirection } from "../data/cell";
 import { getRemainingToolRecoveryTime, isValidCellPosition } from "../checks";
-import { isKnownTool } from "../config/config";
+import { isConfigItemEnabled } from "../config/config";
 
 export function isValidMove(gameState: GameState, turnMove: TurnMove): boolean {
   const motherPosition = gameState.currentPositions[CatId.MOTHER];
@@ -14,7 +14,7 @@ export function isValidMove(gameState: GameState, turnMove: TurnMove): boolean {
   }
 
   if (isTool(turnMove)) {
-    if (!isKnownTool(gameState.setup.config, turnMove)) {
+    if (!isConfigItemEnabled(turnMove)) {
       return false;
     }
 

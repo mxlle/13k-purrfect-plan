@@ -2,7 +2,6 @@ import { DEFAULT_FIELD_SIZE } from "./data/field-size";
 import { DEFAULT_MOON_POSITION } from "./data/objects";
 import { ObjectId } from "../types";
 import { EMPTY_ELEMENT_MAP, GameElementId, GameElementPositions, GameSetup } from "./data/game-elements";
-import { allInConfig } from "./config/config";
 import { calculatePar } from "./par";
 
 export function serializeGame(gameSetup: GameSetup): string {
@@ -40,7 +39,6 @@ export function deserializeGame(serializedGame: string, options?: { skipParCalcu
   const gameSetup: GameSetup = {
     fieldSize: DEFAULT_FIELD_SIZE,
     elementPositions,
-    config: allInConfig,
     possibleSolutions: [],
   };
 

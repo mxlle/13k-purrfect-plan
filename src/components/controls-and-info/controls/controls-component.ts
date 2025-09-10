@@ -10,7 +10,7 @@ import { getTranslation } from "../../../translations/i18n";
 import { TranslationKey } from "../../../translations/translationKey";
 import { globals } from "../../../globals";
 
-import { getToolText, hasMoveLimit, isKnownTool } from "../../../logic/config/config";
+import { getToolText, hasMoveLimit, isConfigItemEnabled } from "../../../logic/config/config";
 import { getXpInnerHtml, XP_FOR_HINT } from "../../../logic/data/experience-points";
 import { toggleDoOverButtonVisibility, updateGameInfoComponent } from "../game-info/game-info-component";
 import { animateXpFlyAway } from "../../xp-components/xp-components";
@@ -193,17 +193,17 @@ function updateRecoveryInfoComponent() {
 
 export function updateToolContainer() {
   if (hintButton) {
-    hintButton.classList.toggle(CssClass.HIDDEN, !globals.gameState || !hasMoveLimit(globals.gameState.setup.config));
+    hintButton.classList.toggle(CssClass.HIDDEN, !globals.gameState || !hasMoveLimit());
   }
 
   if (!globals.gameState) return;
 
-  const shouldHaveTools = ALL_TOOLS.some((tool) => isKnownTool(globals.gameState.setup.config, tool));
+  const shouldHaveTools = ALL_TOOLS.some((tool) => isConfigItemEnabled(tool));
 
   toolContainer.classList.toggle(CssClass.HIDDEN, !shouldHaveTools);
 
   for (const tool of ALL_TOOLS) {
-    getToolButton(tool).classList.toggle(CssClass.HIDDEN, !isKnownTool(globals.gameState.setup.config, tool));
+    getToolButton(tool).classList.toggle(CssClass.HIDDEN, !isConfigItemEnabled(tool));
   }
 }
 

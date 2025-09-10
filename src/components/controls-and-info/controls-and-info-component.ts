@@ -108,7 +108,7 @@ function addNewGameButtons(isInitialStart = false) {
 
   newGameContainer.append(continueButton);
 
-  if (!isInitialStart && hasMoveLimit(globals.gameState.setup.config) && !hasAchievedGoal) {
+  if (!isInitialStart && hasMoveLimit() && !hasAchievedGoal) {
     const restartButton = createButton({
       text: getTranslation(TranslationKey.RESTART_GAME),
       cssClass: CssClass.PRIMARY,

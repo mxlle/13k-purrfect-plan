@@ -40,8 +40,8 @@ export function hideRetryInfo() {
 }
 
 export function updateGameInfoComponent(isReset: boolean = false) {
-  const showMoves = globals.gameState && showMovesInfo(globals.gameState.setup.config);
-  const showMoveLimit = globals.gameState && hasMoveLimit(globals.gameState.setup.config);
+  const showMoves = globals.gameState && showMovesInfo();
+  const showMoveLimit = globals.gameState && hasMoveLimit();
 
   // console.debug("updateTurnMovesComponent", { showMoves, showMoveLimit, isReset, moves: globals.gameState?.moves });
 

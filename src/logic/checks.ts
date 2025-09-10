@@ -21,7 +21,7 @@ export function isWinConditionMet(gameState: GameState | null): boolean {
 }
 
 export function isMoveLimitExceeded(gameState: GameState | null): boolean {
-  if (!gameState || !hasMoveLimit(gameState.setup.config)) {
+  if (!gameState || !hasMoveLimit()) {
     return false;
   }
 

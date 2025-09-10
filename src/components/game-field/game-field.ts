@@ -17,11 +17,11 @@ import {
   wasLastOnboardingStep,
 } from "../../logic/onboarding";
 import { CssClass } from "../../utils/css-class";
-import { ALL_KITTEN_IDS } from "../../logic/data/catId";
+import { ALL_KITTEN_IDS, isKittenId } from "../../logic/data/catId";
 import { CellPosition, getCellDifference, getDirection } from "../../logic/data/cell";
 import { PubSubEvent, pubSubService } from "../../utils/pub-sub-service";
-import { ConfigCategory, ConfigItemId, isTool, ObjectId, Tool } from "../../types";
-import { allInConfig, Config, getValidatedConfig, hasUnknownConfigItems } from "../../logic/config/config";
+import { ConfigItemId, isTool, ObjectId, Tool } from "../../types";
+import { hasUnknownConfigItems, isConfigItemEnabled } from "../../logic/config/config";
 import { DEFAULT_FIELD_SIZE, FieldSize } from "../../logic/data/field-size";
 import { isValidCellPosition, isWinConditionMet } from "../../logic/checks";
 import { serializeGame } from "../../logic/serializer";
@@ -64,7 +64,7 @@ export async function initializeEmptyGameField(fieldSize: FieldSize) {
   appendGameField();
 }
 
-async function shuffleFieldAnimation(config: Config) {
+async function shuffleFieldAnimation() {
   if (!gameFieldElem) {
     console.error("shuffleFieldAnimation should only be called after gameFieldElem is initialized");
     return;
@@ -75,7 +75,7 @@ async function shuffleFieldAnimation(config: Config) {
   gameFieldElem.append(loader);
 
   for (let i = 0; i < 2; i++) {
-    const randomState = getInitialGameState(randomlyPlaceGameElementsOnField(getInitialGameSetup(config), false, true));
+    const randomState = getInitialGameState(randomlyPlaceGameElementsOnField(getInitialGameSetup(), false, true));
     const nextPositionsIfWait = calculateNewPositions(randomState, Tool.WAIT);
     await initializeElementsOnGameField(randomState, nextPositionsIfWait, false, true);
     await requestAnimationFrameWithTimeout(TIMEOUT_BETWEEN_GAMES);
@@ -113,7 +113,7 @@ export async function startNewGame(options: { isDoOver: boolean }) {
 
   let gameSetup = determineGameSetup(options, onboardingData);
   if (gameSetup === null) {
-    gameSetup = await generateRandomGameWhileAnimating(getValidatedConfig(allInConfig));
+    gameSetup = await generateRandomGameWhileAnimating();
   }
 
   if (import.meta.env.DEV) {
@@ -129,9 +129,9 @@ export async function startNewGame(options: { isDoOver: boolean }) {
   addOnboardingSuggestionIfApplicable(onboardingData, newConfigItem);
 }
 
-export async function generateRandomGameWhileAnimating(config: Config, fieldSize: FieldSize = DEFAULT_FIELD_SIZE) {
-  const gameSetupPromise = generateRandomGameSetup(config, fieldSize);
-  const animatePromise = shuffleFieldAnimation(config);
+export async function generateRandomGameWhileAnimating(fieldSize: FieldSize = DEFAULT_FIELD_SIZE) {
+  const gameSetupPromise = generateRandomGameSetup(fieldSize);
+  const animatePromise = shuffleFieldAnimation();
 
   const [gameSetup] = await Promise.all([gameSetupPromise, animatePromise]);
 
@@ -241,10 +241,7 @@ export async function initializeElementsOnGameField(
       }
 
       if (isCatId(elementId)) {
-        representation.htmlElement.classList.toggle(
-          getCatIdClass(elementId),
-          gameState.setup.config[ConfigCategory.KITTEN_BEHAVIOR][elementId],
-        );
+        representation.htmlElement.classList.toggle(getCatIdClass(elementId), !isKittenId(elementId) || isConfigItemEnabled(elementId));
       }
     }
   }

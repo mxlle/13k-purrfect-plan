@@ -49,7 +49,7 @@ export function calculateNewPositions(gameState: GameState, turnMove: TurnMove):
 function doMoonMove(gameState: GameState): CellPosition {
   const moon = gameState.currentPositions[ObjectId.MOON];
 
-  if (!moon || !showMovesInfo(gameState.setup.config)) {
+  if (!moon || !showMovesInfo()) {
     return moon;
   }
 
