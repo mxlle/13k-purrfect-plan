@@ -9,42 +9,47 @@ import { PubSubEvent, pubSubService } from "../../../utils/pub-sub-service";
 import { getTranslation } from "../../../translations/i18n";
 import { TranslationKey } from "../../../translations/translationKey";
 import { globals } from "../../../globals";
-import { isOnboarding } from "../../../logic/onboarding";
 
-import { hasMoveLimit, hasUnknownConfigItems } from "../../../logic/config/config";
-import { getParFromGameState } from "../../../logic/data/game-elements";
-import { calculateNewXP, getXpInnerHtml, XP_FOR_HINT } from "../../../logic/data/experience-points";
-import {
-  getGameInfoComponent,
-  hideRetryInfo,
-  toggleDoOverButtonVisibility,
-  updateGameInfoComponent,
-} from "../game-info/game-info-component";
-import { animateXpFlyAway, getCollectXpButton } from "../../xp-components/xp-components";
+import { hasMoveLimit } from "../../../logic/config/config";
+import { getXpInnerHtml, XP_FOR_HINT } from "../../../logic/data/experience-points";
+import { toggleDoOverButtonVisibility, updateGameInfoComponent } from "../game-info/game-info-component";
+import { animateXpFlyAway } from "../../xp-components/xp-components";
 import { isValidMove } from "../../../logic/gameplay/movement";
 import { getBestNextMove } from "../../../logic/gameplay/hint";
-import { isWinConditionMet } from "../../../logic/checks";
 import { getMeowTextWithIcon } from "../../cat-component/cat-component";
-
-let hasSetupEventListeners = false;
-const controlsComponent: HTMLElement = createElement({ cssClass: styles.controls });
 
 const movementContainer: HTMLElement = createElement({ cssClass: styles.movementControls });
 const toolContainer: HTMLElement = createElement({ cssClass: styles.toolControls });
-let hintButton: HTMLElement | undefined;
+let hintButton: HTMLButtonElement | undefined;
 let highlightedElement: HTMLElement | undefined;
 const recoveryInfoComponent: HTMLElement = createElement({ cssClass: styles.recoveryInfo });
 let toolsFrozenUntilTurn: number | undefined;
 
-export function getControlsComponent(): HTMLElement {
-  setupEventListeners();
+const allDirections = [Direction.UP, Direction.RIGHT, Direction.DOWN, Direction.LEFT];
 
-  const moveButtons = getAllMoveButtons();
+export function initMovementContainer(): HTMLElement {
+  movementContainer.innerHTML = "";
+  const moveButtons = allDirections.map(getMoveButton);
   moveButtons.forEach((button) => movementContainer.append(button));
   updateMoveButtonsDisabledState();
 
+  return movementContainer;
+}
+
+export function initToolContainer(): HTMLElement {
+  toolContainer.innerHTML = "";
   // toolContainer.append(createRecordButton([Tool.MEOW]));
   toolContainer.append(getToolButton(Tool.MEOW), recoveryInfoComponent);
+
+  updateToolContainer();
+
+  return toolContainer;
+}
+
+export function initHintButton(): HTMLButtonElement {
+  if (hintButton) {
+    return hintButton;
+  }
 
   hintButton = createButton({
     html: `${getTranslation(TranslationKey.HINT)} ${getXpInnerHtml(XP_FOR_HINT)}`,
@@ -65,36 +70,28 @@ export function getControlsComponent(): HTMLElement {
   });
   hintButton.classList.add(CssClass.SECONDARY);
 
-  updateToolContainer();
-
-  controlsComponent.append(getGameInfoComponent(), movementContainer, toolContainer, hintButton);
-
-  updateGameInfoComponent();
-
-  if (!globals.gameState && !isOnboarding()) {
-    showNewGameButtons(true);
-  }
-
-  return controlsComponent;
+  return hintButton;
 }
 
-function showNewGameButtons(isInitialStart = false) {
-  movementContainer.append(addNewGameButtons(isInitialStart));
+export function updateControlsOnGameStart() {
+  hintButton.removeAttribute("disabled");
+  toolsFrozenUntilTurn = undefined;
+  updateRecoveryInfoComponent();
+  updateToolContainer();
+  updateMoveButtonsDisabledState();
+}
+
+export function showNewGameButtonsAndHideControls(newGameButtonContainer: HTMLElement) {
+  movementContainer.append(newGameButtonContainer);
   movementContainer.classList.toggle(styles.disabled, true);
   toolContainer.classList.toggle(CssClass.OPACITY_HIDDEN, true);
   hintButton.classList.toggle(CssClass.OPACITY_HIDDEN, true);
 }
 
-function reshowControls() {
+export function reshowControls() {
   movementContainer.classList.toggle(styles.disabled, false);
   toolContainer.classList.toggle(CssClass.OPACITY_HIDDEN, false);
   hintButton.classList.toggle(CssClass.OPACITY_HIDDEN, false);
-}
-
-const allDirections = [Direction.UP, Direction.RIGHT, Direction.DOWN, Direction.LEFT];
-
-function getAllMoveButtons(): HTMLElement[] {
-  return allDirections.map(getMoveButton);
 }
 
 function updateMoveButtonsDisabledState() {
@@ -118,7 +115,7 @@ const directionStyleMap: { [key in Direction]: string } = {
 };
 
 const buttons: { [key in Direction | Tool]?: HTMLElement } = {};
-export function getMoveButton(direction: Direction): HTMLElement {
+function getMoveButton(direction: Direction): HTMLElement {
   return (buttons[direction] ??= createButton(
     {
       onClick: () => handleMove(direction),
@@ -128,38 +125,15 @@ export function getMoveButton(direction: Direction): HTMLElement {
   ));
 }
 
-export function getToolButton(tool: Tool) {
+function getToolButton(tool: Tool) {
   return (buttons[tool] ??= createButton({ text: getMeowTextWithIcon(), onClick: () => handleMove(tool) }));
 }
 
-export function getControlButton(type: Direction | Tool): HTMLElement {
+function getControlButton(type: Direction | Tool): HTMLElement {
   return isTool(type) ? getToolButton(type) : getMoveButton(type);
 }
 
-function setupEventListeners() {
-  if (hasSetupEventListeners) return;
-
-  pubSubService.subscribe(PubSubEvent.GAME_END, () => {
-    if (!controlsComponent) return;
-
-    showNewGameButtons();
-  });
-
-  pubSubService.subscribe(PubSubEvent.START_NEW_GAME, () => {
-    updateGameInfoComponent(true);
-  });
-
-  pubSubService.subscribe(PubSubEvent.GAME_START, () => {
-    controlsComponent.classList.remove(styles.disabled);
-    toggleDoOverButtonVisibility(false);
-    hintButton.removeAttribute("disabled");
-    toolsFrozenUntilTurn = undefined;
-    updateRecoveryInfoComponent();
-    updateGameInfoComponent();
-    updateToolContainer();
-    updateMoveButtonsDisabledState();
-  });
-
+export function setupKeyboardEventListeners() {
   document.addEventListener("keydown", (event) => {
     let turnMove: TurnMove | undefined;
 
@@ -186,59 +160,6 @@ function setupEventListeners() {
       void handleMove(turnMove);
     }
   });
-
-  hasSetupEventListeners = true;
-}
-
-export function addNewGameButtons(isInitialStart = false) {
-  const hasAchievedGoal = isWinConditionMet(globals.gameState) && globals.gameState.moves.length <= getParFromGameState(globals.gameState);
-
-  const newGameContainer = createElement({ cssClass: styles.newGameContainer });
-
-  const continueButton = createButton({
-    text: getTranslation(
-      isInitialStart
-        ? TranslationKey.START_GAME
-        : isOnboarding() || hasUnknownConfigItems()
-          ? TranslationKey.CONTINUE
-          : TranslationKey.NEW_GAME,
-    ),
-    onClick: () => {
-      pubSubService.publish(PubSubEvent.START_NEW_GAME, { isDoOver: false });
-      newGameContainer.remove();
-      hideRetryInfo();
-      reshowControls();
-    },
-  });
-
-  if (hasAchievedGoal) {
-    const newXP = calculateNewXP();
-    const xpButton = getCollectXpButton(newXP, () => {
-      continueButton.classList.toggle(CssClass.HIDDEN, false);
-    });
-    newGameContainer.append(xpButton);
-    continueButton.classList.toggle(CssClass.HIDDEN, true);
-  }
-
-  newGameContainer.append(continueButton);
-
-  if (!isInitialStart && hasMoveLimit(globals.gameState.setup.config) && !hasAchievedGoal) {
-    const restartButton = createButton({
-      text: getTranslation(TranslationKey.RESTART_GAME),
-      onClick: () => {
-        pubSubService.publish(PubSubEvent.START_NEW_GAME, { isDoOver: true });
-        newGameContainer.remove();
-        reshowControls();
-      },
-    });
-    restartButton.classList.add(CssClass.PRIMARY);
-
-    newGameContainer.append(restartButton);
-  } else {
-    continueButton.classList.toggle(CssClass.PRIMARY, true);
-  }
-
-  return newGameContainer;
 }
 
 async function handleMove(turnMove: TurnMove) {

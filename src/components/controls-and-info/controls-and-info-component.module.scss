@@ -1,0 +1,29 @@
+@use "../../names" as *;
+@use "../../theme" as *;
+
+.controlsAndInfo {
+  display: grid;
+  gap: 1.5rem;
+  position: relative;
+  width: fit-content;
+  height: fit-content;
+
+  @media (orientation: landscape) {
+    justify-items: center;
+  }
+
+  > * {
+    transition: opacity 0.3s;
+  }
+}
+
+.newGameContainer {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 6;
+  display: grid;
+  gap: 0.5rem;
+  place-items: center;
+}

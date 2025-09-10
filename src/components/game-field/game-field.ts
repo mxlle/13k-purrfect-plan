@@ -1,5 +1,5 @@
 import styles from "./game-field.module.scss";
-import { activateOnboardingHighlight, getControlsComponent } from "../controls-and-info/controls/controls-component";
+import { activateOnboardingHighlight } from "../controls-and-info/controls/controls-component";
 import { getArrowComponent, styles as arrowStyles, updateArrowComponent } from "../arrow-component/arrow-component";
 import { getCatIdClass } from "../cat-component/cat-component";
 
@@ -41,6 +41,7 @@ import { getTranslation } from "../../translations/i18n";
 import { TranslationKey } from "../../translations/translationKey";
 import { isCatId } from "../../logic/data/cats";
 import { calculateNewPositions } from "../../logic/gameplay/calculate-new-positions";
+import { getControlsAndInfoComponent } from "../controls-and-info/controls-and-info-component";
 
 let mainContainer: HTMLElement | undefined;
 let gameFieldElem: HTMLElement | undefined;
@@ -186,7 +187,7 @@ function appendGameField() {
     });
   }
 
-  controlsElem = getControlsComponent();
+  controlsElem = getControlsAndInfoComponent();
 
   mainContainer.append(gameFieldElem, controlsElem);
 }
