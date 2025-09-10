@@ -67,8 +67,7 @@ function init() {
   });
 
   pubSubService.subscribe(PubSubEvent.GAME_END, (result) => {
-    result.isWon && document.body.classList.add(CssClass.WON);
-    !result.isWon && document.body.classList.add(CssClass.LOST);
+    document.body.classList.add(result.isWon ? CssClass.WON : CssClass.LOST);
 
     if (import.meta.env.POKI_ENABLED === "true") {
       sleep(300).then(() => pokiSdk.gameplayStop()); // to avoid issue that stop is called before start

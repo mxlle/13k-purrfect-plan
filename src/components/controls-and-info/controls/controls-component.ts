@@ -53,6 +53,7 @@ export function initHintButton(): HTMLButtonElement {
 
   hintButton = createButton({
     html: `${getTranslation(TranslationKey.HINT)} ${getXpInnerHtml(XP_FOR_HINT)}`,
+    cssClass: CssClass.SECONDARY,
     onClick: async () => {
       if (!globals.gameState) return;
 
@@ -68,7 +69,6 @@ export function initHintButton(): HTMLButtonElement {
       }
     },
   });
-  hintButton.classList.add(CssClass.SECONDARY);
 
   return hintButton;
 }

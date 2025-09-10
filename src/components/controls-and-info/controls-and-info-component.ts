@@ -111,13 +111,13 @@ function addNewGameButtons(isInitialStart = false) {
   if (!isInitialStart && hasMoveLimit(globals.gameState.setup.config) && !hasAchievedGoal) {
     const restartButton = createButton({
       text: getTranslation(TranslationKey.RESTART_GAME),
+      cssClass: CssClass.PRIMARY,
       onClick: () => {
         pubSubService.publish(PubSubEvent.START_NEW_GAME, { isDoOver: true });
         newGameContainer.remove();
         reshowControls();
       },
     });
-    restartButton.classList.add(CssClass.PRIMARY);
 
     newGameContainer.append(restartButton);
   } else {
