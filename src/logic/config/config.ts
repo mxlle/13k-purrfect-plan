@@ -17,7 +17,7 @@ export interface Config {
 
 export const emptyConfig: Config = {
   [ConfigCategory.KITTEN_BEHAVIOR]: Object.fromEntries(ALL_KITTEN_IDS.map((catId) => [catId, false])) as Record<KittenId, boolean>,
-  [ConfigCategory.OBJECTS]: Object.fromEntries(Object.values(ObjectId).map((type) => [type, false])) as Record<ObjectId, boolean>,
+  [ConfigCategory.OBJECTS]: Object.fromEntries(ALL_OBJECT_IDS.map((type) => [type, false])) as Record<ObjectId, boolean>,
   [ConfigCategory.TOOLS]: Object.fromEntries(Object.values(Tool).map((tool) => [tool, false])) as Record<Tool, boolean>,
   [ConfigCategory.RULES]: {
     moveLimit: MoveLimit.MOVE_LIMIT_NONE,
@@ -25,7 +25,7 @@ export const emptyConfig: Config = {
 };
 export const allInConfig: Config = {
   [ConfigCategory.KITTEN_BEHAVIOR]: Object.fromEntries(ALL_KITTEN_IDS.map((catId) => [catId, true])) as Record<KittenId, boolean>,
-  [ConfigCategory.OBJECTS]: Object.fromEntries(Object.values(ObjectId).map((type) => [type, true])) as Record<ObjectId, boolean>,
+  [ConfigCategory.OBJECTS]: Object.fromEntries(ALL_OBJECT_IDS.map((type) => [type, true])) as Record<ObjectId, boolean>,
   [ConfigCategory.TOOLS]: Object.fromEntries(Object.values(Tool).map((tool) => [tool, true])) as Record<Tool, boolean>,
   [ConfigCategory.RULES]: {
     moveLimit: MoveLimit.MOVE_LIMIT_STRICT,

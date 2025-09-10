@@ -94,6 +94,7 @@ function calculateDifficulty(gameState: GameState, parInfo: ParInfoWithoutDiffic
 
   return Difficulty.EASY;
 }
+
 function calculateParInner(gameState: GameState, options: ParOptions): ParInfoWithoutDifficulty {
   const previousMoves = gameState.moves;
 
@@ -108,8 +109,7 @@ function calculateParInner(gameState: GameState, options: ParOptions): ParInfoWi
   }
 
   if (previousMoves.length >= MAX_PAR) {
-    // console.warn("Too many moves, returning -1 to indicate failure.");
-    return { par: FALLBACK_PAR, possibleSolutions: [previousMoves] }; // Limit the recursion depth to prevent excessive computation
+    return { par: FALLBACK_PAR, possibleSolutions: [previousMoves] };
   }
 
   let bestParInfo: ParInfoWithoutDifficulty = { par: FALLBACK_PAR, possibleSolutions: [] };
@@ -120,8 +120,7 @@ function calculateParInner(gameState: GameState, options: ParOptions): ParInfoWi
     }
 
     const copiedGameState = copyGameState(gameState);
-    const newMoves = [...previousMoves, move];
-    copiedGameState.moves = newMoves;
+    copiedGameState.moves = [...previousMoves, move];
 
     copiedGameState.currentPositions = deepCopyElementsMap(calculateNewPositions(copiedGameState, move));
 

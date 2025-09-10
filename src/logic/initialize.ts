@@ -2,7 +2,7 @@ import { getDefaultPlacedObjects } from "./onboarding";
 import { shuffleArray } from "../utils/random-utils";
 import { getAllCellPositions, getEmptyFields } from "./checks";
 import { ALL_CAT_IDS } from "./data/catId";
-import { CellPosition, isSameCell } from "./data/cell";
+import { isSameCell } from "./data/cell";
 import { allInConfig, Config, getValidatedConfig, hasMoveLimit, hasUnknownConfigItems, showMoon } from "./config/config";
 import { DEFAULT_FIELD_SIZE, FieldSize, getMiddleCoordinates } from "./data/field-size";
 import { copyGameSetup, EMPTY_ELEMENT_MAP, GameElementPositions, GameSetup, isValidGameSetup } from "./data/game-elements";
@@ -82,21 +82,14 @@ export function randomlyPlaceGameElementsOnField(
   const copiedGameSetup = copyGameSetup(gameSetup);
 
   const newObjectPositions = randomlyPlaceObjectsOnField(copiedGameSetup, randomMoonPosition);
-  copiedGameSetup.elementPositions[ObjectId.TREE] = newObjectPositions[ObjectId.TREE];
-  copiedGameSetup.elementPositions[ObjectId.PUDDLE] = newObjectPositions[ObjectId.PUDDLE];
-  copiedGameSetup.elementPositions[ObjectId.MOON] = newObjectPositions[ObjectId.MOON];
+  ALL_OBJECT_IDS.forEach((objId) => {
+    copiedGameSetup.elementPositions[objId] = newObjectPositions[objId];
+  });
 
-  const cats = [...ALL_CAT_IDS];
   const emptyFields = getEmptyFields(copiedGameSetup, { ignoreCats: true });
-  const shuffledRequiredFields = shuffleArray(emptyFields).slice(0, cats.length);
-  shuffledRequiredFields.forEach((cell: CellPosition) => {
-    const cat = cats.pop();
-
-    if (!cat) {
-      return;
-    }
-
-    copiedGameSetup.elementPositions[cat] = cell;
+  const shuffledFields = shuffleArray(emptyFields);
+  ALL_CAT_IDS.forEach((catId, index) => {
+    copiedGameSetup.elementPositions[catId] = shuffledFields[index] ?? shuffledFields[0];
   });
 
   if (!isValidGameSetup(copiedGameSetup) && iteration === 0) {

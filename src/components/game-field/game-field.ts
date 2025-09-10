@@ -17,16 +17,16 @@ import {
   wasLastOnboardingStep,
 } from "../../logic/onboarding";
 import { CssClass } from "../../utils/css-class";
-import { ALL_CAT_IDS, ALL_KITTEN_IDS } from "../../logic/data/catId";
+import { ALL_KITTEN_IDS } from "../../logic/data/catId";
 import { CellPosition, getCellDifference, getDirection } from "../../logic/data/cell";
 import { PubSubEvent, pubSubService } from "../../utils/pub-sub-service";
 import { ConfigCategory, ConfigItemId, isSpecialAction, isTool, ObjectId, SpecialAction } from "../../types";
 import { allInConfig, Config, getValidatedConfig, hasUnknownConfigItems } from "../../logic/config/config";
 import { DEFAULT_FIELD_SIZE, FieldSize } from "../../logic/data/field-size";
-import { ALL_OBJECT_IDS } from "../../logic/data/objects";
 import { isValidCellPosition, isWinConditionMet } from "../../logic/checks";
 import { serializeGame } from "../../logic/serializer";
 import {
+  ALL_GAME_ELEMENT_IDS,
   determineGameSetup,
   GameElementId,
   GameElementPositions,
@@ -46,7 +46,6 @@ import { getControlsAndInfoComponent } from "../controls-and-info/controls-and-i
 let mainContainer: HTMLElement | undefined;
 let gameFieldElem: HTMLElement | undefined;
 let controlsElem: HTMLElement | undefined;
-let startButton: HTMLElement | undefined;
 const cellElements: HTMLElement[][] = [];
 
 const TIMEOUT_BETWEEN_GAMES = 300;
@@ -100,8 +99,6 @@ export async function startNewGame(options: { isDoOver: boolean }) {
   removeAllSpeechBubbles();
   document.body.classList.remove(CssClass.WON, CssClass.LOST);
 
-  startButton?.remove();
-
   if (gameFieldElem) {
     // reset old game field
     if (import.meta.env.POKI_ENABLED === "true") await handlePokiCommercial();
@@ -151,12 +148,12 @@ export async function refreshFieldWithSetup(
   globals.nextPositionsIfWait = calculateNewPositions(globals.gameState, SpecialAction.WAIT);
   const serializedGameSetup = serializeGame(gameSetup);
   location.hash = onboardingData || hasUnknownConfigItems() ? "" : `#${serializedGameSetup}`;
-  document.body.style.setProperty("--s-cnt", globals.gameState.setup.fieldSize.toString());
+  document.body.style.setProperty("--s-cnt", gameSetup.fieldSize.toString());
 
   pubSubService.publish(PubSubEvent.GAME_START);
 
   if (!gameFieldElem) {
-    gameFieldElem = generateGameFieldElement(globals.gameState.setup.fieldSize);
+    gameFieldElem = generateGameFieldElement(gameSetup.fieldSize);
     appendGameField();
     await requestAnimationFrameWithTimeout(TIMEOUT_BETWEEN_GAMES);
   }
@@ -178,9 +175,7 @@ function appendGameField() {
   }
 
   if (!mainContainer) {
-    mainContainer = createElement({
-      tag: "main",
-    });
+    mainContainer = createElement({ tag: "main" });
     document.body.append(mainContainer);
     mainContainer.addEventListener("scroll", () => {
       removeAllSpeechBubbles();
@@ -197,16 +192,12 @@ export function getCellElement(cell: CellPosition): HTMLElement {
 }
 
 export function generateGameFieldElement(fieldSize: FieldSize) {
-  const gameField = createElement({
-    cssClass: styles.field,
-  });
+  const gameField = createElement({ cssClass: styles.field });
   cellElements.length = 0;
 
   for (let rowIndex = 0; rowIndex < fieldSize; rowIndex++) {
     const rowElements: HTMLElement[] = [];
-    const rowElem = createElement({
-      cssClass: styles.row,
-    });
+    const rowElem = createElement({ cssClass: styles.row });
     gameField.append(rowElem);
 
     for (let columnIndex = 0; columnIndex < fieldSize; columnIndex++) {
@@ -236,7 +227,7 @@ export async function initializeElementsOnGameField(
   isInitialStart: boolean,
   shouldResetToInitialPosition: boolean,
 ) {
-  for (const elementId of [...ALL_CAT_IDS, ...ALL_OBJECT_IDS]) {
+  for (const elementId of ALL_GAME_ELEMENT_IDS) {
     const representation = gameState.representations[elementId];
 
     if (representation) {

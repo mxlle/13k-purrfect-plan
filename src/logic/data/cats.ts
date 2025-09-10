@@ -1,5 +1,5 @@
 import { createCatElement } from "../../components/cat-component/cat-component";
-import { CatId } from "./catId";
+import { ALL_CAT_IDS, CatId } from "./catId";
 
 export const CAT_NAMES: Record<CatId, string> = {
   [CatId.MOTHER]: "Amara",
@@ -10,7 +10,7 @@ export const CAT_NAMES: Record<CatId, string> = {
 
 const cachedCatElements: Partial<Record<CatId, HTMLElement>> = {};
 export function getCatElement(id: CatId): HTMLElement {
-  return cachedCatElements[id] ??= createCatElement(id);
+  return (cachedCatElements[id] ??= createCatElement(id));
 }
 
 export function isMom(catId: CatId): boolean {
@@ -18,5 +18,5 @@ export function isMom(catId: CatId): boolean {
 }
 
 export function isCatId(value: any): value is CatId {
-  return Object.values(CatId).includes(value);
+  return ALL_CAT_IDS.includes(value);
 }

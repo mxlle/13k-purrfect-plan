@@ -1,6 +1,6 @@
 import { ALL_CAT_IDS, CatId } from "./catId";
 import { getCatElement } from "./cats";
-import { getObjectElement, isObjectId } from "./objects";
+import { ALL_OBJECT_IDS, getObjectElement, isObjectId } from "./objects";
 import { CellPosition } from "./cell";
 import { FieldSize, getMiddleCoordinates } from "./field-size";
 import { Config, hasUnknownConfigItems } from "../config/config";
@@ -114,7 +114,7 @@ export function getParFromGameState(gameState: GameState | null): number | null 
   return MAX_PAR; // For now we always allow the maximum par
 }
 
-const ALL_GAME_ELEMENT_IDS: GameElementId[] = [...Object.values(CatId), ...Object.values(ObjectId)];
+export const ALL_GAME_ELEMENT_IDS: GameElementId[] = [...ALL_CAT_IDS, ...ALL_OBJECT_IDS];
 
 export function EMPTY_ELEMENT_MAP<T extends GameElementPositions | GameElementRepresentations>(): T {
   return ALL_GAME_ELEMENT_IDS.reduce((acc, id) => {
