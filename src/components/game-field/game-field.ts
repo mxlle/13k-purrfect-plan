@@ -92,7 +92,7 @@ export async function startNewGame(options: { isDoOver: boolean }) {
     increaseOnboardingStepIfApplicable();
   }
 
-  if (notYetAllConfigItems && !isOnboarding()) {
+  if (notYetAllConfigItems && !isOnboarding() && !options.isDoOver) {
     newConfigItem = await createConfigChooserComponent();
   }
 
