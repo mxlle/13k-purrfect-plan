@@ -9,7 +9,7 @@ import { globals } from "../../../globals";
 import { hasMoveLimit, showMovesInfo } from "../../../logic/config/config";
 import { getParFromGameState } from "../../../logic/data/game-elements";
 import { FALLBACK_PAR } from "../../../logic/par";
-import { getDifficultyRepresention } from "../../../logic/difficulty";
+import { getDifficultyRepresentation } from "../../../logic/difficulty";
 import { Difficulty } from "../../../types";
 
 const turnMovesContainer: HTMLElement = createElement({ cssClass: styles.movesContainer });
@@ -54,7 +54,7 @@ export function updateGameInfoComponent(isReset: boolean = false) {
   difficultyComponent.style.display = showMoveLimit && difficulty ? "flex" : "none";
   difficultyComponent.innerHTML = `${getTranslation(TranslationKey.DIFFICULTY)}: `;
   difficultyComponent.append(
-    isReset ? "?" : createElement({ cssClass: getCssClassForDifficulty(difficulty), text: getDifficultyRepresention(difficulty) }),
+    isReset ? "?" : createElement({ cssClass: getCssClassForDifficulty(difficulty), text: getDifficultyRepresentation(difficulty) }),
   );
 
   retryInfo.classList.toggle(CssClass.HIDDEN, globals.failedAttempts === 0);

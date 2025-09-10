@@ -6,11 +6,6 @@ export type LocalStorageKey = defineEnum<typeof LocalStorageKey>;
 export const LocalStorageKey = defineEnum({
   MUTED: "muted",
   ONBOARDING_STEP: "onbStepC",
-  DIFFICULTY: "d8y",
-  DIFFICULTY_EASY: "d8y0",
-  DIFFICULTY_MEDIUM: "d8y1",
-  DIFFICULTY_HARD: "d8y2",
-  DIFFICULTY_EXTREME: "d8y3",
   SOUND: "sound",
   KNOWN_CONFIG_ELEMENTS: "knownConfig",
   XP: "xp",
