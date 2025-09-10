@@ -26,7 +26,7 @@ export interface OnboardingData {
 const serializedGameOnboardingMap: Record<OnboardingStep, string> = {
   [OnboardingStep.INTRO]: "🟣11🟡21🟢21🔵21",
   [OnboardingStep.INTERMEDIATE_OBJECTS]: "🟣12🟡32🟢31🔵32🌳22💧21",
-  [OnboardingStep.LAST_SETUP]: "🟣11🟡13🟢31🔵33🌳23💧21🌙12",
+  [OnboardingStep.LAST_SETUP]: "🟣11🟡32🟢31🔵33🌳23💧21🌙12",
 };
 
 const onboardingFieldSizeMap: Record<OnboardingStep, FieldSize> = {
