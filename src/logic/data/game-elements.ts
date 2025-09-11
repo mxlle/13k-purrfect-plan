@@ -1,9 +1,9 @@
 import { ALL_CAT_IDS, CatId } from "./catId";
 import { getCatElement } from "./cats";
-import { ALL_OBJECT_IDS, getObjectElement, isObjectId } from "./objects";
+import { ALL_OBJECT_IDS, getObjectElement, isMoon, isObjectId } from "./objects";
 import { CellPosition } from "./cell";
 import { FieldSize, getMiddleCoordinates } from "./field-size";
-import { hasUnknownConfigItems } from "../config/config";
+import { hasUnknownConfigItems, showMoon } from "../config/config";
 import { Difficulty, ObjectId, TurnMove } from "../../types";
 import { FALLBACK_PAR } from "../par";
 import { getDefaultPlacedObjects, isOnboarding, OnboardingData } from "../onboarding";
@@ -79,9 +79,9 @@ export function getHtmlElementForGameElement(id: GameElementId): HTMLElement {
   return isObjectId(id) ? getObjectElement(id) : getCatElement(id);
 }
 
-export function getInitialPositionOfGameElement(setup: GameSetup, id: GameElementId): CellPosition {
+export function getInitialPositionOfGameElement(setup: GameSetup, id: GameElementId): CellPosition | null {
   if (isObjectId(id)) {
-    return isOnboarding() ? setup.elementPositions[id] : getDefaultPlacedObjects()[id];
+    return isOnboarding() ? setup.elementPositions[id] : isMoon(id) && !showMoon() ? null : getDefaultPlacedObjects()[id];
   } else {
     // cats
     return getMiddleCoordinates(setup.fieldSize);

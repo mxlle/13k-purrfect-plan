@@ -10,6 +10,10 @@ export function isObjectId(value: any): value is ObjectId {
   return ALL_OBJECT_IDS.includes(value);
 }
 
+export function isMoon(id: any): boolean {
+  return id === ObjectId.MOON;
+}
+
 const OBJECT_ELEMENTS: Partial<Record<ObjectId, HTMLElement>> = {};
 export function getObjectElement(id: ObjectId): HTMLElement {
   return (OBJECT_ELEMENTS[id] ??= createObjectElement(id));
