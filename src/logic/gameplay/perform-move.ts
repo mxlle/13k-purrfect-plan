@@ -73,7 +73,7 @@ export async function performMove(gameState: GameState, turnMove: TurnMove) {
         getTranslation(isWon ? TranslationKey.UNITED : TranslationKey.LOST),
       );
       pubSubService.publish(PubSubEvent.GAME_END, { isWon });
-      isWon && (await kittenMeows(ALL_KITTEN_IDS, true));
+      isWon && (await kittenMeows(ALL_KITTEN_IDS, false));
     }
   } catch (error) {
     console.error("Error performing move:", error);

@@ -45,7 +45,7 @@ export async function initAudio(initializeMuted: boolean) {
   });
 }
 
-function generateUntilDone(player): Promise<void> {
+export function generateUntilDone(player): Promise<void> {
   return new Promise((resolve) => {
     const interval = setInterval(() => {
       if (player.generate() >= 1) {

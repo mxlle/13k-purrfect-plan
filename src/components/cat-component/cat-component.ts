@@ -5,13 +5,13 @@ import catSvg from "./black-cat-pink-eyes-2.svg";
 
 import styles from "./cat-component.module.scss";
 import { isMom } from "../../logic/data/cats";
+import { sleep } from "../../utils/promise-utils";
 import { hasSoundForAction, playSoundForAction } from "../../audio/sound-control/sound-control";
 import { Tool } from "../../types";
-import { sleep } from "../../utils/promise-utils";
 
 export { styles };
 
-const MOM_PLAYBACK_RATE = 1.2;
+const MOM_PLAYBACK_RATE = 1;
 
 const playbackRateMap: Record<CatId, number> = {
   [CatId.MOTHER]: MOM_PLAYBACK_RATE,

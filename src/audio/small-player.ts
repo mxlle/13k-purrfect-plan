@@ -44,19 +44,19 @@ export var CPlayer = function () {
     return Math.sin(value * 6.283184);
   };
 
-  // var osc_saw = function (value) {
-  //   return 2 * (value % 1) - 1;
-  // };
-  //
-  // var osc_square = function (value) {
-  //   return value % 1 < 0.5 ? 1 : -1;
-  // };
-  //
-  // var osc_tri = function (value) {
-  //   var v2 = (value % 1) * 4;
-  //   if (v2 < 2) return v2 - 1;
-  //   return 3 - v2;
-  // };
+  var osc_saw = function (value) {
+    return 2 * (value % 1) - 1;
+  };
+
+  var osc_square = function (value) {
+    return value % 1 < 0.5 ? 1 : -1;
+  };
+
+  var osc_tri = function (value) {
+    var v2 = (value % 1) * 4;
+    if (v2 < 2) return v2 - 1;
+    return 3 - v2;
+  };
 
   var getnotefreq = function (n) {
     // 174.61.. / 44100 = 0.003959503758 (F3)
@@ -134,7 +134,7 @@ export var CPlayer = function () {
   //--------------------------------------------------------------------------
 
   // Array of oscillator functions
-  var mOscillators = [osc_sin /* osc_square, osc_saw, osc_tri*/];
+  var mOscillators = [osc_sin, osc_square, osc_saw, osc_tri];
 
   // Private variables set up by init()
   var mSong, mLastRow, mCurrentCol, mNumWords, mMixBuf;

@@ -1,5 +1,6 @@
 import { TurnMove } from "../../types";
 import { getLocalStorageItem, LocalStorageKey, setLocalStorageItem } from "../../utils/local-storage";
+import { getSoundBoxSrc } from "./sound-control-box";
 
 const soundMap: Partial<Record<TurnMove, string>> = {};
 
@@ -11,7 +12,11 @@ export async function playSoundForAction(action: TurnMove, playbackRate: number 
   const soundSrc = getSoundForAction(action);
   if (!soundSrc) return;
 
-  const audio = new Audio(soundSrc);
+  await playSound(soundSrc, playbackRate);
+}
+
+export function playSound(audioSrc: string, playbackRate: number = 1) {
+  const audio = new Audio(audioSrc);
   audio.preload = "auto";
   audio.preservesPitch = false;
   audio.playbackRate = playbackRate;
@@ -30,7 +35,7 @@ function getSoundForAction(action: TurnMove): string | undefined {
     soundMap[action] = getLocalStorageItem(LocalStorageKey.SOUND, action);
   }
 
-  return soundMap[action];
+  return soundMap[action] ?? getSoundBoxSrc(action);
 }
 
 export function saveRecording(action: TurnMove, audioSrc: string) {
