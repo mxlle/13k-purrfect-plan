@@ -7,7 +7,7 @@ import { hasMoveLimit, showMoon } from "./config/config";
 import { DEFAULT_FIELD_SIZE, FieldSize, getMiddleCoordinates } from "./data/field-size";
 import { copyGameSetup, EMPTY_ELEMENT_MAP, GameElementPositions, GameSetup, getMoonColumnFromDesiredPar } from "./data/game-elements";
 import { calculatePar, MAX_PAR, MIN_PAR } from "./par";
-import { ALL_OBJECT_IDS, DEFAULT_MOON_POSITION } from "./data/objects";
+import { ALL_OBJECT_IDS, DEFAULT_MOON_POSITION, isMoon } from "./data/objects";
 import { sleep } from "../utils/promise-utils";
 import { Difficulty, ObjectId } from "../types";
 import { getRandomItem } from "../utils/array-utils";
@@ -39,7 +39,7 @@ export function getInitialGameSetup(fieldSize: FieldSize = DEFAULT_FIELD_SIZE): 
   const elementPositions: GameElementPositions = EMPTY_ELEMENT_MAP();
 
   for (const obj of ALL_OBJECT_IDS) {
-    if (obj === ObjectId.MOON && !showMoon()) {
+    if (isMoon(obj) && !showMoon()) {
       continue;
     }
     elementPositions[obj] = { ...placedObjects[obj] };

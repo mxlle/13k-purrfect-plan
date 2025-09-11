@@ -45,6 +45,7 @@ import { calculateNewPositions } from "../../logic/gameplay/calculate-new-positi
 import { getControlsAndInfoComponent } from "../controls-and-info/controls-and-info-component";
 import { MAX_PAR } from "../../logic/par";
 import { IS_DEV, IS_POKI_ENABLED } from "../../env-utils";
+import { isMoon } from "../../logic/data/objects";
 
 let mainContainer: HTMLElement | undefined;
 let gameFieldElem: HTMLElement | undefined;
@@ -274,7 +275,7 @@ export function updateAllPositions(gameState: GameState, nextPositionsIfWait: Ga
     const [rowDiff, colDiff] = getCellDifference(currentPosition, initialPosition);
     htmlElement.style.transform = `translate(${colDiff * 100}%, ${rowDiff * 100}%)`;
 
-    if (gameElementId === ObjectId.MOON) {
+    if (isMoon(gameElementId)) {
       const isMoonSet = !isValidCellPosition(gameState, currentPosition, ObjectId.MOON) && !hasWon;
       document.body.classList.toggle(CssClass.DARKNESS, isMoonSet);
       htmlElement.classList.toggle(CssClass.OPACITY_HIDDEN, isMoonSet);

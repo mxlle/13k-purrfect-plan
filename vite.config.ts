@@ -97,7 +97,12 @@ export default defineConfig(({ mode, command }) => {
       createHtmlPlugin({
         minify: true,
         inject: {
-          tags: js13k ? [] : [{ injectTo: "head", tag: "link", attrs: { rel: "manifest", href: "src/manifest.json" } }],
+          tags: js13k
+            ? []
+            : [
+                { injectTo: "head", tag: "link", attrs: { rel: "manifest", href: "src/manifest.json" } },
+                { injectTo: "head", tag: "meta", attrs: { name: "description", content: "Plan your route to collect all lost kittens" } },
+              ],
         },
       }),
       analyze &&
