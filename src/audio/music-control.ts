@@ -1,5 +1,5 @@
 import { CPlayer } from "./small-player";
-import { songWithDrums } from "./songs/chords-song-major-v3-with-drums";
+import { song } from "./songs/soft-kitty";
 import { LocalStorageKey, setLocalStorageItem } from "../utils/local-storage";
 import { PubSubEvent, pubSubService } from "../utils/pub-sub-service";
 
@@ -8,15 +8,13 @@ let isActive = false;
 let initialized = false;
 
 export async function initAudio(initializeMuted: boolean) {
-  isActive = !initializeMuted;
-
   audioElem = document.createElement("audio");
   audioElem.loop = true;
-  audioElem.volume = 0.5;
+  audioElem.volume = 0.4;
   audioElem.playbackRate = 1;
 
   const player = new CPlayer();
-  player.init(songWithDrums);
+  player.init(song);
 
   await generateUntilDone(player);
   const wave = player.createWave();
@@ -26,24 +24,23 @@ export async function initAudio(initializeMuted: boolean) {
     audioElem.muted = document.hidden;
   });
 
-  pubSubService.subscribe(PubSubEvent.MUTE_MUSIC, () => {
-    console.log("Muting music");
-    audioElem.muted = true;
-  });
+  if (import.meta.env.POKI_ENABLED === "true") {
+    pubSubService.subscribe(PubSubEvent.MUTE_MUSIC, () => {
+      console.log("Muting music");
+      audioElem.muted = true;
+    });
 
-  pubSubService.subscribe(PubSubEvent.UNMUTE_MUSIC, () => {
-    console.log("Unmuting music");
-    audioElem.muted = false;
-  });
+    pubSubService.subscribe(PubSubEvent.UNMUTE_MUSIC, () => {
+      console.log("Unmuting music");
+      audioElem.muted = false;
+    });
+  }
 
   document.addEventListener("click", () => {
     if (!initialized) {
       initialized = true;
 
-      const isCurrentlyPlaying = !audioElem.paused && !audioElem.ended;
-      if (isActive && !isCurrentlyPlaying) {
-        audioElem.play();
-      }
+      !initializeMuted && togglePlayer();
     }
   });
 }

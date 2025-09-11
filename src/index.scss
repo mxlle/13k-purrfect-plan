@@ -149,6 +149,10 @@ button.#{$ICON_BTN} {
   &.#{$TOUCHING} {
     transform: scale(1.2);
   }
+
+  &.#{$SECONDARY} {
+    background: none;
+  }
 }
 
 h3 {

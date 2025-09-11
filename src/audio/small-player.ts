@@ -32,6 +32,7 @@
 //  * If you're not using all the functionality (e.g. not all oscillator types,
 //    or certain effects), you can reduce the size of the player routine even
 //    further by deleting the code.
+// Note: Get the latest code from: https://sb.bitsnbites.eu/player-small.js
 
 export var CPlayer = function () {
   //--------------------------------------------------------------------------
@@ -43,19 +44,19 @@ export var CPlayer = function () {
     return Math.sin(value * 6.283184);
   };
 
-  var osc_saw = function (value) {
-    return 2 * (value % 1) - 1;
-  };
-
-  var osc_square = function (value) {
-    return value % 1 < 0.5 ? 1 : -1;
-  };
-
-  var osc_tri = function (value) {
-    var v2 = (value % 1) * 4;
-    if (v2 < 2) return v2 - 1;
-    return 3 - v2;
-  };
+  // var osc_saw = function (value) {
+  //   return 2 * (value % 1) - 1;
+  // };
+  //
+  // var osc_square = function (value) {
+  //   return value % 1 < 0.5 ? 1 : -1;
+  // };
+  //
+  // var osc_tri = function (value) {
+  //   var v2 = (value % 1) * 4;
+  //   if (v2 < 2) return v2 - 1;
+  //   return 3 - v2;
+  // };
 
   var getnotefreq = function (n) {
     // 174.61.. / 44100 = 0.003959503758 (F3)
@@ -96,9 +97,7 @@ export var CPlayer = function () {
 
         // Calculate note frequencies for the oscillators
         o1t = getnotefreq(n + (arp & 15) + instr.i[2] - 128);
-        o2t =
-          getnotefreq(n + (arp & 15) + instr.i[6] - 128) *
-          (1 + 0.0008 * instr.i[7]);
+        o2t = getnotefreq(n + (arp & 15) + instr.i[6] - 128) * (1 + 0.0008 * instr.i[7]);
       }
 
       // Envelope
@@ -135,7 +134,7 @@ export var CPlayer = function () {
   //--------------------------------------------------------------------------
 
   // Array of oscillator functions
-  var mOscillators = [osc_sin, osc_square, osc_saw, osc_tri];
+  var mOscillators = [osc_sin /* osc_square, osc_saw, osc_tri*/];
 
   // Private variables set up by init()
   var mSong, mLastRow, mCurrentCol, mNumWords, mMixBuf;
@@ -166,23 +165,7 @@ export var CPlayer = function () {
   // Generate audio data for a single track
   this.generate = function () {
     // Local variables
-    var i,
-      j,
-      b,
-      p,
-      row,
-      col,
-      n,
-      cp,
-      k,
-      t,
-      lfor,
-      e,
-      x,
-      rsample,
-      rowStartSample,
-      f,
-      da;
+    var i, j, b, p, row, col, n, cp, k, t, lfor, e, x, rsample, rowStartSample, f, da;
 
     // Put performance critical items in local variables
     var chnBuf = new Int32Array(mNumWords),
@@ -245,11 +228,7 @@ export var CPlayer = function () {
 
             // Copy note from the note cache
             var noteBuf = noteCache[n];
-            for (
-              j = 0, i = rowStartSample * 2;
-              j < noteBuf.length;
-              j++, i += 2
-            ) {
+            for (j = 0, i = rowStartSample * 2; j < noteBuf.length; j++, i += 2) {
               chnBuf[i] += noteBuf[j];
             }
           }
@@ -265,9 +244,9 @@ export var CPlayer = function () {
           if (rsample || filterActive) {
             // State variable filter
             f = fxFreq;
-            if (fxLFO) {
-              f *= oscLFO(lfoFreq * k) * lfoAmt + 0.5;
-            }
+            // if (fxLFO) {
+            //   f *= oscLFO(lfoFreq * k) * lfoAmt + 0.5;
+            // }
             f = 1.5 * Math.sin(f);
             low += f * band;
             high = q * (rsample - band) - low;
@@ -275,12 +254,11 @@ export var CPlayer = function () {
             rsample = fxFilter == 3 ? band : fxFilter == 1 ? high : low;
 
             // Distortion
-            if (dist) {
-              rsample *= dist;
-              rsample =
-                rsample < 1 ? (rsample > -1 ? osc_sin(rsample * 0.25) : -1) : 1;
-              rsample /= dist;
-            }
+            // if (dist) {
+            //   rsample *= dist;
+            //   rsample = rsample < 1 ? (rsample > -1 ? osc_sin(rsample * 0.25) : -1) : 1;
+            //   rsample /= dist;
+            // }
 
             // Drive
             rsample *= drive;
@@ -322,16 +300,16 @@ export var CPlayer = function () {
   };
 
   // Create a AudioBuffer from the generated audio data
-  this.createAudioBuffer = function (context) {
-    var buffer = context.createBuffer(2, mNumWords / 2, 44100);
-    for (var i = 0; i < 2; i++) {
-      var data = buffer.getChannelData(i);
-      for (var j = i; j < mNumWords; j += 2) {
-        data[j >> 1] = mMixBuf[j] / 65536;
-      }
-    }
-    return buffer;
-  };
+  // this.createAudioBuffer = function (context) {
+  //   var buffer = context.createBuffer(2, mNumWords / 2, 44100);
+  //   for (var i = 0; i < 2; i++) {
+  //     var data = buffer.getChannelData(i);
+  //     for (var j = i; j < mNumWords; j += 2) {
+  //       data[j >> 1] = mMixBuf[j] / 65536;
+  //     }
+  //   }
+  //   return buffer;
+  // };
 
   // Create a WAVE formatted Uint8Array from the generated audio data
   this.createWave = function () {

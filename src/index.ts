@@ -1,6 +1,6 @@
 import "./index.scss";
 
-import { createElement } from "./utils/html-utils";
+import { createButton, createElement } from "./utils/html-utils";
 import { PubSubEvent, pubSubService } from "./utils/pub-sub-service";
 import { initializeEmptyGameField, startNewGame } from "./components/game-field/game-field";
 import { initPoki, pokiSdk } from "./poki-integration";
@@ -10,11 +10,13 @@ import { CssClass } from "./utils/css-class";
 import { sleep } from "./utils/promise-utils";
 import { changeXP, getCurrentXP, getXpInnerHtml } from "./logic/data/experience-points";
 import { animateNumber } from "./utils/custom-animation-util";
+import { initAudio, togglePlayer } from "./audio/music-control";
+import { getLocalStorageItem, LocalStorageKey } from "./utils/local-storage";
 
 let titleElement: HTMLElement;
 let xpElement: HTMLElement;
 
-// const initializeMuted = getLocalStorageItem(LocalStorageKey.MUTED) === "true";
+const initializeMuted = getLocalStorageItem(LocalStorageKey.MUTED) !== "false";
 
 let isInitialized = false;
 
@@ -37,16 +39,16 @@ function init() {
     cssClass: "h-btns",
   });
 
-  // const muteButton = createButton({
-  //   text: initializeMuted ? "🔇" : "🔊",
-  //   onClick: (event: MouseEvent) => {
-  //     const isActive = togglePlayer();
-  //     (event.target as HTMLElement).textContent = isActive ? "🔊" : "🔇";
-  //   },
-  //   cssClass: CssClass.ICON_BTN,
-  // });
-  //
-  // btnContainer.append(muteButton);
+  const muteButton = createButton({
+    text: initializeMuted ? "🔇" : "🔊",
+    onClick: (event: MouseEvent) => {
+      const isActive = togglePlayer();
+      (event.target as HTMLElement).textContent = isActive ? "🔊" : "🔇";
+    },
+    cssClass: [CssClass.ICON_BTN, CssClass.SECONDARY],
+  });
+
+  btnContainer.append(muteButton);
 
   xpElement = createElement();
   updateXpElement();
@@ -101,7 +103,7 @@ function updateXpElement(xp: number = getCurrentXP()) {
 const initApp = async () => {
   init();
   await sleep(0); // to make it a real promise
-  // await initAudio(initializeMuted);
+  await initAudio(initializeMuted);
 };
 
 if (import.meta.env.POKI_ENABLED === "true") initPoki(initApp);
