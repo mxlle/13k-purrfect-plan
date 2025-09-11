@@ -12,7 +12,6 @@ import { changeXP, getCurrentXP, getXpInnerHtml } from "./logic/data/experience-
 import { animateNumber } from "./utils/custom-animation-util";
 import { initAudio, togglePlayer } from "./audio/music-control";
 import { getLocalStorageItem, LocalStorageKey } from "./utils/local-storage";
-import { initSoundEffects } from "./audio/sound-control/sound-control-box";
 
 let titleElement: HTMLElement;
 let xpElement: HTMLElement;
@@ -105,7 +104,7 @@ const initApp = async () => {
   init();
   await sleep(0); // to make it a real promise
   await initAudio(initializeMuted);
-  await initSoundEffects();
+  // await initSoundEffects();
 };
 
 if (import.meta.env.POKI_ENABLED === "true") initPoki(initApp);
