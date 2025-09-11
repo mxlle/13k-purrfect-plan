@@ -13,6 +13,7 @@ import { Difficulty, ObjectId } from "../types";
 import { getRandomItem } from "../utils/array-utils";
 import { difficultyEmoji } from "./difficulty";
 import { getXpLevelModifier, hasXpLevelOfPlayedGames } from "./data/experience-points";
+import { HAS_GAMEPLAY_NICE_TO_HAVES, IS_DEV } from "../env-utils";
 
 const MAX_ITERATIONS_FOR_RANDOM_PLACEMENT = 13;
 
@@ -61,18 +62,18 @@ export async function generateRandomGameSetup(fieldSize: FieldSize = DEFAULT_FIE
   const tempGameSetup = getInitialGameSetup(fieldSize);
 
   let performanceStart: number | undefined;
-  if (import.meta.env.DEV) {
+  if (IS_DEV) {
     performanceStart = performance.now();
   }
 
   const finalGameSetup = randomlyPlaceGameElementsOnField(tempGameSetup, {
     shouldCalculatePar: hasMoveLimit(),
     randomMoonPosition: false,
-    allowLessMoves: shouldAllowLessMoves(),
-    desiredPar: shouldStartWithParMinus1() ? MAX_PAR - 1 : MAX_PAR,
+    allowLessMoves: HAS_GAMEPLAY_NICE_TO_HAVES ? shouldAllowLessMoves() : true,
+    desiredPar: HAS_GAMEPLAY_NICE_TO_HAVES && shouldStartWithParMinus1() ? MAX_PAR - 1 : MAX_PAR,
   });
 
-  if (import.meta.env.DEV) {
+  if (IS_DEV) {
     const performanceEnd = performance.now();
     const performanceTime = performanceEnd - performanceStart;
     console.info("Random game setup generation time:", Math.round(performanceTime), "ms");

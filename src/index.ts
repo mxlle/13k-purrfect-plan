@@ -12,6 +12,8 @@ import { changeXP, getCurrentXP, getXpInnerHtml } from "./logic/data/experience-
 import { animateNumber } from "./utils/custom-animation-util";
 import { initAudio, togglePlayer } from "./audio/music-control";
 import { getLocalStorageItem, LocalStorageKey } from "./utils/local-storage";
+import { HAS_MUTE_BUTTON, HAS_SOUND_EFFECTS, HAS_VISUAL_NICE_TO_HAVES, IS_POKI_ENABLED } from "./env-utils";
+import { initSoundEffects } from "./audio/sound-control/sound-control-box";
 
 let titleElement: HTMLElement;
 let xpElement: HTMLElement;
@@ -39,16 +41,18 @@ function init() {
     cssClass: "h-btns",
   });
 
-  const muteButton = createButton({
-    text: initializeMuted ? "🔇" : "🔊",
-    onClick: (event: MouseEvent) => {
-      const isActive = togglePlayer();
-      (event.target as HTMLElement).textContent = isActive ? "🔊" : "🔇";
-    },
-    cssClass: [CssClass.ICON_BTN, CssClass.SECONDARY],
-  });
+  if (HAS_MUTE_BUTTON) {
+    const muteButton = createButton({
+      text: initializeMuted ? "🔇" : "🔊",
+      onClick: (event: MouseEvent) => {
+        const isActive = togglePlayer();
+        (event.target as HTMLElement).textContent = isActive ? "🔊" : "🔇";
+      },
+      cssClass: [CssClass.ICON_BTN, CssClass.SECONDARY],
+    });
 
-  btnContainer.append(muteButton);
+    btnContainer.append(muteButton);
+  }
 
   xpElement = createElement();
   updateXpElement();
@@ -71,7 +75,7 @@ function init() {
   pubSubService.subscribe(PubSubEvent.GAME_END, (result) => {
     document.body.classList.add(result.isWon ? CssClass.WON : CssClass.LOST);
 
-    if (import.meta.env.POKI_ENABLED === "true") {
+    if (IS_POKI_ENABLED) {
       sleep(300).then(() => pokiSdk.gameplayStop()); // to avoid issue that stop is called before start
     }
   });
@@ -85,14 +89,18 @@ function updateXpWithAnimation(newXP: number) {
   const oldXP = getCurrentXP();
   const targetXP = changeXP(newXP);
 
-  animateNumber({
-    keyframeDuration: Math.abs(newXP) * 80,
-    initialState: oldXP,
-    exitState: targetXP,
-    onProgress: (current) => {
-      updateXpElement(Math.round(current));
-    },
-  });
+  if (HAS_VISUAL_NICE_TO_HAVES) {
+    animateNumber({
+      keyframeDuration: Math.abs(newXP) * 80,
+      initialState: oldXP,
+      exitState: targetXP,
+      onProgress: (current) => {
+        updateXpElement(Math.round(current));
+      },
+    });
+  } else {
+    updateXpElement(targetXP);
+  }
 }
 
 function updateXpElement(xp: number = getCurrentXP()) {
@@ -104,8 +112,8 @@ const initApp = async () => {
   init();
   await sleep(0); // to make it a real promise
   await initAudio(initializeMuted);
-  // await initSoundEffects();
+  HAS_SOUND_EFFECTS && (await initSoundEffects());
 };
 
-if (import.meta.env.POKI_ENABLED === "true") initPoki(initApp);
+if (IS_POKI_ENABLED) initPoki(initApp);
 else initApp();

@@ -38,7 +38,7 @@ export default defineConfig(({ mode, command }) => {
 
   return {
     base: "",
-    envPrefix: ["GERMAN_ENABLED", "POKI_ENABLED"],
+    envPrefix: ["GERMAN_ENABLED", "POKI_ENABLED", "VISUAL_NICE_TO_HAVES", "GAMEPLAY_NICE_TO_HAVES", "HAS_MUTE_BUTTON"],
     build: {
       minify: production ? "terser" : false,
       cssMinify: production ? "lightningcss" : false,

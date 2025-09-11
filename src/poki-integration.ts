@@ -1,4 +1,5 @@
 import { PubSubEvent, pubSubService } from "./utils/pub-sub-service";
+import { IS_POKI_ENABLED } from "./env-utils";
 
 interface PokiSDK {
   init: () => Promise<void>;
@@ -16,7 +17,7 @@ const createElement = (tag, props) => Object.assign(document.createElement(tag),
 const loadScript = (src) => new Promise((onload, onerror) => document.head.appendChild(createElement("script", { src, onload, onerror })));
 
 export async function initPoki(continueToGame: () => Promise<void>) {
-  if (import.meta.env.POKI_ENABLED !== "true") return continueToGame();
+  if (!IS_POKI_ENABLED) return continueToGame();
 
   try {
     await loadScript("https://game-cdn.poki.com/scripts/v2/poki-sdk.js");
@@ -42,7 +43,7 @@ export async function initPoki(continueToGame: () => Promise<void>) {
 }
 
 export function handlePokiCommercial(): Promise<void> {
-  if (import.meta.env.POKI_ENABLED !== "true") return;
+  if (!IS_POKI_ENABLED) return;
   // pause your game here if it isn't already
   return pokiSdk
     .commercialBreak(() => {

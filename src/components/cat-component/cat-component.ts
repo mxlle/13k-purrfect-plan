@@ -8,6 +8,7 @@ import { isMom } from "../../logic/data/cats";
 import { sleep } from "../../utils/promise-utils";
 import { hasSoundForAction, playSoundForAction } from "../../audio/sound-control/sound-control";
 import { Tool } from "../../types";
+import { HAS_SOUND_EFFECTS } from "../../env-utils";
 
 export { styles };
 
@@ -24,9 +25,13 @@ export function createCatElement(catId: CatId): HTMLElement {
   return createElement(
     {
       cssClass: CssClass.CAT_BOX,
-      onClick: () => {
-        void meow(catId);
-      },
+      ...(HAS_SOUND_EFFECTS
+        ? {
+            onClick: () => {
+              void meow(catId);
+            },
+          }
+        : {}),
     },
     [
       createElement({
@@ -38,7 +43,7 @@ export function createCatElement(catId: CatId): HTMLElement {
 }
 
 export function meow(catId: CatId): Promise<void> {
-  if (!import.meta.env.DEV) {
+  if (!HAS_SOUND_EFFECTS) {
     return Promise.resolve();
   }
 
@@ -46,7 +51,7 @@ export function meow(catId: CatId): Promise<void> {
 }
 
 export async function kittenMeows(kittens: KittenId[], doubleMeow?: boolean): Promise<void> {
-  if (!import.meta.env.DEV) {
+  if (!HAS_SOUND_EFFECTS) {
     return Promise.resolve();
   }
 

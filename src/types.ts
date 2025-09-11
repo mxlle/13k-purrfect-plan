@@ -4,10 +4,10 @@ import { MoveLimit } from "./logic/config/move-limit";
 
 export type Direction = defineEnum<typeof Direction>;
 export const Direction = defineEnum({
-  UP: "up",
-  DOWN: "down",
-  LEFT: "left",
-  RIGHT: "right",
+  UP: "u",
+  DOWN: "d",
+  LEFT: "l",
+  RIGHT: "r",
 });
 
 export type Tool = defineEnum<typeof Tool>;

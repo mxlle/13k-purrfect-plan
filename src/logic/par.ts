@@ -1,4 +1,4 @@
-import { ALL_TURN_MOVES, Difficulty, isDirection, TurnMove } from "../types";
+import { ALL_TURN_MOVES, Difficulty, Direction, isDirection, TurnMove } from "../types";
 import { shuffleArray } from "../utils/random-utils";
 import { copyGameState, deepCopyElementsMap, GameSetup, GameState, getInitialGameState } from "./data/game-elements";
 import { difficultyEmoji } from "./difficulty";
@@ -6,6 +6,7 @@ import { removeDuplicates } from "../utils/array-utils";
 import { isValidMove } from "./gameplay/movement";
 import { isMoveLimitExceeded, isWinConditionMet } from "./checks";
 import { calculateNewPositions } from "./gameplay/calculate-new-positions";
+import { HAS_GAMEPLAY_NICE_TO_HAVES, IS_DEV } from "../env-utils";
 
 interface ParInfo {
   par: number;
@@ -26,9 +27,24 @@ interface ParOptions {
   returnAllSolutions?: boolean;
 }
 
+function readableDirection(turnMove: TurnMove): string {
+  switch (turnMove) {
+    case Direction.UP:
+      return "up";
+    case Direction.DOWN:
+      return "down";
+    case Direction.LEFT:
+      return "left";
+    case Direction.RIGHT:
+      return "right";
+    default:
+      return turnMove;
+  }
+}
+
 export function calculatePar(gameSetup: GameSetup, options: ParOptions = { returnAllSolutions: false }): ParInfo {
   let performanceStart;
-  if (import.meta.env.DEV) {
+  if (IS_DEV) {
     performanceStart = performance.now();
   }
   const gameState = getInitialGameState(gameSetup);
@@ -36,7 +52,7 @@ export function calculatePar(gameSetup: GameSetup, options: ParOptions = { retur
   const parInfo = calculateParInner(gameState, options);
   const difficulty = calculateDifficulty(gameState, parInfo);
   let performanceTime;
-  if (import.meta.env.DEV) {
+  if (IS_DEV) {
     const performanceEnd = performance.now();
     performanceTime = performanceEnd - performanceStart;
   }
@@ -51,7 +67,7 @@ export function calculatePar(gameSetup: GameSetup, options: ParOptions = { retur
     parInfo.possibleSolutions.length + " solutions: ",
     parInfo.possibleSolutions,
   );
-  console.info("First solution:", parInfo.possibleSolutions[0]?.join(" > "));
+  console.info("First solution:", parInfo.possibleSolutions[0]?.map(readableDirection).join(" > "));
 
   return { par: parInfo.par, possibleSolutions: shuffleArray(parInfo.possibleSolutions), difficulty };
 }
@@ -61,6 +77,10 @@ function calculateDifficulty(gameState: GameState, parInfo: ParInfoWithoutDiffic
 
   if (numberOfSolutions <= 1) {
     return Difficulty.HARD;
+  }
+
+  if (!HAS_GAMEPLAY_NICE_TO_HAVES) {
+    return numberOfSolutions < 5 ? Difficulty.MEDIUM : Difficulty.EASY;
   }
 
   const containsSpecialMoves = parInfo.possibleSolutions.every((solution) => solution.some((move) => !isDirection(move)));

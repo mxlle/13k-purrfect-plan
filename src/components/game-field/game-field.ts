@@ -44,6 +44,7 @@ import { isCatId } from "../../logic/data/cats";
 import { calculateNewPositions } from "../../logic/gameplay/calculate-new-positions";
 import { getControlsAndInfoComponent } from "../controls-and-info/controls-and-info-component";
 import { MAX_PAR } from "../../logic/par";
+import { IS_DEV, IS_POKI_ENABLED } from "../../env-utils";
 
 let mainContainer: HTMLElement | undefined;
 let gameFieldElem: HTMLElement | undefined;
@@ -110,7 +111,7 @@ export async function startNewGame(options: { isDoOver: boolean }) {
 
   if (gameFieldElem) {
     // reset old game field
-    if (import.meta.env.POKI_ENABLED === "true") await handlePokiCommercial();
+    if (IS_POKI_ENABLED) await handlePokiCommercial();
 
     if (!isSameLevel() && !wasLastOnboardingStep()) {
       console.debug("Was different setup, removing game field");
@@ -125,7 +126,7 @@ export async function startNewGame(options: { isDoOver: boolean }) {
     gameSetup = await generateRandomGameWhileAnimating();
   }
 
-  if (import.meta.env.DEV) {
+  if (IS_DEV) {
     if (!isValidGameSetup(gameSetup)) {
       throw new Error("Generated or provided game setup is invalid, cannot start game.", { cause: gameSetup });
     }

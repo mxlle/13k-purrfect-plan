@@ -2,6 +2,7 @@ import { CPlayer } from "./small-player";
 import { song } from "./songs/soft-kitty";
 import { LocalStorageKey, setLocalStorageItem } from "../utils/local-storage";
 import { PubSubEvent, pubSubService } from "../utils/pub-sub-service";
+import { IS_POKI_ENABLED } from "../env-utils";
 
 let audioElem: HTMLAudioElement;
 let isActive = false;
@@ -24,7 +25,7 @@ export async function initAudio(initializeMuted: boolean) {
     audioElem.muted = document.hidden;
   });
 
-  if (import.meta.env.POKI_ENABLED === "true") {
+  if (IS_POKI_ENABLED) {
     pubSubService.subscribe(PubSubEvent.MUTE_MUSIC, () => {
       console.log("Muting music");
       audioElem.muted = true;

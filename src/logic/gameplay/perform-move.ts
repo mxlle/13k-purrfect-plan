@@ -14,6 +14,7 @@ import { TranslationKey } from "../../translations/translationKey";
 import { pokiSdk } from "../../poki-integration";
 import { isValidMove } from "./movement";
 import { calculateNewPositions } from "./calculate-new-positions";
+import { HAS_SOUND_EFFECTS, IS_POKI_ENABLED } from "../../env-utils";
 
 let isPerformingMove = false;
 
@@ -37,7 +38,7 @@ export async function performMove(gameState: GameState, turnMove: TurnMove) {
     return;
   }
 
-  if (import.meta.env.POKI_ENABLED === "true" && gameState.moves.length === 0) {
+  if (IS_POKI_ENABLED && gameState.moves.length === 0) {
     pokiSdk.gameplayStart();
   }
 
@@ -63,14 +64,18 @@ export async function performMove(gameState: GameState, turnMove: TurnMove) {
 
     updateAllPositions(gameState, globals.nextPositionsIfWait, isWon);
 
-    const newKittensOnCell = kittensOnCellAfter.filter((kitten) => !kittensOnCellBefore.includes(kitten));
-    !isWon && (await kittenMeows(newKittensOnCell));
+    if (HAS_SOUND_EFFECTS) {
+      const newKittensOnCell = kittensOnCellAfter.filter((kitten) => !kittensOnCellBefore.includes(kitten));
+      !isWon && (await kittenMeows(newKittensOnCell));
+    }
 
     if (isWon || isLost) {
       await sleep(300); // to finish moving
       showSpeechBubble(getHtmlElementForGameElement(CatId.MOTHER), getTranslation(isWon ? TranslationKey.UNITED : TranslationKey.LOST));
       pubSubService.publish(PubSubEvent.GAME_END, { isWon });
-      isWon && (await kittenMeows(ALL_KITTEN_IDS, false));
+      if (HAS_SOUND_EFFECTS) {
+        isWon && (await kittenMeows(ALL_KITTEN_IDS, false));
+      }
     }
   } catch (error) {
     console.error("Error performing move:", error);
@@ -84,7 +89,11 @@ async function preToolAction(_gameState: GameState, tool: Tool) {
     case Tool.MEOW:
       showSpeechBubble(getHtmlElementForGameElement(CatId.MOTHER), getTranslation(TranslationKey.MEOW), MEOW_TIME);
 
-      await Promise.all([meow(CatId.MOTHER), sleep(300)]); // Wait for meow speech bubble to appear
+      if (HAS_SOUND_EFFECTS) {
+        await Promise.all([meow(CatId.MOTHER), sleep(300)]); // Wait for meow speech bubble to appear
+      } else {
+        await sleep(300); // Wait for meow speech bubble to appear
+      }
 
       break;
   }
