@@ -1,6 +1,8 @@
 import { getLocalStorageItem, LocalStorageKey, setLocalStorageItem } from "../../utils/local-storage";
 import { globals } from "../../globals";
 import { Difficulty } from "../../types";
+import { hasMoveLimit } from "../config/config";
+import { getParFromMoonPosition } from "./game-elements";
 
 export const XP_REP = "🧶";
 const XP_FOR_UNION = 10;
@@ -36,7 +38,8 @@ export function calculateNewXP(): number {
   }
 
   const difficulty = globals.gameState.setup.difficulty;
-  const difficultyBonusXP = difficulty ? difficultyBonusXPMap[difficulty] : 0;
+  const difficultyBonus = difficulty ? difficultyBonusXPMap[difficulty] : 0;
+  const finishEarlierBonus = hasMoveLimit() ? getParFromMoonPosition(globals.gameState.setup) - globals.gameState.moves.length : 0;
 
-  return XP_FOR_UNION + globals.failedAttempts * XP_FOR_RETRY + difficultyBonusXP;
+  return XP_FOR_UNION + globals.failedAttempts * XP_FOR_RETRY + difficultyBonus + finishEarlierBonus;
 }
