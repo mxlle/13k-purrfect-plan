@@ -4,7 +4,7 @@ import { getKittensOnCell, isMoveLimitExceeded, isWinConditionMet } from "../che
 import { ALL_KITTEN_IDS, CatId } from "../data/catId";
 import { updateAllPositions } from "../../components/game-field/game-field";
 import { sleep } from "../../utils/promise-utils";
-import { GameState } from "../data/game-elements";
+import { GameState, getHtmlElementForGameElement } from "../data/game-elements";
 
 import { kittenMeows, meow } from "../../components/cat-component/cat-component";
 import { globals, isGameInProgress } from "../../globals";
@@ -68,10 +68,7 @@ export async function performMove(gameState: GameState, turnMove: TurnMove) {
 
     if (isWon || isLost) {
       await sleep(300); // to finish moving
-      showSpeechBubble(
-        gameState.representations[CatId.MOTHER].htmlElement,
-        getTranslation(isWon ? TranslationKey.UNITED : TranslationKey.LOST),
-      );
+      showSpeechBubble(getHtmlElementForGameElement(CatId.MOTHER), getTranslation(isWon ? TranslationKey.UNITED : TranslationKey.LOST));
       pubSubService.publish(PubSubEvent.GAME_END, { isWon });
       isWon && (await kittenMeows(ALL_KITTEN_IDS, false));
     }
@@ -82,10 +79,10 @@ export async function performMove(gameState: GameState, turnMove: TurnMove) {
   isPerformingMove = false;
 }
 
-async function preToolAction(gameState: GameState, tool: Tool) {
+async function preToolAction(_gameState: GameState, tool: Tool) {
   switch (tool) {
     case Tool.MEOW:
-      showSpeechBubble(gameState.representations[CatId.MOTHER].htmlElement, getTranslation(TranslationKey.MEOW), MEOW_TIME);
+      showSpeechBubble(getHtmlElementForGameElement(CatId.MOTHER), getTranslation(TranslationKey.MEOW), MEOW_TIME);
 
       await Promise.all([meow(CatId.MOTHER), sleep(300)]); // Wait for meow speech bubble to appear
 

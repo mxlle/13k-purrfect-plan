@@ -31,7 +31,6 @@ export interface GameSetup {
 export interface GameState {
   setup: GameSetup;
   currentPositions: GameElementPositions;
-  representations: GameElementRepresentations;
   moves: TurnMove[];
 }
 
@@ -76,27 +75,23 @@ export function isValidGameSetup(setup: GameSetup): boolean {
   });
 }
 
-export function getInitialGameState(setup: GameSetup): GameState {
-  const representations: GameElementRepresentations = EMPTY_ELEMENT_MAP();
-  const middlePosition = getMiddleCoordinates(setup.fieldSize);
-  const defaultObjectPositions = getDefaultPlacedObjects();
+export function getHtmlElementForGameElement(id: GameElementId): HTMLElement {
+  return isObjectId(id) ? getObjectElement(id) : getCatElement(id);
+}
 
-  for (const id of ALL_GAME_ELEMENT_IDS) {
-    const position = setup.elementPositions[id];
-    if (position) {
-      representations[id] = {
-        htmlElement: isObjectId(id) ? getObjectElement(id) : getCatElement(id),
-        initialPosition: isObjectId(id) ? (isOnboarding() ? position : defaultObjectPositions[id]) : middlePosition,
-      };
-    } else {
-      representations[id] = null;
-    }
+export function getInitialPositionOfGameElement(setup: GameSetup, id: GameElementId): CellPosition {
+  if (isObjectId(id)) {
+    return isOnboarding() ? setup.elementPositions[id] : getDefaultPlacedObjects()[id];
+  } else {
+    // cats
+    return getMiddleCoordinates(setup.fieldSize);
   }
+}
 
+export function getInitialGameState(setup: GameSetup): GameState {
   return {
     setup,
     currentPositions: deepCopyElementsMap(setup.elementPositions),
-    representations,
     moves: [],
   };
 }
@@ -150,7 +145,6 @@ export function copyGameState(state: GameState): GameState {
   return {
     setup: copyGameSetup(state.setup),
     currentPositions: deepCopyElementsMap(state.currentPositions),
-    representations: deepCopyElementsMap(state.representations),
     moves: [...state.moves],
   };
 }

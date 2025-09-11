@@ -28,11 +28,12 @@ import { serializeGame } from "../../logic/serializer";
 import {
   ALL_GAME_ELEMENT_IDS,
   determineGameSetup,
-  GameElementId,
   GameElementPositions,
   GameSetup,
   GameState,
+  getHtmlElementForGameElement,
   getInitialGameState,
+  getInitialPositionOfGameElement,
   isValidGameSetup,
 } from "../../logic/data/game-elements";
 import { createConfigChooserComponent } from "../config-chooser/config-chooser-component";
@@ -235,21 +236,22 @@ export async function initializeElementsOnGameField(
   isInitialStart: boolean,
   shouldResetToInitialPosition: boolean,
 ) {
-  for (const elementId of ALL_GAME_ELEMENT_IDS) {
-    const representation = gameState.representations[elementId];
+  for (const gameElementId of ALL_GAME_ELEMENT_IDS) {
+    const htmlElement = getHtmlElementForGameElement(gameElementId);
+    const initialPosition = getInitialPositionOfGameElement(gameState.setup, gameElementId);
 
-    if (representation) {
-      const cellElement = getCellElement(representation.initialPosition);
+    if (initialPosition) {
+      const cellElement = getCellElement(initialPosition);
 
       // append if not already there
-      if (!cellElement.contains(representation.htmlElement)) {
-        cellElement.append(representation.htmlElement);
+      if (!cellElement.contains(htmlElement)) {
+        cellElement.append(htmlElement);
       } else if (shouldResetToInitialPosition) {
-        resetTransform(representation.htmlElement);
+        resetTransform(htmlElement);
       }
 
-      if (isCatId(elementId)) {
-        representation.htmlElement.classList.toggle(getCatIdClass(elementId), !isKittenId(elementId) || isConfigItemEnabled(elementId));
+      if (isCatId(gameElementId)) {
+        htmlElement.classList.toggle(getCatIdClass(gameElementId), !isKittenId(gameElementId) || isConfigItemEnabled(gameElementId));
       }
     }
   }
@@ -262,30 +264,31 @@ export async function initializeElementsOnGameField(
 }
 
 export function updateAllPositions(gameState: GameState, nextPositionsIfWait: GameElementPositions | undefined, hasWon: boolean = false) {
-  for (const gameElementId in gameState.representations) {
-    const representation = gameState.representations[gameElementId as GameElementId];
-    const position = gameState.currentPositions[gameElementId as GameElementId];
-    if (representation === null || position === null) continue;
+  for (const gameElementId of ALL_GAME_ELEMENT_IDS) {
+    const htmlElement = getHtmlElementForGameElement(gameElementId);
+    const initialPosition = getInitialPositionOfGameElement(gameState.setup, gameElementId);
+    const currentPosition = gameState.currentPositions[gameElementId];
+    if (initialPosition === null || currentPosition === null) continue;
 
-    const [rowDiff, colDiff] = getCellDifference(position, representation.initialPosition);
-    representation.htmlElement.style.transform = `translate(${colDiff * 100}%, ${rowDiff * 100}%)`;
+    const [rowDiff, colDiff] = getCellDifference(currentPosition, initialPosition);
+    htmlElement.style.transform = `translate(${colDiff * 100}%, ${rowDiff * 100}%)`;
 
     if (gameElementId === ObjectId.MOON) {
-      const isMoonSet = !isValidCellPosition(gameState, position, ObjectId.MOON) && !hasWon;
+      const isMoonSet = !isValidCellPosition(gameState, currentPosition, ObjectId.MOON) && !hasWon;
       document.body.classList.toggle(CssClass.DARKNESS, isMoonSet);
-      representation.htmlElement.classList.toggle(CssClass.OPACITY_HIDDEN, isMoonSet);
+      htmlElement.classList.toggle(CssClass.OPACITY_HIDDEN, isMoonSet);
     }
 
     if (ALL_KITTEN_IDS.includes(gameElementId as any) && nextPositionsIfWait) {
-      const nextPosition = nextPositionsIfWait[gameElementId as GameElementId];
-      const direction = nextPosition ? getDirection(position, nextPosition) : undefined;
-      const existingArrow = representation.htmlElement.querySelector(`.${arrowStyles.arrow}`) as HTMLElement | undefined;
+      const nextPosition = nextPositionsIfWait[gameElementId];
+      const direction = nextPosition ? getDirection(currentPosition, nextPosition) : undefined;
+      const existingArrow = htmlElement.querySelector(`.${arrowStyles.arrow}`) as HTMLElement | undefined;
 
       if (direction) {
         if (existingArrow) {
           updateArrowComponent(existingArrow, direction);
         } else {
-          representation.htmlElement.append(getArrowComponent(direction));
+          htmlElement.append(getArrowComponent(direction));
         }
       } else {
         existingArrow?.remove();
