@@ -43,3 +43,13 @@ export function calculateNewXP(): number {
 
   return XP_FOR_UNION + globals.failedAttempts * XP_FOR_RETRY + difficultyBonus + finishEarlierBonus;
 }
+
+export function hasXpLevelOfPlayedGames(targetPlayedGames: number) {
+  return getCurrentXP() >= targetPlayedGames * XP_FOR_UNION;
+}
+
+export function getXpLevelModifier(minPlayedGames: number = 10, maxPlayedGames: number = 40): number {
+  const xp = getCurrentXP();
+
+  return Math.max(0, Math.min(1, ((xp - minPlayedGames * XP_FOR_UNION) / maxPlayedGames) * XP_FOR_UNION));
+}

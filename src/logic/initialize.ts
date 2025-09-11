@@ -3,7 +3,7 @@ import { shuffleArray } from "../utils/random-utils";
 import { getAllCellPositions, getEmptyFields } from "./checks";
 import { ALL_CAT_IDS } from "./data/catId";
 import { containsCell, isSameCell } from "./data/cell";
-import { hasMoveLimit, hasUnknownConfigItems, showMoon } from "./config/config";
+import { hasMoveLimit, showMoon } from "./config/config";
 import { DEFAULT_FIELD_SIZE, FieldSize, getMiddleCoordinates } from "./data/field-size";
 import { copyGameSetup, EMPTY_ELEMENT_MAP, GameElementPositions, GameSetup, getMoonColumnFromDesiredPar } from "./data/game-elements";
 import { calculatePar, MAX_PAR, MIN_PAR } from "./par";
@@ -12,11 +12,25 @@ import { sleep } from "../utils/promise-utils";
 import { Difficulty, ObjectId } from "../types";
 import { getRandomItem } from "../utils/array-utils";
 import { difficultyEmoji } from "./difficulty";
+import { getXpLevelModifier, hasXpLevelOfPlayedGames } from "./data/experience-points";
 
 const MAX_ITERATIONS_FOR_RANDOM_PLACEMENT = 13;
 
+interface RandomGameSetupOptions {
+  shouldCalculatePar: boolean;
+  randomMoonPosition: boolean;
+  allowLessMoves: boolean;
+  desiredPar: number;
+}
+
 function shouldAllowLessMoves() {
-  return Math.random() < 0.5;
+  // 50% change or more depending on the xp
+  return Math.random() < 1 - 0.5 * getXpLevelModifier();
+}
+
+function shouldStartWithParMinus1() {
+  // 30% chance or less depending on the xp
+  return Math.random() < 0.3 * getXpLevelModifier();
 }
 
 export function getInitialGameSetup(fieldSize: FieldSize = DEFAULT_FIELD_SIZE): GameSetup {
@@ -55,6 +69,7 @@ export async function generateRandomGameSetup(fieldSize: FieldSize = DEFAULT_FIE
     shouldCalculatePar: hasMoveLimit(),
     randomMoonPosition: false,
     allowLessMoves: shouldAllowLessMoves(),
+    desiredPar: shouldStartWithParMinus1() ? MAX_PAR - 1 : MAX_PAR,
   });
 
   if (import.meta.env.DEV) {
@@ -66,15 +81,15 @@ export async function generateRandomGameSetup(fieldSize: FieldSize = DEFAULT_FIE
   return { ...finalGameSetup };
 }
 
-function randomlyPlaceObjectsOnField(gameSetup: GameSetup, randomMoonPosition: boolean): GameElementPositions {
+function randomlyPlaceObjectsOnField(gameSetup: GameSetup, options: RandomGameSetupOptions): GameElementPositions {
   const allCellPositions = getAllCellPositions(gameSetup.fieldSize);
   const cellsAllowedForTree = allCellPositions.filter(
     (cell) => cell.row !== 0 && cell.column !== 0 && cell.row !== gameSetup.fieldSize - 1 && cell.column !== gameSetup.fieldSize - 1,
   );
   const cellsAllowedForPuddle = allCellPositions.filter((cell) => cell.row !== 0);
-  const cellsAllowedForMoon = randomMoonPosition
+  const cellsAllowedForMoon = options.randomMoonPosition
     ? allCellPositions.filter((cell) => cell.column !== 0 && cell.row === 0)
-    : [DEFAULT_MOON_POSITION];
+    : [{ ...DEFAULT_MOON_POSITION, column: getMoonColumnFromDesiredPar(gameSetup, options.desiredPar) }];
 
   const newCellForTree = getRandomItem(cellsAllowedForTree);
   const newCellForPuddle = getRandomItem(cellsAllowedForPuddle.filter((cell) => !isSameCell(cell, newCellForTree)));
@@ -88,14 +103,10 @@ function randomlyPlaceObjectsOnField(gameSetup: GameSetup, randomMoonPosition: b
   };
 }
 
-export function randomlyPlaceGameElementsOnField(
-  gameSetup: GameSetup,
-  options: { shouldCalculatePar: boolean; randomMoonPosition: boolean; allowLessMoves: boolean },
-  iteration: number = 0,
-): GameSetup {
+export function randomlyPlaceGameElementsOnField(gameSetup: GameSetup, options: RandomGameSetupOptions, iteration: number = 0): GameSetup {
   let copiedGameSetup = copyGameSetup(gameSetup);
 
-  const newObjectPositions = randomlyPlaceObjectsOnField(copiedGameSetup, options.randomMoonPosition);
+  const newObjectPositions = randomlyPlaceObjectsOnField(copiedGameSetup, options);
   ALL_OBJECT_IDS.forEach((objId) => {
     copiedGameSetup.elementPositions[objId] = newObjectPositions[objId];
   });
@@ -113,7 +124,9 @@ export function randomlyPlaceGameElementsOnField(
     const parInfo = calculatePar(copiedGameSetup, { returnAllSolutions: options.allowLessMoves });
 
     if (
-      (parInfo.par > MAX_PAR || parInfo.par < MIN_PAR || (parInfo.difficulty >= Difficulty.HARD && hasUnknownConfigItems())) &&
+      (parInfo.par > options.desiredPar ||
+        parInfo.par < MIN_PAR ||
+        (parInfo.difficulty >= Difficulty.HARD && !hasXpLevelOfPlayedGames(10))) &&
       iteration < MAX_ITERATIONS_FOR_RANDOM_PLACEMENT
     ) {
       console.info("not a good setup", parInfo.par, difficultyEmoji[parInfo.difficulty]);
@@ -121,7 +134,7 @@ export function randomlyPlaceGameElementsOnField(
       return randomlyPlaceGameElementsOnField(copiedGameSetup, options, iteration + 1);
     }
 
-    if (!options.allowLessMoves && parInfo.par < MAX_PAR && iteration < MAX_ITERATIONS_FOR_RANDOM_PLACEMENT) {
+    if (!options.allowLessMoves && parInfo.par < options.desiredPar && iteration < MAX_ITERATIONS_FOR_RANDOM_PLACEMENT) {
       const alternativePar = parInfo.par;
       const innerCopy = copyGameSetup(copiedGameSetup);
       const newMoonPosition = {

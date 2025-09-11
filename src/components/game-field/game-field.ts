@@ -42,6 +42,7 @@ import { TranslationKey } from "../../translations/translationKey";
 import { isCatId } from "../../logic/data/cats";
 import { calculateNewPositions } from "../../logic/gameplay/calculate-new-positions";
 import { getControlsAndInfoComponent } from "../controls-and-info/controls-and-info-component";
+import { MAX_PAR } from "../../logic/par";
 
 let mainContainer: HTMLElement | undefined;
 let gameFieldElem: HTMLElement | undefined;
@@ -80,6 +81,7 @@ async function shuffleFieldAnimation() {
         shouldCalculatePar: false,
         randomMoonPosition: true,
         allowLessMoves: true,
+        desiredPar: MAX_PAR,
       }),
     );
     const nextPositionsIfWait = calculateNewPositions(randomState, Tool.WAIT);
