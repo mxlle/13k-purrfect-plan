@@ -6,13 +6,7 @@ import { calculatePar } from "./par";
 
 export function serializeGame(gameSetup: GameSetup): string {
   return Object.entries(gameSetup.elementPositions)
-    .map(([stringId, pos]) => {
-      const id = stringId as GameElementId;
-
-      if (id === ObjectId.MOON) {
-        return "";
-      }
-
+    .map(([id, pos]) => {
       return pos ? `${id}${pos.row}${pos.column}` : "";
     })
     .join("");
@@ -46,7 +40,7 @@ export function deserializeGame(serializedGame: string, options?: { skipParCalcu
     return gameSetup;
   }
 
-  const parInfo = calculatePar(gameSetup);
+  const parInfo = calculatePar(gameSetup, { returnAllSolutions: true });
 
   return { ...gameSetup, possibleSolutions: parInfo.possibleSolutions, difficulty: parInfo.difficulty };
 }

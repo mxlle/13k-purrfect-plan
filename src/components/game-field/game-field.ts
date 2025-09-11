@@ -75,7 +75,13 @@ async function shuffleFieldAnimation() {
   gameFieldElem.append(loader);
 
   for (let i = 0; i < 2; i++) {
-    const randomState = getInitialGameState(randomlyPlaceGameElementsOnField(getInitialGameSetup(), false, true));
+    const randomState = getInitialGameState(
+      randomlyPlaceGameElementsOnField(getInitialGameSetup(), {
+        shouldCalculatePar: false,
+        randomMoonPosition: true,
+        allowLessMoves: true,
+      }),
+    );
     const nextPositionsIfWait = calculateNewPositions(randomState, Tool.WAIT);
     await initializeElementsOnGameField(randomState, nextPositionsIfWait, false, true);
     await requestAnimationFrameWithTimeout(TIMEOUT_BETWEEN_GAMES);

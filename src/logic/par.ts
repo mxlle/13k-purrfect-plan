@@ -4,7 +4,7 @@ import { copyGameState, deepCopyElementsMap, GameSetup, GameState, getInitialGam
 import { difficultyEmoji } from "./difficulty";
 import { removeDuplicates } from "../utils/array-utils";
 import { isValidMove } from "./gameplay/movement";
-import { isWinConditionMet } from "./checks";
+import { isMoveLimitExceeded, isWinConditionMet } from "./checks";
 import { calculateNewPositions } from "./gameplay/calculate-new-positions";
 
 interface ParInfo {
@@ -18,7 +18,7 @@ type ParInfoWithoutDifficulty = Omit<ParInfo, "difficulty">;
 let iterationCount = 1;
 
 export const MAX_PAR = 5;
-export const MIN_PAR = 4;
+export const MIN_PAR = 3;
 
 export const FALLBACK_PAR = 42; // Fallback value for par when no solution is found
 
@@ -26,7 +26,7 @@ interface ParOptions {
   returnAllSolutions?: boolean;
 }
 
-export function calculatePar(gameSetup: GameSetup, options: ParOptions = { returnAllSolutions: true }): ParInfo {
+export function calculatePar(gameSetup: GameSetup, options: ParOptions = { returnAllSolutions: false }): ParInfo {
   let performanceStart;
   if (import.meta.env.DEV) {
     performanceStart = performance.now();
@@ -108,7 +108,7 @@ function calculateParInner(gameState: GameState, options: ParOptions): ParInfoWi
     return { par: 0, possibleSolutions: [previousMoves] }; // Already won, no moves needed
   }
 
-  if (previousMoves.length >= MAX_PAR) {
+  if (isMoveLimitExceeded(gameState) || previousMoves.length >= MAX_PAR) {
     return { par: FALLBACK_PAR, possibleSolutions: [previousMoves] };
   }
 

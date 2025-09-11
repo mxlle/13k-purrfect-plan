@@ -5,7 +5,7 @@ import { CellPosition } from "./cell";
 import { FieldSize, getMiddleCoordinates } from "./field-size";
 import { hasUnknownConfigItems } from "../config/config";
 import { Difficulty, ObjectId, TurnMove } from "../../types";
-import { FALLBACK_PAR, MAX_PAR } from "../par";
+import { FALLBACK_PAR } from "../par";
 import { getDefaultPlacedObjects, isOnboarding, OnboardingData } from "../onboarding";
 import { deserializeGame } from "../serializer";
 import { globals } from "../../globals";
@@ -106,11 +106,20 @@ export function getParFromGameState(gameState: GameState | null): number | null 
     return null;
   }
 
-  if (gameState.setup.possibleSolutions.length === 0) {
-    return FALLBACK_PAR;
-  }
+  return getParFromMoonPosition(gameState.setup);
+}
 
-  return MAX_PAR; // For now we always allow the maximum par
+export function getParFromMoonPosition(setup: GameSetup): number {
+  const maxPar = setup.fieldSize;
+  const moonPosition = setup.elementPositions[ObjectId.MOON];
+
+  return moonPosition ? maxPar - moonPosition.column : FALLBACK_PAR;
+}
+
+export function getMoonColumnFromDesiredPar(setup: GameSetup, desiredPar: number): number {
+  const maxPar = setup.fieldSize;
+
+  return maxPar - desiredPar;
 }
 
 export const ALL_GAME_ELEMENT_IDS: GameElementId[] = [...ALL_CAT_IDS, ...ALL_OBJECT_IDS];
