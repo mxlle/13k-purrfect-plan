@@ -36,16 +36,13 @@ export function getKittensElsewhere(gameState: GameState, cell: CellPosition): K
   return ALL_KITTEN_IDS.filter((catId) => !isSameCell(gameState.currentPositions[catId], cell));
 }
 
-export function isEmptyField(cell: CellPosition, gameSetup: GameSetup, options?: { ignoreCats: boolean }): boolean {
-  const occupiedPositions = Object.entries(gameSetup.elementPositions)
-    .filter(([id]) => !options?.ignoreCats || !isCatId(id))
-    .map(([_id, position]) => position)
-    .filter(Boolean) as CellPosition[];
+export function isEmptyField(cell: CellPosition, gameSetup: GameSetup): boolean {
+  const occupiedPositions = Object.values(gameSetup.elementPositions).filter(Boolean) as CellPosition[];
   return occupiedPositions.every((pos: CellPosition) => !isSameCell(pos, cell));
 }
 
-export function getEmptyFields(gameSetup: GameSetup, options?: { ignoreCats: boolean }): CellPosition[] {
-  return getAllCellPositions(gameSetup.fieldSize).filter((cell) => isEmptyField(cell, gameSetup, options));
+export function getEmptyFields(gameSetup: GameSetup): CellPosition[] {
+  return getAllCellPositions(gameSetup.fieldSize).filter((cell) => isEmptyField(cell, gameSetup));
 }
 
 export function getAllCellPositions(fieldSize: FieldSize): CellPosition[] {
@@ -58,17 +55,30 @@ export function getAllCellPositions(fieldSize: FieldSize): CellPosition[] {
   return positions;
 }
 
-export function isValidCellPosition(gameState: GameState, position: CellPosition, elementToBeMoved: GameElementId): boolean {
-  const fieldSize = gameState.setup.fieldSize;
+function isWithinBounds(position: CellPosition, size: number): boolean {
+  const { row, column } = position;
+  return row >= 0 && row < size && column >= 0 && column < size;
+}
 
-  if (position.row < 0 || position.row >= fieldSize || position.column < 0 || position.column >= fieldSize) {
+export function isValidCellPosition(gameState: GameState, position: CellPosition, elementId: GameElementId): boolean {
+  const fieldSize = gameState.setup.fieldSize;
+  if (!isWithinBounds(position, fieldSize)) {
     return false;
   }
 
-  const targetIsTree = !!gameState.currentPositions[ObjectId.TREE] && isSameCell(position, gameState.currentPositions[ObjectId.TREE]);
-  const targetIsPuddle = !!gameState.currentPositions[ObjectId.PUDDLE] && isSameCell(position, gameState.currentPositions[ObjectId.PUDDLE]);
+  const treePos = gameState.currentPositions[ObjectId.TREE];
+  const puddlePos = gameState.currentPositions[ObjectId.PUDDLE];
 
-  return !targetIsTree && (!targetIsPuddle || !isCatId(elementToBeMoved) || !isMom(elementToBeMoved)); // mom doesn't move into the puddle
+  const targetIsTree = !!treePos && isSameCell(position, treePos);
+
+  if (targetIsTree) {
+    return false;
+  }
+
+  const targetIsPuddle = !!puddlePos && isSameCell(position, puddlePos);
+  const isMomElement = isCatId(elementId) && isMom(elementId);
+
+  return !targetIsPuddle || !isMomElement; // Mother cannot move into the puddle
 }
 
 export function getRemainingToolRecoveryTime(gameState: GameState, tool: Tool): number {

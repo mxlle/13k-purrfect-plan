@@ -2,7 +2,7 @@ import { getDefaultPlacedObjects } from "./onboarding";
 import { shuffleArray } from "../utils/random-utils";
 import { getAllCellPositions, getEmptyFields } from "./checks";
 import { ALL_CAT_IDS } from "./data/catId";
-import { containsCell, isSameCell } from "./data/cell";
+import { CellPosition, containsCell, isSameCell } from "./data/cell";
 import { hasMoveLimit, showMoon } from "./config/config";
 import { DEFAULT_FIELD_SIZE, FieldSize, getMiddleCoordinates } from "./data/field-size";
 import { copyGameSetup, EMPTY_ELEMENT_MAP, GameElementPositions, GameSetup, getMoonColumnFromDesiredPar } from "./data/game-elements";
@@ -82,36 +82,41 @@ export async function generateRandomGameSetup(fieldSize: FieldSize = DEFAULT_FIE
 }
 
 function randomlyPlaceObjectsOnField(gameSetup: GameSetup, options: RandomGameSetupOptions): GameElementPositions {
-  const allCellPositions = getAllCellPositions(gameSetup.fieldSize);
-  const cellsAllowedForTree = allCellPositions.filter(
-    (cell) => cell.row !== 0 && cell.column !== 0 && cell.row !== gameSetup.fieldSize - 1 && cell.column !== gameSetup.fieldSize - 1,
-  );
-  const cellsAllowedForPuddle = allCellPositions.filter((cell) => cell.row !== 0);
+  const fieldSize = gameSetup.fieldSize;
+
+  const allCellPositions = getAllCellPositions(fieldSize);
+
+  const isBorderCell = (cell: CellPosition) =>
+    cell.row === 0 || cell.column === 0 || cell.row === fieldSize - 1 || cell.column === fieldSize - 1;
+
+  const isInteriorCell = (cell: CellPosition) => !isBorderCell(cell);
+  const isTopRow = (cell: CellPosition) => cell.row === 0;
+  const isNonTopRow = (cell: CellPosition) => !isTopRow(cell);
+
+  const cellsAllowedForTree = allCellPositions.filter(isInteriorCell);
+  const cellsAllowedForPuddle = allCellPositions.filter(isNonTopRow);
   const cellsAllowedForMoon = options.randomMoonPosition
-    ? allCellPositions.filter((cell) => cell.column !== 0 && cell.row === 0)
+    ? allCellPositions.filter(isTopRow)
     : [{ ...DEFAULT_MOON_POSITION, column: getMoonColumnFromDesiredPar(gameSetup, options.desiredPar) }];
 
-  const newCellForTree = getRandomItem(cellsAllowedForTree);
-  const newCellForPuddle = getRandomItem(cellsAllowedForPuddle.filter((cell) => !isSameCell(cell, newCellForTree)));
-  const newCellForMoon = showMoon() ? getRandomItem(cellsAllowedForMoon) : null;
+  const treeCell = getRandomItem(cellsAllowedForTree);
+  const puddleCell = getRandomItem(cellsAllowedForPuddle.filter((cell) => !isSameCell(cell, treeCell)));
+  const moonCell = showMoon() ? getRandomItem(cellsAllowedForMoon) : null;
 
   return {
     ...EMPTY_ELEMENT_MAP(),
-    [ObjectId.TREE]: newCellForTree,
-    [ObjectId.PUDDLE]: newCellForPuddle,
-    [ObjectId.MOON]: newCellForMoon,
+    [ObjectId.TREE]: treeCell,
+    [ObjectId.PUDDLE]: puddleCell,
+    [ObjectId.MOON]: moonCell,
   };
 }
 
 export function randomlyPlaceGameElementsOnField(gameSetup: GameSetup, options: RandomGameSetupOptions, iteration: number = 0): GameSetup {
   let copiedGameSetup = copyGameSetup(gameSetup);
 
-  const newObjectPositions = randomlyPlaceObjectsOnField(copiedGameSetup, options);
-  ALL_OBJECT_IDS.forEach((objId) => {
-    copiedGameSetup.elementPositions[objId] = newObjectPositions[objId];
-  });
+  copiedGameSetup.elementPositions = randomlyPlaceObjectsOnField(copiedGameSetup, options);
 
-  const emptyFields = getEmptyFields(copiedGameSetup, { ignoreCats: true });
+  const emptyFields = getEmptyFields(copiedGameSetup);
   const shuffledFields = shuffleArray(emptyFields);
   ALL_CAT_IDS.forEach((catId, index) => {
     copiedGameSetup.elementPositions[catId] = shuffledFields[index] ?? shuffledFields[0];
