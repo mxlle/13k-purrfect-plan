@@ -1,7 +1,7 @@
 import { GameState } from "../data/game-elements";
 import { Direction, isTool, TurnMove } from "../../types";
 import { CatId } from "../data/catId";
-import { CellPosition, getCellDifferenceAbsolute, getFourNeighbors, isSameCell, newCellPositionFromDirection } from "../data/cell";
+import { CellPosition, getCellDifferenceAbsolute, getNeighbors, isSameCell, newCellPositionFromDirection } from "../data/cell";
 import { getRemainingToolRecoveryTime, isValidCellPosition } from "../checks";
 import { isConfigItemEnabled } from "../config/config";
 
@@ -33,16 +33,16 @@ export function moveCatTowardsCell(gameState: GameState, catId: CatId, targetCel
     return catPosition;
   }
 
-  const validNeighbors = getFourNeighbors(catPosition).filter((cell) => isValidCellPosition(gameState, cell, catId));
+  const validNeighbors = getNeighbors(catPosition).filter((cell) => isValidCellPosition(gameState, cell, catId));
   const sortedNeighbors = validNeighbors.sort((a, b) => {
-    const aDiff = getCellDifferenceAbsolute(a, targetCell);
-    const bDiff = getCellDifferenceAbsolute(b, targetCell);
-    const aDiffTotal = aDiff.rowDiff + aDiff.columnDiff;
-    const bDiffTotal = bDiff.rowDiff + bDiff.columnDiff;
+    const [aRowDiff, aColumnDiff] = getCellDifferenceAbsolute(a, targetCell);
+    const [bRowDiff, bColumnDiff] = getCellDifferenceAbsolute(b, targetCell);
+    const aDiffTotal = aRowDiff + aColumnDiff;
+    const bDiffTotal = bRowDiff + bColumnDiff;
 
     if (aDiffTotal === bDiffTotal) {
-      const aMaxDiff = Math.max(aDiff.rowDiff, aDiff.columnDiff);
-      const bMaxDiff = Math.max(bDiff.rowDiff, bDiff.columnDiff);
+      const aMaxDiff = Math.max(aRowDiff, aColumnDiff);
+      const bMaxDiff = Math.max(bRowDiff, bColumnDiff);
 
       return aMaxDiff - bMaxDiff || a.row - b.row || a.column - b.column;
     }

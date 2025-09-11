@@ -1,5 +1,5 @@
 import { GameState } from "../data/game-elements";
-import { CellPosition, getEightNeighborsClockwise, isSameCell } from "../data/cell";
+import { CellPosition, getNeighbors, isSameCell } from "../data/cell";
 import { CatId, KittenId } from "../data/catId";
 import { ObjectId } from "../../types";
 import { moveCatTowardsCell } from "./movement";
@@ -59,7 +59,7 @@ function doIvyMove(gameState: GameState): CellPosition {
   const treePosition = gameState.currentPositions[ObjectId.TREE];
 
   if (treePosition) {
-    const neighbors = getEightNeighborsClockwise(treePosition);
+    const neighbors = getNeighbors(treePosition, true);
 
     const indexOfCatInNeighbors = neighbors.findIndex((cell) => isSameCell(cell, catPosition));
 
