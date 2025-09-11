@@ -11,12 +11,7 @@ export const LocalStorageKey = defineEnum({
   XP: "xp",
 });
 
-export function setLocalStorageItem(key: LocalStorageKey, value: string | false, postfix?: string) {
-  if (value === false) {
-    removeLocalStorageItem(key);
-    return;
-  }
-
+export function setLocalStorageItem(key: LocalStorageKey, value: string, postfix?: string) {
   localStorage.setItem(LOCAL_STORAGE_PREFIX + "." + key + (postfix ? "." + postfix : ""), value);
 }
 

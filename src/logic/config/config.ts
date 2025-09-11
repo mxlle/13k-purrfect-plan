@@ -38,19 +38,26 @@ export const explanationMap: Record<ConfigItemId, TranslationKey | undefined> = 
   [ObjectId.PUDDLE]: undefined,
 };
 
-export const preconditions: Record<ConfigItemId, ConfigItemId[]> = {
-  [CatId.MOONY]: [ObjectId.MOON, MoveLimit.MOVE_LIMIT_SIMPLE],
-  [CatId.IVY]: [ObjectId.TREE],
-  [CatId.SPLASHY]: [ObjectId.PUDDLE, Tool.MEOW],
-  [Tool.MEOW]: [],
+export const preconditions: Partial<Record<ConfigItemId, ConfigItemId[]>> = {
+  [CatId.MOONY]: [MoveLimit.MOVE_LIMIT_SIMPLE],
+  [CatId.SPLASHY]: [Tool.MEOW],
   [Tool.WAIT]: [Tool.MEOW, CatId.IVY],
-  [MoveLimit.MOVE_LIMIT_NONE]: [],
-  [MoveLimit.MOVE_LIMIT_SIMPLE]: [ObjectId.MOON],
-  [MoveLimit.MOVE_LIMIT_STRICT]: [ObjectId.MOON, MoveLimit.MOVE_LIMIT_SIMPLE],
-  [ObjectId.TREE]: [],
-  [ObjectId.MOON]: [],
-  [ObjectId.PUDDLE]: [],
+  [MoveLimit.MOVE_LIMIT_STRICT]: [MoveLimit.MOVE_LIMIT_SIMPLE],
 };
+
+// export const preconditions: Record<ConfigItemId, ConfigItemId[]> = {
+//   [CatId.MOONY]: [ObjectId.MOON, MoveLimit.MOVE_LIMIT_SIMPLE],
+//   [CatId.IVY]: [ObjectId.TREE],
+//   [CatId.SPLASHY]: [ObjectId.PUDDLE, Tool.MEOW],
+//   [Tool.MEOW]: [],
+//   [Tool.WAIT]: [Tool.MEOW, CatId.IVY],
+//   [MoveLimit.MOVE_LIMIT_NONE]: [],
+//   [MoveLimit.MOVE_LIMIT_SIMPLE]: [ObjectId.MOON],
+//   [MoveLimit.MOVE_LIMIT_STRICT]: [ObjectId.MOON, MoveLimit.MOVE_LIMIT_SIMPLE],
+//   [ObjectId.TREE]: [],
+//   [ObjectId.MOON]: [],
+//   [ObjectId.PUDDLE]: [],
+// };
 
 let knownConfigItems: ConfigItemId[] | undefined;
 export function getKnownConfigItems(): ConfigItemId[] {
@@ -69,7 +76,9 @@ export function getNextUnknownConfigItems() {
   const knownConfigItems = getKnownConfigItems();
   const unknownConfigItems = allConfigItems.filter((item) => !knownConfigItems.includes(item));
 
-  return unknownConfigItems.filter((item) => preconditions[item].every((precondition) => knownConfigItems.includes(precondition)));
+  return unknownConfigItems.filter(
+    (item) => !preconditions[item] || preconditions[item].every((precondition) => knownConfigItems.includes(precondition)),
+  );
 }
 
 export function hasUnknownConfigItems() {
