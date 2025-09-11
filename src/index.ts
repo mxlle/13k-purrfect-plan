@@ -1,5 +1,5 @@
-import "./index.scss";
-
+import "./globals.scss";
+import styles from "./index.module.scss";
 import { createButton, createElement } from "./utils/html-utils";
 import { PubSubEvent, pubSubService } from "./utils/pub-sub-service";
 import { initializeEmptyGameField, startNewGame } from "./components/game-field/game-field";
@@ -15,6 +15,10 @@ import { getLocalStorageItem, LocalStorageKey } from "./utils/local-storage";
 import { HAS_MUTE_BUTTON, HAS_SOUND_EFFECTS, HAS_VISUAL_NICE_TO_HAVES, IS_POKI_ENABLED } from "./env-utils";
 import { initSoundEffects } from "./audio/sound-control/sound-control-box";
 
+if (HAS_VISUAL_NICE_TO_HAVES) {
+  import("./globals.nice2have.scss");
+}
+
 let titleElement: HTMLElement;
 let xpElement: HTMLElement;
 
@@ -27,18 +31,18 @@ function init() {
   isInitialized = true;
 
   const header = createElement({
-    tag: "header",
+    cssClass: styles.header,
   });
 
   titleElement = createElement({
-    cssClass: CssClass.TITLE,
+    cssClass: styles.title,
     text: "Kittens united - a purrfect plan",
   });
 
   header.append(titleElement);
 
   const btnContainer = createElement({
-    cssClass: "h-btns",
+    cssClass: styles.headerButtons,
   });
 
   if (HAS_MUTE_BUTTON) {

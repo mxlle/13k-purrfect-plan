@@ -1,5 +1,3 @@
-import { sleep } from "./promise-utils";
-
 export function addCanvasToBody() {
   const canvas = createElement({
     tag: "canvas",
@@ -42,40 +40,6 @@ export function createElement<TagName extends HTMLTagName = "div">(
 
 export function createButton(props: Omit<CreateElementOptions<"button">, "tag">, children: (Node | string)[] = []) {
   return createElement({ tag: "button", ...props }, children);
-}
-
-function absorbEvent_(event: Event) {
-  event.preventDefault && event.preventDefault();
-  event.stopPropagation && event.stopPropagation();
-  event.cancelBubble = true;
-  event.returnValue = false;
-  return false;
-}
-
-export function convertLongPressToClick(node: Node, clickHandler?: (ev: TouchEvent) => void, touchingClassTimeout = 300) {
-  function onTouchEnd(event, promise, target) {
-    promise.then(() => target.classList.remove("touching"));
-    return absorbEvent_(event);
-  }
-
-  const explicitPassiveOption = { passive: false }; // https://github.com/WICG/EventListenerOptions/blob/gh-pages/explainer.md#solution-the-passive-option
-  const innerEventOptions = { ...explicitPassiveOption, once: true };
-
-  node.addEventListener(
-    "touchstart",
-    function (event) {
-      const target = event.currentTarget as HTMLElement;
-      target.classList.add("touching");
-      clickHandler && clickHandler(event as TouchEvent);
-      const sleepPromise = sleep(touchingClassTimeout);
-      node.addEventListener("touchend", (_event) => onTouchEnd(_event, sleepPromise, target), innerEventOptions);
-      node.addEventListener("touchmove", absorbEvent_, innerEventOptions);
-      node.addEventListener("touchcancel", absorbEvent_, innerEventOptions);
-
-      return absorbEvent_(event);
-    },
-    explicitPassiveOption,
-  );
 }
 
 export function addBodyClasses(...classes: string[]) {

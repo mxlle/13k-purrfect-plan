@@ -18,10 +18,7 @@
 }
 
 .newGameContainer {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  @extend %centeredAbsolute;
   z-index: 6;
   display: grid;
   gap: 0.5rem;

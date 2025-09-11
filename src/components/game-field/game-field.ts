@@ -185,7 +185,7 @@ function appendGameField() {
   }
 
   if (!mainContainer) {
-    mainContainer = createElement({ tag: "main" });
+    mainContainer = createElement({ cssClass: styles.main });
     document.body.append(mainContainer);
     mainContainer.addEventListener("scroll", () => {
       removeAllSpeechBubbles();

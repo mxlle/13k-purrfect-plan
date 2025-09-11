@@ -45,13 +45,13 @@ export function updateGameInfoComponent(isReset: boolean = false) {
 
   // console.debug("updateTurnMovesComponent", { showMoves, showMoveLimit, isReset, moves: globals.gameState?.moves });
 
-  turnMovesContainer.style.display = showMoves ? "flex" : "none";
+  turnMovesContainer.classList.toggle(CssClass.HIDDEN, !showMoves);
   const par = getParFromGameState(globals.gameState);
   const parString = par && showMoveLimit && !isReset ? ` / ${par < FALLBACK_PAR ? par : "?"}` : "";
   turnMovesComponent.innerHTML = `${getTranslation(TranslationKey.MOVES)}: ${isReset ? 0 : (globals.gameState?.moves.length ?? 0)}${parString}`;
 
   const difficulty = globals.gameState?.setup.difficulty;
-  difficultyComponent.style.display = showMoveLimit && difficulty ? "flex" : "none";
+  difficultyComponent.classList.toggle(CssClass.HIDDEN, !showMoveLimit || !difficulty);
   difficultyComponent.innerHTML = `${getTranslation(TranslationKey.DIFFICULTY)}: `;
   difficultyComponent.append(
     isReset ? "?" : createElement({ cssClass: getCssClassForDifficulty(difficulty), text: getDifficultyRepresentation(difficulty) }),

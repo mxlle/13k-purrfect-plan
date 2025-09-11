@@ -1,0 +1,26 @@
+@use "theme" as *;
+@use "names" as *;
+
+.title {
+  color: $main-color;
+  font-family: $font-family-special;
+
+  @media (max-width: 640px) {
+    font-size: 0.8rem;
+  }
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 1rem 0;
+  align-items: center;
+  gap: 1rem;
+}
+
+.headerButtons {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+}

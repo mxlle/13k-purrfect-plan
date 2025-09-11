@@ -6,6 +6,26 @@
 
 $border-style: outset;
 
+.main {
+  // height: 100%;
+  // width: 100%;
+  overflow: auto;
+  display: grid;
+  padding: 1rem;
+  padding-top: 0.5rem;
+  gap: 1rem;
+  grid-template-columns: minmax(min-content, 1fr) minmax(360px, 1fr);
+  place-items: center;
+  margin: 0 auto;
+  max-width: min-content;
+
+  @media (orientation: portrait) {
+    grid-template-columns: 1fr;
+    grid-template-rows: min-content auto;
+    max-width: initial;
+  }
+}
+
 .field {
   --t: #{$tile-color-1};
   position: relative;
@@ -30,10 +50,7 @@ $border-style: outset;
 }
 
 .loader {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  @extend %centeredAbsolute;
   opacity: 0.5;
   white-space: nowrap;
   font-family: $font-family-special;

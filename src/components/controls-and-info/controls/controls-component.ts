@@ -56,7 +56,7 @@ export function initHintButton(): HTMLButtonElement {
     onClick: async () => {
       if (!globals.gameState) return;
 
-      hintButton.setAttribute("disabled", "disabled");
+      hintButton.disabled = true;
       await animateXpFlyAway(getXpInnerHtml(XP_FOR_HINT), hintButton);
       pubSubService.publish(PubSubEvent.UPDATE_XP, XP_FOR_HINT);
 
@@ -73,7 +73,7 @@ export function initHintButton(): HTMLButtonElement {
 }
 
 export function updateControlsOnGameStart() {
-  hintButton.removeAttribute("disabled");
+  hintButton.disabled = false;
   updateRecoveryInfoComponent();
   updateToolContainer();
   updateMoveButtonsDisabledState();
@@ -97,12 +97,7 @@ function updateMoveButtonsDisabledState() {
   for (const direction of allDirections) {
     const shouldDisable = globals.gameState && !isValidMove(globals.gameState, direction);
     const button = getMoveButton(direction);
-
-    if (shouldDisable) {
-      button.setAttribute("disabled", "disabled");
-    } else {
-      button.removeAttribute("disabled");
-    }
+    button.disabled = shouldDisable;
   }
 }
 
@@ -113,8 +108,8 @@ const directionStyleMap: { [key in Direction]: string } = {
   [Direction.LEFT]: styles.left,
 };
 
-const buttons: { [key in Direction | Tool]?: HTMLElement } = {};
-function getMoveButton(direction: Direction): HTMLElement {
+const buttons: { [key in Direction | Tool]?: HTMLButtonElement } = {};
+function getMoveButton(direction: Direction): HTMLButtonElement {
   return (buttons[direction] ??= createButton(
     {
       onClick: () => handleMove(direction),
@@ -167,7 +162,7 @@ async function handleMove(turnMove: TurnMove) {
     highlightedElement = undefined;
   }
 
-  hintButton.removeAttribute("disabled");
+  hintButton.disabled = false;
 
   await performMove(globals.gameState, turnMove);
   updateGameInfoComponent();

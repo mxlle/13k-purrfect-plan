@@ -21,8 +21,6 @@ let isPerformingMove = false;
 const MEOW_TIME = 1500;
 
 export async function performMove(gameState: GameState, turnMove: TurnMove) {
-  console.debug(`Make move: ${turnMove}`);
-
   if (isPerformingMove) {
     console.warn("Already performing a move, ignoring this one.");
     return;
