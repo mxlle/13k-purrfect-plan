@@ -10,17 +10,16 @@ let isActive = false;
 let initialized = false;
 
 export async function initAudio(initializeMuted: boolean) {
-  audioElem = document.createElement("audio");
-  audioElem.loop = true;
-  audioElem.volume = 0.5;
-  audioElem.playbackRate = 1;
-
   const player = HAS_SOUND_EFFECTS ? new CPlayer() : new CPlayerSimple();
   player.init(song);
 
   await generateUntilDone(player);
   const wave = player.createWave();
-  audioElem.src = URL.createObjectURL(new Blob([wave], { type: "audio/wav" }));
+  const src = URL.createObjectURL(new Blob([wave], { type: "audio/wav" }));
+
+  audioElem = new Audio(src);
+  audioElem.loop = true;
+  audioElem.volume = 0.5;
 
   document.addEventListener("visibilitychange", () => {
     audioElem.muted = document.hidden;

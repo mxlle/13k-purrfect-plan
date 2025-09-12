@@ -4,7 +4,6 @@ export const difficultyEmoji: Record<Difficulty, string> = {
   [Difficulty.EASY]: "💚",
   [Difficulty.MEDIUM]: "🟡",
   [Difficulty.HARD]: "🟥",
-  [Difficulty.EXTREME]: "💀",
 };
 
 const DIFFICULTY_SYMBOL = "●";

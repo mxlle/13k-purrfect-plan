@@ -26,6 +26,7 @@ import {
   updateToolContainer,
 } from "./controls/controls-component";
 import { collectXp } from "../xp-components/xp-components";
+import { sleep } from "../../utils/promise-utils";
 
 let hasSetupEventListeners = false;
 const controlsAndInfoComponent: HTMLElement = createElement({ cssClass: styles.controlsAndInfo });
@@ -33,11 +34,7 @@ const controlsAndInfoComponent: HTMLElement = createElement({ cssClass: styles.c
 export function getControlsAndInfoComponent(): HTMLElement {
   setupEventListeners();
 
-  const movementContainer = initMovementContainer();
-  const toolContainer = initToolContainer();
-  const hintButton = initHintButton();
-
-  controlsAndInfoComponent.append(getGameInfoComponent(), movementContainer, toolContainer, hintButton);
+  controlsAndInfoComponent.append(getGameInfoComponent(), initMovementContainer(), initToolContainer(), initHintButton());
 
   updateToolContainer();
   updateGameInfoComponent();
@@ -66,7 +63,8 @@ function setupEventListeners() {
     updateGameInfoComponent(true);
   });
 
-  pubSubService.subscribe(PubSubEvent.GAME_START, () => {
+  pubSubService.subscribe(PubSubEvent.GAME_START, async () => {
+    await sleep(0); // to make sure the state is settled
     toggleDoOverButtonVisibility(false);
     updateGameInfoComponent();
     updateControlsOnGameStart();
@@ -88,6 +86,7 @@ function addNewGameButtons(isInitialStart = false) {
     text: getTranslation(
       isInitialStart ? TranslationKey.START_GAME : shouldShowRedoButton ? TranslationKey.NEW_GAME : TranslationKey.CONTINUE,
     ),
+    cssClass: CssClass.PRIMARY,
     onClick: async () => {
       if (hasAchievedGoal) {
         await collectXp(continueButton, newXp);
@@ -119,9 +118,8 @@ function addNewGameButtons(isInitialStart = false) {
       },
     });
 
+    continueButton.classList.remove(CssClass.PRIMARY);
     newGameContainer.append(restartButton);
-  } else {
-    continueButton.classList.toggle(CssClass.PRIMARY, true);
   }
 
   return newGameContainer;

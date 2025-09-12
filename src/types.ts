@@ -64,5 +64,4 @@ export const Difficulty = Object.freeze({
   EASY: 1,
   MEDIUM: 2,
   HARD: 3,
-  EXTREME: 4,
 });

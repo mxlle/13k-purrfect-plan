@@ -13,7 +13,6 @@ const difficultyBonusXPMap: Record<Difficulty, number> = {
   [Difficulty.EASY]: 0,
   [Difficulty.MEDIUM]: 1,
   [Difficulty.HARD]: 3,
-  [Difficulty.EXTREME]: 5,
 };
 
 export function getCurrentXP(): number {

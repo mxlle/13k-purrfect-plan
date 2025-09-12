@@ -57,22 +57,15 @@ export function updateGameInfoComponent(isReset: boolean = false) {
   difficultyComponent.classList.toggle(CssClass.HIDDEN, !showMoveLimit || !difficulty);
   difficultyComponent.innerHTML = `${getTranslation(TranslationKey.DIFFICULTY)}: `;
   difficultyComponent.append(
-    isReset ? "?" : createElement({ cssClass: getCssClassForDifficulty(difficulty), text: getDifficultyRepresentation(difficulty) }),
+    isReset ? "?" : createElement({ cssClass: difficultyStyleMap[difficulty], text: getDifficultyRepresentation(difficulty) }),
   );
 
   retryInfo.classList.toggle(CssClass.HIDDEN, globals.failedAttempts === 0);
   retryInfo.innerHTML = `${getTranslation(TranslationKey.RETRIES)}: ${Array.from({ length: globals.failedAttempts }, () => "I").join("")}`;
 }
 
-function getCssClassForDifficulty(difficulty: Difficulty) {
-  switch (difficulty) {
-    case Difficulty.EASY:
-      return styles.easy;
-    case Difficulty.MEDIUM:
-      return styles.medium;
-    case Difficulty.HARD:
-      return styles.hard;
-    default:
-      return "";
-  }
-}
+const difficultyStyleMap: Record<Difficulty, string> = {
+  [Difficulty.EASY]: styles.easy,
+  [Difficulty.MEDIUM]: styles.medium,
+  [Difficulty.HARD]: styles.hard,
+};

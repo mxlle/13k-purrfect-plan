@@ -20,24 +20,20 @@ export function createDialog(innerElement: HTMLElement): Dialog {
     onClick: (event) => event.stopPropagation(), // TODO - why?
   });
 
-  const dialogContent = createElement({ cssClass: styles.content });
-  dialogContent.appendChild(innerElement);
-  dialog.appendChild(dialogContent);
+  const dialogContent = createElement({ cssClass: styles.content }, [innerElement]);
 
   function closeDialog(confirm: boolean) {
     dialog.classList.remove(styles.open);
     pubSubService.publish(PubSubEvent.CLOSE_DIALOG, confirm);
   }
 
-  const buttons = createElement({ cssClass: styles.btns });
-
   const submitButton = createButton({
     text: getTranslation(TranslationKey.CONTINUE),
     cssClass: CssClass.PRIMARY,
     onClick: () => closeDialog(true),
   });
-  buttons.appendChild(submitButton);
-  dialog.appendChild(buttons);
+
+  dialog.append(dialogContent, createElement({ cssClass: styles.btns }, [submitButton]));
 
   document.body.appendChild(dialog);
 
