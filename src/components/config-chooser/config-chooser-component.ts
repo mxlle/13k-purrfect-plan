@@ -22,9 +22,9 @@ export async function createConfigChooserComponent(): Promise<ConfigItemId | boo
   chooserContainer.append(header);
 
   const explanationElement = createElement({ cssClass: styles.explanation, text: getTranslation(TranslationKey.EXPLANATION_EMPTY) });
-  const skipTutorialLink = createElement({
-    tag: "a",
+  const skipTutorialButton = createButton({
     text: getTranslation(TranslationKey.SKIP_TUTORIAL),
+    cssClass: CssClass.TERTIARY,
     onClick: () => {
       selectedConfigItem = true;
       chooserDialog?.close(true);
@@ -39,7 +39,7 @@ export async function createConfigChooserComponent(): Promise<ConfigItemId | boo
         return;
       }
 
-      skipTutorialLink.remove();
+      skipTutorialButton.remove();
       explanationElement.innerHTML = getTranslation(explanationMap[choice]);
       explanationElement.classList.add(styles.active);
       header.innerHTML = getTranslation(TranslationKey.YOUR_CHOICE);
@@ -63,7 +63,7 @@ export async function createConfigChooserComponent(): Promise<ConfigItemId | boo
 
   choicesContainer.append(...choiceElements);
 
-  chooserContainer.append(choicesContainer, explanationElement, skipTutorialLink);
+  chooserContainer.append(choicesContainer, explanationElement, skipTutorialButton);
 
   chooserDialog = createDialog(chooserContainer, { submitButtonText: getTranslation(TranslationKey.CONFIRM), showCloseButton: false });
   chooserDialog.toggleSubmitDisabled(true);

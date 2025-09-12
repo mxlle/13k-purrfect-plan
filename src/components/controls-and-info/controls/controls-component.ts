@@ -1,6 +1,6 @@
-import { createButton, createElement } from "../../../utils/html-utils";
+import { addBodyClasses, createButton, createElement } from "../../../utils/html-utils";
 import { CssClass } from "../../../utils/css-class";
-import { ALL_TOOLS, Direction, isTool, Tool, TurnMove } from "../../../types";
+import { ALL_TOOLS, Direction, isDirection, isTool, Tool, TurnMove } from "../../../types";
 
 import styles from "./controls-component.module.scss";
 import { performMove } from "../../../logic/gameplay/perform-move";
@@ -11,7 +11,7 @@ import { TranslationKey } from "../../../translations/translationKey";
 import { globals } from "../../../globals";
 
 import { getToolText, hasMoveLimit, isConfigItemEnabled } from "../../../logic/config/config";
-import { getXpInnerHtml, XP_FOR_HINT } from "../../../logic/data/experience-points";
+import { getXpText, XP_FOR_HINT } from "../../../logic/data/experience-points";
 import { toggleDoOverButtonVisibility, updateGameInfoComponent } from "../game-info/game-info-component";
 import { animateXpFlyAway } from "../../xp-components/xp-components";
 import { isValidMove } from "../../../logic/gameplay/movement";
@@ -25,6 +25,23 @@ let highlightedElement: HTMLElement | undefined;
 const recoveryInfoComponent: HTMLElement = createElement({ cssClass: styles.recoveryInfo });
 
 const allDirections = [Direction.UP, Direction.RIGHT, Direction.DOWN, Direction.LEFT];
+
+const HINT = "hint" as const;
+type Action = Direction | Tool | typeof HINT;
+
+const KEYMAP: Record<KeyboardEvent["key"], Action> = {
+  ArrowUp: Direction.UP,
+  ArrowDown: Direction.DOWN,
+  ArrowLeft: Direction.LEFT,
+  ArrowRight: Direction.RIGHT,
+  w: Direction.UP,
+  a: Direction.LEFT,
+  s: Direction.DOWN,
+  d: Direction.RIGHT,
+  e: Tool.MEOW,
+  q: Tool.WAIT,
+  F1: HINT,
+};
 
 export function initMovementContainer(): HTMLElement {
   movementContainer.innerHTML = "";
@@ -46,30 +63,26 @@ export function initToolContainer(): HTMLElement {
 }
 
 export function initHintButton(): HTMLButtonElement {
-  if (hintButton) {
-    return hintButton;
-  }
+  return (hintButton ??= createButton(
+    {
+      cssClass: CssClass.SECONDARY,
+      onClick: async () => {
+        if (!globals.gameState) return;
 
-  hintButton = createButton({
-    html: `${getTranslation(TranslationKey.HINT)} ${getXpInnerHtml(XP_FOR_HINT)}`,
-    cssClass: CssClass.SECONDARY,
-    onClick: async () => {
-      if (!globals.gameState) return;
+        hintButton.disabled = true;
+        await animateXpFlyAway(getXpText(XP_FOR_HINT), hintButton);
+        pubSubService.publish(PubSubEvent.UPDATE_XP, XP_FOR_HINT);
 
-      hintButton.disabled = true;
-      await animateXpFlyAway(getXpInnerHtml(XP_FOR_HINT), hintButton);
-      pubSubService.publish(PubSubEvent.UPDATE_XP, XP_FOR_HINT);
-
-      const hint = getBestNextMove(globals.gameState);
-      if (hint !== undefined) {
-        activateOnboardingHighlight(hint);
-      } else {
-        toggleDoOverButtonVisibility(true);
-      }
+        const hint = getBestNextMove(globals.gameState);
+        if (hint !== undefined) {
+          activateOnboardingHighlight(hint);
+        } else {
+          toggleDoOverButtonVisibility(true);
+        }
+      },
     },
-  });
-
-  return hintButton;
+    [getTranslation(TranslationKey.HINT), " ", getXpText(XP_FOR_HINT), createKeyboardHint(HINT)],
+  ));
 }
 
 export function updateControlsOnGameStart() {
@@ -85,6 +98,7 @@ export function showNewGameButtonsAndHideControls(newGameButtonContainer: HTMLEl
   movementContainer.classList.toggle(styles.disabled, true);
   toolContainer.classList.toggle(CssClass.OPACITY_HIDDEN, true);
   hintButton.classList.toggle(CssClass.OPACITY_HIDDEN, true);
+  newGameButtonContainer.querySelector<HTMLButtonElement>(`button.${CssClass.PRIMARY}`).focus();
 }
 
 function reshowControls() {
@@ -108,6 +122,15 @@ const directionStyleMap: { [key in Direction]: string } = {
   [Direction.LEFT]: styles.left,
 };
 
+function createKeyboardHint(action: Action) {
+  return createElement({
+    tag: "kbd",
+    text: Object.entries(KEYMAP)
+      .find(([key, val]) => val === action && key.length <= 2)?.[0]
+      .toUpperCase(),
+  });
+}
+
 const buttons: { [key in Direction | Tool]?: HTMLButtonElement } = {};
 function getMoveButton(direction: Direction): HTMLButtonElement {
   return (buttons[direction] ??= createButton(
@@ -115,12 +138,15 @@ function getMoveButton(direction: Direction): HTMLButtonElement {
       onClick: () => handleMove(direction),
       cssClass: [CssClass.ICON_BTN, directionStyleMap[direction]],
     },
-    [getArrowComponent(direction)],
+    [getArrowComponent(direction), createKeyboardHint(direction)],
   ));
 }
 
 function getToolButton(tool: Tool) {
-  return (buttons[tool] ??= createButton({ html: `<span>${getToolText(tool)}</span>`, onClick: () => handleMove(tool) }));
+  return (buttons[tool] ??= createButton({ onClick: () => handleMove(tool) }, [
+    createElement({ tag: "span" }, [getToolText(tool)]),
+    createKeyboardHint(tool),
+  ]));
 }
 
 function getControlButton(type: Direction | Tool): HTMLElement {
@@ -129,29 +155,24 @@ function getControlButton(type: Direction | Tool): HTMLElement {
 
 export function setupKeyboardEventListeners() {
   document.addEventListener("keydown", (event) => {
-    let turnMove: TurnMove | undefined;
+    const action = KEYMAP[event.key];
+    if (!action) return;
+    event.preventDefault(); // Prevent default scrolling behavior
+    addBodyClasses(styles.keyboardActive);
 
-    switch (event.key) {
-      case "ArrowUp":
-        turnMove = Direction.UP;
-        break;
-      case "ArrowDown":
-        turnMove = Direction.DOWN;
-        break;
-      case "ArrowLeft":
-        turnMove = Direction.LEFT;
-        break;
-      case "ArrowRight":
-        turnMove = Direction.RIGHT;
-        break;
-      case "m": // 'm' for meow
-        turnMove = Tool.MEOW;
-        break;
-    }
-
-    if (turnMove) {
-      event.preventDefault(); // Prevent default scrolling behavior
-      void handleMove(turnMove);
+    if (!movementContainer.classList.contains(styles.disabled)) {
+      // During game
+      if (action === HINT) {
+        hintButton.click();
+      } else {
+        void handleMove(action);
+      }
+    } else if (isDirection(action)) {
+      // Focus next new game button
+      const buttons = movementContainer.querySelectorAll<HTMLButtonElement>(`& div button:not(.${CssClass.HIDDEN})`).values().toArray();
+      const current = buttons.indexOf(document.activeElement as any);
+      console.log({ buttons, current, action });
+      buttons[(current + 1) % buttons.length].focus();
     }
   });
 }
@@ -176,13 +197,7 @@ function updateRecoveryInfoComponent() {
 
   const remainingRecoveryTime = getRemainingToolRecoveryTime(globals.gameState, Tool.MEOW);
 
-  if (!remainingRecoveryTime) {
-    recoveryInfoComponent.innerHTML = "";
-    getToolButton(Tool.MEOW).classList.remove(styles.disabled);
-    return;
-  }
-
-  recoveryInfoComponent.innerHTML = `${remainingRecoveryTime}`;
+  recoveryInfoComponent.innerHTML = `${remainingRecoveryTime || ""}`;
   getToolButton(Tool.MEOW).classList.toggle(styles.disabled, remainingRecoveryTime > 0);
 }
 

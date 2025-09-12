@@ -4,6 +4,7 @@ export type CssClass = defineEnum<typeof CssClass>;
 export const CssClass = defineEnum({
   PRIMARY: "global__primary",
   SECONDARY: "global__secondary",
+  TERTIARY: "global__tertiary",
   CELL: "global__cell",
   CAT_BOX: "global__cat-box",
   OBJECT_BOX: "global__object-box",

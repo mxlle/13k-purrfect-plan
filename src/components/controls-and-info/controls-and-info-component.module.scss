@@ -15,6 +15,9 @@
   > * {
     transition: opacity 0.3s;
   }
+  button {
+    position: relative;
+  }
 }
 
 .newGameContainer {
@@ -23,6 +26,11 @@
   display: grid;
   gap: 0.5rem;
   place-items: center;
+  text-align: center;
   pointer-events: all !important;
   opacity: 1 !important;
+}
+
+.xpInfo {
+  font-size: 0.8em;
 }
