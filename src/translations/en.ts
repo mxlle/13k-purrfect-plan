@@ -19,7 +19,7 @@ export const enTranslations: Record<TranslationKey, string> = {
     "Splashy loves water and wants to play in it. Once she's in, you can only lure her out with Mom's meow.",
   [TranslationKey.EXPLANATION_MEOW]: "When Mom meows, all kittens move one step closer. But you can only do this every 3 moves.",
   [TranslationKey.EXPLANATION_WAIT]: "You can stay where you are and wait for the kittens to move.",
-  [TranslationKey.EXPLANATION_MOVE_LIMIT_1]: "The moon moves across sky. Once it sets, darkness falls - but you can still finish.",
+  [TranslationKey.EXPLANATION_MOVE_LIMIT_1]: "The moon moves across the sky. Once it sets, darkness falls - but you can still finish.",
   [TranslationKey.EXPLANATION_MOVE_LIMIT_2]: "Unite all the kittens before the moon sets!",
   [TranslationKey.EXPLANATION_EMPTY]: "Your choice will be explained here.",
   [TranslationKey.YOUR_CHOICE]: "Your choice",
