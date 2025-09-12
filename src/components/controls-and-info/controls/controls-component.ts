@@ -81,7 +81,7 @@ export function initHintButton(): HTMLButtonElement {
         }
       },
     },
-    [getTranslation(TranslationKey.HINT), getXpText(XP_FOR_HINT), createKeyboardHint(HINT)],
+    [getTranslation(TranslationKey.HINT), " ", getXpText(XP_FOR_HINT), createKeyboardHint(HINT)],
   ));
 }
 
