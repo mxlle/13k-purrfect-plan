@@ -8,7 +8,7 @@ import { isOnboarding } from "./logic/onboarding";
 import { DEFAULT_FIELD_SIZE } from "./logic/data/field-size";
 import { CssClass } from "./utils/css-class";
 import { sleep } from "./utils/promise-utils";
-import { changeXP, getCurrentXP, getXpInnerHtml } from "./logic/data/experience-points";
+import { changeXP, getCurrentXP, getXpText } from "./logic/data/experience-points";
 import { animateNumber } from "./utils/custom-animation-util";
 import { initAudio, togglePlayer } from "./audio/music-control";
 import { getLocalStorageItem, LocalStorageKey } from "./utils/local-storage";
@@ -108,7 +108,7 @@ function updateXpWithAnimation(newXP: number) {
 }
 
 function updateXpElement(xp: number = getCurrentXP()) {
-  xpElement.innerHTML = getXpInnerHtml(xp);
+  xpElement.innerText = getXpText(xp);
 }
 
 // INIT

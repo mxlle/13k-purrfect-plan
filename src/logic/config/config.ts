@@ -80,5 +80,5 @@ export function updateKnownConfigItems(newConfigItems: ConfigItemId[]) {
 }
 
 export function getToolText(tool: Tool) {
-  return tool === Tool.MEOW ? `💬&nbsp;${getTranslation(TranslationKey.MEOW)}` : `💤&nbsp;${getTranslation(TranslationKey.WAIT)}`;
+  return tool === Tool.MEOW ? `💬 ${getTranslation(TranslationKey.MEOW)}` : `💤 ${getTranslation(TranslationKey.WAIT)}`;
 }

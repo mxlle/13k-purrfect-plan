@@ -28,7 +28,7 @@ export type TurnMove = Direction | Tool;
 export const ALL_DIRECTIONS: Direction[] = Object.values(Direction);
 export const ALL_TOOLS: Tool[] = Object.values(Tool);
 
-export function isDirection(move: TurnMove): move is Direction {
+export function isDirection(move: unknown): move is Direction {
   return ALL_DIRECTIONS.includes(move as Direction);
 }
 

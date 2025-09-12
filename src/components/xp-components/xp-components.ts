@@ -1,7 +1,7 @@
 import { createButton, createElement, resetTransform } from "../../utils/html-utils";
 import { getTranslation } from "../../translations/i18n";
 import { TranslationKey } from "../../translations/translationKey";
-import { getXpInnerHtml, XP_REP } from "../../logic/data/experience-points";
+import { getXpText, XP_REP } from "../../logic/data/experience-points";
 import { requestAnimationFrameWithTimeout, sleep } from "../../utils/promise-utils";
 import { PubSubEvent, pubSubService } from "../../utils/pub-sub-service";
 import { CssClass } from "../../utils/css-class";
@@ -9,7 +9,7 @@ import styles from "./xp-components.module.scss";
 
 export function getCollectXpButton(newXp: number, afterCollect: () => void): HTMLElement {
   const xpButton = createButton({
-    html: getTranslation(TranslationKey.COLLECT_XP, getXpInnerHtml(newXp)),
+    text: getTranslation(TranslationKey.COLLECT_XP, getXpText(newXp)),
     onClick: async () => {
       sleep(500).then(() => {
         pubSubService.publish(PubSubEvent.UPDATE_XP, newXp);

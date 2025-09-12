@@ -22,6 +22,8 @@
 
   > button {
     color: $main-color;
+    display: grid;
+    place-items: center;
   }
 
   &.disabled > * {
@@ -80,7 +82,7 @@
         display: block;
       }
 
-      > span {
+      > *:not(.recovery-info) {
         opacity: 0.1;
         filter: grayscale(80%);
       }
@@ -104,6 +106,34 @@
       content: "⏳ ";
     }
   }
+}
+
+kbd {
+  opacity: 0;
+  transition: opacity 0.1s;
+  .keyboard-active & {
+    opacity: 1;
+  }
+
+  position: absolute;
+  .toolControls &,
+  .hintButton & {
+    right: .15rem;
+    bottom: .15rem;
+  }
+  .up & { bottom: -.2rem; }
+  .right & { left: -.2rem; }
+  .down & { top: -.2rem; }
+  .left & { right: -.2rem; }
+
+  font-family: monospace;
+  padding: .05rem .25rem;
+  border-radius: .2rem;
+  font-size: .45rem;
+  line-height: 1.2;
+  background-color: $bg-alpha-05;
+  border: 1px solid $bg-alpha-10;
+  color: $text-secondary;
 }
 
 @keyframes boxShadowPulse {
