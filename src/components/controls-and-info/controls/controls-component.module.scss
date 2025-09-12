@@ -6,11 +6,9 @@
 }
 
 .movementControls {
-  display: grid;
+  @extend %gridCentered;
   grid-template-columns: repeat(3, auto);
   grid-template-rows: repeat(3, auto);
-  align-items: center;
-  justify-items: center;
   place-self: center;
   width: fit-content;
   position: relative;
@@ -22,11 +20,10 @@
 
   > button {
     color: $main-color;
-    display: grid;
-    place-items: center;
+    @extend %gridCentered;
   }
 
-  &.disabled > * {
+  &.disabled > :global(.#{$ICON_BTN}) {
     pointer-events: none;
     opacity: 0;
   }
@@ -66,8 +63,7 @@
 }
 
 .toolControls {
-  display: grid;
-  place-items: center;
+  @extend %gridCentered;
   gap: 0.5rem;
 
   button {

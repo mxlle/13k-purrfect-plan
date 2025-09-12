@@ -9,13 +9,12 @@ $border-style: outset;
 .main {
   // height: 100%;
   // width: 100%;
+  @extend %gridCentered;
   overflow: auto;
-  display: grid;
   padding: 1rem;
   padding-top: 0.5rem;
   gap: 1rem;
   grid-template-columns: minmax(min-content, 1fr) minmax(360px, 1fr);
-  place-items: center;
   margin: 0 auto;
   max-width: min-content;
 
@@ -58,11 +57,10 @@ $border-style: outset;
 }
 
 :global(.#{$CELL}) {
+  @extend %gridCentered;
   background-color: var(--t);
-  display: grid;
-  place-items: center;
   position: relative;
-  transition: background-color 0.3s;
+  transition: background 0.3s;
 
   :global(.#{$CAT_BOX}) {
     z-index: 3;

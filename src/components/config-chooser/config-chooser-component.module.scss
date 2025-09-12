@@ -14,10 +14,9 @@
 }
 
 .configItem {
-  height: min(40vh, 40vw);
-  width: min(40vh, 40vw);
-  display: grid;
-  place-items: center;
+  @extend %gridCentered;
+  height: min(30vh, 40vw);
+  width: min(30vh, 40vw);
   color: $main-color-secondary;
   padding: 0.25rem;
   hyphens: auto;

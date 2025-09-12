@@ -45,8 +45,7 @@ const KEYMAP: Record<KeyboardEvent["key"], Action> = {
 
 export function initMovementContainer(): HTMLElement {
   movementContainer.innerHTML = "";
-  const moveButtons = allDirections.map(getMoveButton);
-  moveButtons.forEach((button) => movementContainer.append(button));
+  movementContainer.append(...allDirections.map(getMoveButton));
   updateMoveButtonsDisabledState();
 
   return movementContainer;

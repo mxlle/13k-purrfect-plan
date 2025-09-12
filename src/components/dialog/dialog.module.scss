@@ -35,8 +35,7 @@
 }
 
 .btns {
-  display: grid;
-  place-items: center;
+  @extend %gridCentered;
   padding: 1rem;
   padding-bottom: 2rem;
 

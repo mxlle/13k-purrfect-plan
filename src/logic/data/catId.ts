@@ -3,9 +3,9 @@ import { defineEnum } from "../../utils/enums";
 export type CatId = defineEnum<typeof CatId>;
 export const CatId = defineEnum({
   MOTHER: "🟣",
-  MOONY: "🟡",
-  IVY: "🟢",
   SPLASHY: "🔵",
+  IVY: "🟢",
+  MOONY: "🟡",
 });
 
 export const ALL_CAT_IDS = Object.values(CatId);

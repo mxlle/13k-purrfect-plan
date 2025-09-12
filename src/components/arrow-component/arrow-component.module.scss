@@ -2,10 +2,9 @@
 @use "../../names" as *;
 
 .arrow {
+  @extend %gridCentered;
   width: 100%;
   height: 100%;
-  display: grid;
-  place-items: center;
   transition: transform 0.3s;
 
   svg {

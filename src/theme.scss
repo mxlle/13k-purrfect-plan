@@ -58,3 +58,8 @@ $tile-color-alpha: $tile-color-1-dark-alpha;
   left: 50%;
   transform: translate(-50%, -50%);
 }
+
+%gridCentered {
+  display: grid;
+  place-items: center;
+}
