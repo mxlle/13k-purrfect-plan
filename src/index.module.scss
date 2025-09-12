@@ -3,7 +3,6 @@
 
 .title {
   color: $main-color;
-  font-family: $font-family-special;
 
   @media (max-width: 640px) {
     font-size: 0.8rem;
@@ -16,6 +15,7 @@
   padding: 0.5rem 1rem 0;
   align-items: center;
   gap: 1rem;
+  font-family: $font-family-special;
 }
 
 .headerButtons {

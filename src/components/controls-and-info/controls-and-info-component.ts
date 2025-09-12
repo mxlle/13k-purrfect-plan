@@ -79,12 +79,15 @@ function setupEventListeners() {
 
 function addNewGameButtons(isInitialStart = false) {
   const hasAchievedGoal = isWinConditionMet(globals.gameState) && globals.gameState.moves.length <= getParFromGameState(globals.gameState);
+  const shouldShowRedoButton = !isInitialStart && hasMoveLimit() && !hasAchievedGoal;
   const newXp = hasAchievedGoal ? calculateNewXP() : 0;
 
   const newGameContainer = createElement({ cssClass: styles.newGameContainer });
 
   const continueButton = createButton({
-    text: getTranslation(isInitialStart ? TranslationKey.START_GAME : hasAchievedGoal ? TranslationKey.CONTINUE : TranslationKey.NEW_GAME),
+    text: getTranslation(
+      isInitialStart ? TranslationKey.START_GAME : shouldShowRedoButton ? TranslationKey.NEW_GAME : TranslationKey.CONTINUE,
+    ),
     onClick: async () => {
       if (hasAchievedGoal) {
         await collectXp(continueButton, newXp);
@@ -106,7 +109,7 @@ function addNewGameButtons(isInitialStart = false) {
     newGameContainer.append(xpElement);
   }
 
-  if (!isInitialStart && hasMoveLimit() && !hasAchievedGoal) {
+  if (shouldShowRedoButton) {
     const restartButton = createButton({
       text: getTranslation(TranslationKey.RESTART_GAME),
       cssClass: CssClass.PRIMARY,

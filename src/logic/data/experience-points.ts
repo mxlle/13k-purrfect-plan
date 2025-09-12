@@ -29,7 +29,7 @@ export function changeXP(newXP: number) {
 }
 
 export function getXpText(xp: number = getCurrentXP()): string {
-  return xp ? `${xp} ${XP_REP}` : "";
+  return `${xp} ${XP_REP}`;
 }
 
 export function calculateNewXP(): number {

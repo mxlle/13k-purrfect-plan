@@ -22,7 +22,7 @@ if (HAS_VISUAL_NICE_TO_HAVES) {
 let titleElement: HTMLElement;
 let xpElement: HTMLElement;
 
-const initializeMuted = getLocalStorageItem(LocalStorageKey.MUTED) !== "false";
+const initializeMuted = getLocalStorageItem(LocalStorageKey.MUTED) === "true";
 
 let isInitialized = false;
 
