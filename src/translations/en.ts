@@ -1,7 +1,8 @@
 import { TranslationKey } from "./translationKey";
+import { HAS_SHORT_TEXTS } from "../env-utils";
 
 export const enTranslations: Record<TranslationKey, string> = {
-  [TranslationKey.START_GAME]: "Start game",
+  [TranslationKey.START_GAME]: HAS_SHORT_TEXTS ? "Start" : "Start game",
   [TranslationKey.NEW_GAME]: "New game",
   [TranslationKey.RESTART_GAME]: "Try again",
   [TranslationKey.RETRIES]: "Retries",
@@ -12,15 +13,20 @@ export const enTranslations: Record<TranslationKey, string> = {
   [TranslationKey.CHOICE_TOOL]: "New action",
   [TranslationKey.CHOICE_RULE]: "New rule",
   [TranslationKey.CHOICE_KITTEN_BEHAVIOR]: "Kitten personality",
-  [TranslationKey.EXPLANATION_MOONY]: "Moony loves the moon and will try to reach it.",
-  [TranslationKey.EXPLANATION_IVY]: "Ivy loves to run around the tree.",
-  [TranslationKey.EXPLANATION_SPLASHY]:
-    "Splashy loves water and wants to play in it. Once she's in, you can only lure her out with Mom's meow.",
-  [TranslationKey.EXPLANATION_MEOW]: "When Mom meows, all kittens move one step closer. But you can only do this every 3 moves.",
-  [TranslationKey.EXPLANATION_WAIT]: "You can stay where you are and wait for the kittens to move.",
-  [TranslationKey.EXPLANATION_MOVE_LIMIT_1]: "The moon moves across the sky. Once it sets, darkness falls - but you can still finish.",
-  [TranslationKey.EXPLANATION_MOVE_LIMIT_2]: "Unite all the kittens before the moon sets!",
-  [TranslationKey.EXPLANATION_EMPTY]: "Your choice will be explained here.",
+  [TranslationKey.EXPLANATION_MOONY]: HAS_SHORT_TEXTS ? "Will run to the moon" : "Moony loves the moon and will try to reach it.",
+  [TranslationKey.EXPLANATION_IVY]: HAS_SHORT_TEXTS ? "Will run around the tree" : "Ivy loves to run around the tree.",
+  [TranslationKey.EXPLANATION_SPLASHY]: HAS_SHORT_TEXTS
+    ? "Will run to the water"
+    : "Splashy loves water and wants to play in it. Once she's in, you can only lure her out with Mom's meow.",
+  [TranslationKey.EXPLANATION_MEOW]: HAS_SHORT_TEXTS
+    ? "Lures the kittens closer"
+    : "When Mom meows, all kittens move one step closer. But you can only do this every 3 moves.",
+  [TranslationKey.EXPLANATION_WAIT]: HAS_SHORT_TEXTS ? "Do nothing" : "You can stay where you are and wait for the kittens to move.",
+  [TranslationKey.EXPLANATION_MOVE_LIMIT_1]: HAS_SHORT_TEXTS
+    ? "Once the moon sets, darkness falls"
+    : "The moon moves across the sky. Once it sets, darkness falls - but you can still finish.",
+  [TranslationKey.EXPLANATION_MOVE_LIMIT_2]: "Unite all kittens before the moon sets!",
+  [TranslationKey.EXPLANATION_EMPTY]: HAS_SHORT_TEXTS ? "..." : "Your choice will be explained here.",
   [TranslationKey.YOUR_CHOICE]: "Your choice",
   [TranslationKey.UNITED]: "United!",
   [TranslationKey.LOST]: "Oh no!",
@@ -28,8 +34,8 @@ export const enTranslations: Record<TranslationKey, string> = {
   [TranslationKey.WAIT]: "Wait",
   [TranslationKey.LOADING]: "Loading...",
   [TranslationKey.HINT]: "Hint",
-  [TranslationKey.COLLECT_XP]: "Collect +{0}",
-  [TranslationKey.SKIP_TUTORIAL]: "Give me everything! I'll figure it out.",
+  [TranslationKey.COLLECT_XP]: HAS_SHORT_TEXTS ? "+{0}" : "Collect +{0}",
+  [TranslationKey.SKIP_TUTORIAL]: HAS_SHORT_TEXTS ? "Skip tutorial" : "Give me everything! I'll figure it out.",
   [TranslationKey.RECORD]: "Record meow",
   [TranslationKey.DELETE_RECORD]: "Delete meow",
 };
