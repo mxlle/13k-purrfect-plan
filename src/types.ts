@@ -1,19 +1,19 @@
 import { defineEnum } from "./utils/enums";
 import type { KittenId } from "./logic/data/catId";
-import { MoveLimit } from "./logic/config/move-limit";
+import type { MoveLimit } from "./logic/config/move-limit";
 
 export type Direction = defineEnum<typeof Direction>;
 export const Direction = defineEnum({
-  UP: "u",
-  DOWN: "d",
-  LEFT: "l",
-  RIGHT: "r",
+  UP: 4,
+  DOWN: 5,
+  LEFT: 6,
+  RIGHT: 7,
 });
 
 export type Tool = defineEnum<typeof Tool>;
 export const Tool = defineEnum({
-  MEOW: "m",
-  WAIT: "w",
+  MEOW: 8,
+  WAIT: 9,
 });
 
 type RecoveryTurnCount = number;
@@ -46,21 +46,15 @@ export const OnboardingStep = defineEnum({
 });
 export type ObjectId = defineEnum<typeof ObjectId>;
 export const ObjectId = defineEnum({
-  MOON: "🌙",
-  TREE: "🌳",
-  PUDDLE: "💧",
+  MOON: 4,
+  TREE: 5,
+  PUDDLE: 6,
 });
-export type ConfigCategory = defineEnum<typeof ConfigCategory>;
-export const ConfigCategory = defineEnum({
-  KITTEN_BEHAVIOR: "Kitten Behavior",
-  OBJECTS: "Objects",
-  TOOLS: "Tools",
-  RULES: "Rules",
-});
+
 export type ConfigItemId = KittenId | Tool | MoveLimit;
 
-export type Difficulty = (typeof Difficulty)[keyof typeof Difficulty];
-export const Difficulty = Object.freeze({
+export type Difficulty = defineEnum<typeof Difficulty>;
+export const Difficulty = defineEnum({
   EASY: 1,
   MEDIUM: 2,
   HARD: 3,

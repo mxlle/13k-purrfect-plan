@@ -11,6 +11,7 @@ import { TranslationKey } from "../../translations/translationKey";
 import { getCatIdClass } from "../cat-component/cat-component";
 import { sleep } from "../../utils/promise-utils";
 import { CssClass } from "../../utils/css-class";
+import { moveLimitLabels } from "../../logic/config/move-limit";
 
 let chooserDialog: Dialog | undefined;
 
@@ -109,7 +110,7 @@ function getChoiceElement(configItem: ConfigItemId, chooseItem: (event: MouseEve
       if (isCatId(configItem)) {
         innerChild.classList.add(getCatIdClass(configItem));
       } else {
-        event.target.innerHTML = isTool(configItem) ? getToolText(configItem) : configItem;
+        event.target.innerHTML = isTool(configItem) ? getToolText(configItem) : moveLimitLabels[configItem];
       }
 
       chooseItem(event);

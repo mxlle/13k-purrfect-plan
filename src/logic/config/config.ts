@@ -2,7 +2,7 @@ import { ALL_KITTEN_IDS, CatId } from "../data/catId";
 import { ALL_TOOLS, ConfigItemId, Tool } from "../../types";
 import { MoveLimit } from "./move-limit";
 import { TranslationKey } from "../../translations/translationKey";
-import { getArrayFromStorage, LocalStorageKey, setLocalStorageItem } from "../../utils/local-storage";
+import { getLocalStorageItem, LocalStorageKey, setLocalStorageItem } from "../../utils/local-storage";
 import { getTranslation } from "../../translations/i18n";
 
 export const allConfigItems: ConfigItemId[] = [...ALL_KITTEN_IDS, ...ALL_TOOLS, ...Object.values(MoveLimit)];
@@ -53,7 +53,7 @@ export const preconditions: Partial<Record<ConfigItemId, ConfigItemId[]>> = {
 let knownConfigItems: ConfigItemId[] | undefined;
 export function getKnownConfigItems(): ConfigItemId[] {
   if (knownConfigItems === undefined) {
-    knownConfigItems = getArrayFromStorage(LocalStorageKey.KNOWN_CONFIG_ELEMENTS) as ConfigItemId[];
+    knownConfigItems = (getLocalStorageItem(LocalStorageKey.KNOWN_CONFIG_ELEMENTS)?.split(",").map(Number) ?? []) as ConfigItemId[];
   }
 
   return knownConfigItems;

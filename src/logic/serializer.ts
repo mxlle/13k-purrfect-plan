@@ -3,12 +3,21 @@ import { DEFAULT_MOON_POSITION } from "./data/objects";
 import { ObjectId } from "../types";
 import { EMPTY_ELEMENT_MAP, GameElementId, GameElementPositions, GameSetup } from "./data/game-elements";
 import { calculatePar } from "./par";
+import { CatId } from "./data/catId";
+
+const serializeStrings = {
+  [CatId.MOTHER]: "🟣",
+  [CatId.MOONY]: "🟡",
+  [CatId.IVY]: "🟢",
+  [CatId.SPLASHY]: "🔵",
+  [ObjectId.MOON]: "🌙",
+  [ObjectId.TREE]: "🌳",
+  [ObjectId.PUDDLE]: "💧",
+};
 
 export function serializeGame(gameSetup: GameSetup): string {
   return Object.entries(gameSetup.elementPositions)
-    .map(([id, pos]) => {
-      return pos ? `${id}${pos.row}${pos.column}` : "";
-    })
+    .map(([id, pos]) => (pos ? `${serializeStrings[id]}${pos.row}${pos.column}` : ""))
     .join("");
 }
 
@@ -19,10 +28,11 @@ export function deserializeGame(serializedGame: string, options?: { skipParCalcu
   elementPositions[ObjectId.MOON] = { ...DEFAULT_MOON_POSITION };
 
   for (let i = 0; i < serializedGame.length; i += 4) {
-    const id = serializedGame.slice(i, i + 2) as GameElementId;
+    const s = serializedGame.slice(i, i + 2);
+    const id = Object.entries(serializeStrings).find(([, v]) => v === s)?.[0] as unknown as GameElementId;
     elementPositions[id] = {
-      row: parseInt(serializedGame.charAt(i + 2), 10),
-      column: parseInt(serializedGame.charAt(i + 3), 10),
+      row: +serializedGame.charAt(i + 2),
+      column: +serializedGame.charAt(i + 3),
     };
   }
 

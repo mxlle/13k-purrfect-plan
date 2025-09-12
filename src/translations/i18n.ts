@@ -28,13 +28,5 @@ export function getTranslation(key, ...args) {
 
   document.documentElement.setAttribute("lang", language);
 
-  let translation = getTranslationRecords()[key];
-
-  for (let i = 0; i < args.length; i++) {
-    const arg = args[i];
-    const regex = new RegExp(`\\{${i}\\}`, "g");
-    translation = translation.replace(regex, arg);
-  }
-
-  return translation;
+  return getTranslationRecords()[key].replace(/\{(\d+)}/g, ([v, i]) => args[i]);
 }

@@ -29,5 +29,6 @@ export function getArrayFromStorage(key: LocalStorageKey) {
     return [];
   }
 
-  return item.split(",");
+  // @ts-ignore
+  return item.split(",").map((v) => (v == +v ? +v : v));
 }
