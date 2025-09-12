@@ -65,7 +65,7 @@ export function initToolContainer(): HTMLElement {
 export function initHintButton(): HTMLButtonElement {
   return (hintButton ??= createButton(
     {
-      cssClass: [CssClass.SECONDARY, styles.hintButton],
+      cssClass: CssClass.SECONDARY,
       onClick: async () => {
         if (!globals.gameState) return;
 

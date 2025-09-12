@@ -117,7 +117,7 @@ kbd {
 
   position: absolute;
   .toolControls &,
-  .hintButton & {
+  :global(button.#{$SECONDARY}) & {
     right: .15rem;
     bottom: .15rem;
   }
