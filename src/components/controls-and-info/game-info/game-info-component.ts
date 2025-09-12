@@ -1,4 +1,4 @@
-import { createElement } from "../../../utils/html-utils";
+import { createButton, createElement } from "../../../utils/html-utils";
 import styles from "./game-info-component.module.scss";
 import controlStyles from "../controls/controls-component.module.scss";
 import { getTranslation } from "../../../translations/i18n";
@@ -16,10 +16,9 @@ const turnMovesContainer: HTMLElement = createElement({ cssClass: styles.movesCo
 const turnMovesComponent: HTMLElement = createElement({ cssClass: styles.moves });
 const difficultyComponent: HTMLElement = createElement({ cssClass: styles.difficultyBox });
 const retryInfo: HTMLElement = createElement({ cssClass: styles.retryInfo });
-let redoButton: HTMLElement = createElement({
-  tag: "a",
+let redoButton: HTMLElement = createButton({
   text: getTranslation(TranslationKey.RESTART_GAME),
-  cssClass: CssClass.OPACITY_HIDDEN,
+  cssClass: [CssClass.OPACITY_HIDDEN, CssClass.TERTIARY],
   onClick: () => {
     pubSubService.publish(PubSubEvent.START_NEW_GAME, { isDoOver: true });
   },
@@ -33,6 +32,10 @@ export function getGameInfoComponent(): HTMLElement {
 export function toggleDoOverButtonVisibility(shouldShow: boolean) {
   redoButton.classList.toggle(CssClass.OPACITY_HIDDEN, !shouldShow);
   redoButton.classList.toggle(controlStyles.onboardingHighlight, shouldShow);
+
+  if (shouldShow) {
+    redoButton.focus();
+  }
 }
 
 export function hideRetryInfo() {

@@ -65,6 +65,16 @@ button {
     padding: 0.25rem 1.5rem;
   }
 
+  &.#{$TERTIARY} {
+    background: none;
+    padding: 0;
+    font-size: 0.8rem;
+    color: $main-color-tertiary;
+    text-decoration: underline;
+    cursor: pointer;
+    border-radius: 0;
+  }
+
   &[disabled] {
     opacity: 0.3;
     pointer-events: none;
@@ -97,11 +107,4 @@ button.#{$ICON_BTN} {
 .#{$OPACITY_HIDDEN} {
   opacity: 0 !important;
   pointer-events: none !important;
-}
-
-a {
-  font-size: 0.8rem;
-  color: $main-color-tertiary;
-  text-decoration: underline;
-  cursor: pointer;
 }
