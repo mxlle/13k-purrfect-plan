@@ -12,7 +12,7 @@ import { changeXP, getCurrentXP, getXpInnerHtml } from "./logic/data/experience-
 import { animateNumber } from "./utils/custom-animation-util";
 import { initAudio, togglePlayer } from "./audio/music-control";
 import { getLocalStorageItem, LocalStorageKey } from "./utils/local-storage";
-import { HAS_MUTE_BUTTON, HAS_SOUND_EFFECTS, HAS_VISUAL_NICE_TO_HAVES, IS_POKI_ENABLED } from "./env-utils";
+import { GAME_TITLE, HAS_MUTE_BUTTON, HAS_SOUND_EFFECTS, HAS_VISUAL_NICE_TO_HAVES, IS_POKI_ENABLED } from "./env-utils";
 import { initSoundEffects } from "./audio/sound-control/sound-control-box";
 
 if (HAS_VISUAL_NICE_TO_HAVES) {
@@ -36,7 +36,7 @@ function init() {
 
   titleElement = createElement({
     cssClass: styles.title,
-    text: "Kittens united - a purrfect plan",
+    text: GAME_TITLE,
   });
 
   header.append(titleElement);
