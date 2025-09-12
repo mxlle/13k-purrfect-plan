@@ -42,25 +42,25 @@ button {
   cursor: pointer;
   color: $text-primary;
   border: none;
-  background-color: $bg-alpha-05;
-  padding: 0.5rem 1.5rem;
+  background: $bg-alpha-05;
+  padding: 0.5rem 1rem;
   border-radius: $border-radius;
   hyphens: none;
 
   @include hover {
-    background-color: $bg-alpha-10;
+    background: $bg-alpha-10;
   }
 
   &.#{$PRIMARY}:not([disabled]) {
-    background-color: $main-color;
+    background: $main-color;
 
     @include hover {
-      background-color: rgba($main-color, 0.7);
+      background: rgba($main-color, 0.7);
     }
   }
 
   &.#{$SECONDARY} {
-    font-size: 0.8rem;
+    font-size: 0.8em;
     color: $text-tertiary;
     padding: 0.25rem 1rem;
   }
@@ -68,7 +68,7 @@ button {
   &.#{$TERTIARY} {
     background: none;
     padding: 0;
-    font-size: 0.8rem;
+    font-size: 0.8em;
     color: $main-color-tertiary;
     text-decoration: underline;
     cursor: pointer;

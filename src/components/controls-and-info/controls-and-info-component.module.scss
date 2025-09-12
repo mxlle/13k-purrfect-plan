@@ -3,13 +3,17 @@
 
 .controlsAndInfo {
   display: grid;
-  gap: 1.5rem;
+  gap: 1rem;
   position: relative;
   width: fit-content;
   height: fit-content;
 
   @media (orientation: landscape) {
     justify-items: center;
+  }
+
+  @media (max-height: 700px) {
+    font-size: 0.9em;
   }
 
   > * {

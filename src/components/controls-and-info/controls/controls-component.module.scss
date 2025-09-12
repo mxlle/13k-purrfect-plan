@@ -13,7 +13,7 @@
   width: fit-content;
   position: relative;
 
-  @media (orientation: portrait) {
+  @media (orientation: portrait) or (max-height: 700px) {
     grid-column: 2;
     grid-row: span 3;
   }
@@ -87,10 +87,6 @@
     > span {
       grid-area: 1 / 1;
       color: $main-color;
-    }
-
-    @media (max-height: 700px) {
-      font-size: 0.7em;
     }
   }
 

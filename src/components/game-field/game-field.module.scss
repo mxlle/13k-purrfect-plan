@@ -13,7 +13,7 @@ $border-style: outset;
   overflow: auto;
   padding: 1rem;
   padding-top: 0.5rem;
-  gap: 1rem;
+  gap: 1rem 0.5rem;
   grid-template-columns: minmax(min-content, 1fr) minmax(360px, 1fr);
   margin: 0 auto;
   max-width: min-content;
