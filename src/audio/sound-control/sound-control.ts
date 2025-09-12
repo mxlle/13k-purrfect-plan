@@ -30,6 +30,11 @@ export function playSound(audioSrc: string, playbackRate: number = 1) {
   });
 }
 
+export function playSoundSimple(audioSrc: string) {
+  const audio = new Audio(audioSrc);
+  void audio.play();
+}
+
 function getSoundForAction(action: TurnMove): string | undefined {
   if (!soundMap[action]) {
     soundMap[action] = getLocalStorageItem(LocalStorageKey.SOUND, action);

@@ -12,8 +12,16 @@ import { changeXP, getCurrentXP, getXpText } from "./logic/data/experience-point
 import { animateNumber } from "./utils/custom-animation-util";
 import { initAudio, togglePlayer } from "./audio/music-control";
 import { getLocalStorageItem, LocalStorageKey } from "./utils/local-storage";
-import { GAME_TITLE, HAS_MUTE_BUTTON, HAS_SOUND_EFFECTS, HAS_VISUAL_NICE_TO_HAVES, IS_POKI_ENABLED } from "./env-utils";
-import { initSoundEffects } from "./audio/sound-control/sound-control-box";
+import {
+  GAME_TITLE,
+  HAS_MUTE_BUTTON,
+  HAS_SIMPLE_SOUND_EFFECTS,
+  HAS_SOUND_EFFECTS,
+  HAS_VISUAL_NICE_TO_HAVES,
+  IS_POKI_ENABLED,
+} from "./env-utils";
+import { initSoundEffects, initWinLoseSoundEffects, loseSoundSrcUrl, winSoundSrcUrl } from "./audio/sound-control/sound-control-box";
+import { playSoundSimple } from "./audio/sound-control/sound-control";
 
 if (HAS_VISUAL_NICE_TO_HAVES) {
   import("./globals.nice2have.scss");
@@ -79,6 +87,11 @@ function init() {
   pubSubService.subscribe(PubSubEvent.GAME_END, (result) => {
     document.body.classList.add(result.isWon ? CssClass.WON : CssClass.LOST);
 
+    if (HAS_SIMPLE_SOUND_EFFECTS) {
+      const soundEffect = result.isWon ? winSoundSrcUrl : loseSoundSrcUrl;
+      soundEffect && playSoundSimple(soundEffect);
+    }
+
     if (IS_POKI_ENABLED) {
       sleep(300).then(() => pokiSdk.gameplayStop()); // to avoid issue that stop is called before start
     }
@@ -117,6 +130,7 @@ const initApp = async () => {
   await sleep(0); // to make it a real promise
   await initAudio(initializeMuted);
   HAS_SOUND_EFFECTS && (await initSoundEffects());
+  HAS_SIMPLE_SOUND_EFFECTS && (await initWinLoseSoundEffects());
 };
 
 if (IS_POKI_ENABLED) initPoki(initApp);

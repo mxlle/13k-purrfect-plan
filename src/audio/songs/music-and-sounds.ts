@@ -108,3 +108,37 @@ export const song = {
   endPattern: 8, // End pattern
   numChannels: 2, // Number of channels
 };
+
+export const winSound = {
+  songData: [
+    {
+      // Instrument 1
+      i: instrument,
+      // Patterns
+      p: [1],
+      // Columns
+      c: [{ n: [135, 139, 142, 147], f: [] }],
+    },
+  ],
+  rowLen: 11025, // In sample lengths
+  patternLen: 16, // Rows per pattern
+  endPattern: 1, // End pattern
+  numChannels: 1, // Number of channels
+};
+
+export const loseSound = {
+  songData: [
+    {
+      // Instrument 1
+      i: instrument,
+      // Patterns
+      p: [1],
+      // Columns
+      c: [{ n: [129, 126, 123, , , , , , , , , , , , , , , , 126, , , , , , , , , , , , , , , , 129], f: [] }],
+    },
+  ],
+  rowLen: 11025, // In sample lengths
+  patternLen: 16, // Rows per pattern
+  endPattern: 1, // End pattern
+  numChannels: 1, // Number of channels
+};

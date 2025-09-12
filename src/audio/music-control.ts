@@ -1,5 +1,5 @@
 import { CPlayer } from "./small-player";
-import { song } from "./songs/soft-kitty";
+import { song } from "./songs/music-and-sounds";
 import { LocalStorageKey, setLocalStorageItem } from "../utils/local-storage";
 import { PubSubEvent, pubSubService } from "../utils/pub-sub-service";
 import { HAS_SOUND_EFFECTS, IS_POKI_ENABLED } from "../env-utils";
