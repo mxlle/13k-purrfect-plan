@@ -58,14 +58,19 @@ export function generateUntilDone(player): Promise<void> {
 
 export function togglePlayer(): boolean {
   isActive = !isActive;
-  const isCurrentlyPlaying = !audioElem.paused && !audioElem.ended;
-  if (isActive && !isCurrentlyPlaying) {
-    audioElem.play();
-  } else if (!isActive && isCurrentlyPlaying) {
-    audioElem.pause();
-  }
+  playOrPauseMusicIfApplicable();
 
   setLocalStorageItem(LocalStorageKey.MUTED, isActive ? "false" : "true");
 
   return isActive;
+}
+
+export function playOrPauseMusicIfApplicable(shouldPlay: boolean = isActive) {
+  const isCurrentlyPlaying = !audioElem.paused && !audioElem.ended;
+
+  if (shouldPlay && !isCurrentlyPlaying) {
+    audioElem.play();
+  } else if (!shouldPlay && isCurrentlyPlaying) {
+    audioElem.pause();
+  }
 }

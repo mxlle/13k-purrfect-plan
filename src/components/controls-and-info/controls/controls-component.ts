@@ -53,7 +53,6 @@ export function initMovementContainer(): HTMLElement {
 
 export function initToolContainer(): HTMLElement {
   toolContainer.innerHTML = "";
-  // toolContainer.append(createRecordButton([Tool.MEOW]));
   const meowButton = getToolButton(Tool.MEOW);
   meowButton.append(recoveryInfoComponent);
   toolContainer.append(meowButton, getToolButton(Tool.WAIT));

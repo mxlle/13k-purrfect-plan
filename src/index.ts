@@ -14,7 +14,7 @@ import { initAudio, togglePlayer } from "./audio/music-control";
 import { getLocalStorageItem, LocalStorageKey } from "./utils/local-storage";
 import { GAME_TITLE, HAS_MUTE_BUTTON, HAS_SIMPLE_SOUND_EFFECTS, HAS_VISUAL_NICE_TO_HAVES, IS_POKI_ENABLED } from "./env-utils";
 import { initWinLoseSoundEffects, loseSoundSrcUrl, winSoundSrcUrl } from "./audio/sound-control/sound-control-box";
-import { playSoundSimple } from "./audio/sound-control/sound-control";
+import { playSound } from "./audio/sound-control/sound-control";
 
 if (HAS_VISUAL_NICE_TO_HAVES) {
   import("./globals.nice2have.scss");
@@ -82,7 +82,7 @@ function init() {
 
     if (HAS_SIMPLE_SOUND_EFFECTS) {
       const soundEffect = result.isWon ? winSoundSrcUrl : loseSoundSrcUrl;
-      soundEffect && playSoundSimple(soundEffect);
+      soundEffect && playSound(soundEffect);
     }
 
     if (IS_POKI_ENABLED) {

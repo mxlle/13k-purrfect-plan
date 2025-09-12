@@ -30,4 +30,6 @@ export const enTranslations: Record<TranslationKey, string> = {
   [TranslationKey.HINT]: "Hint",
   [TranslationKey.COLLECT_XP]: "Collect +{0}",
   [TranslationKey.SKIP_TUTORIAL]: "Give me everything! I'll figure it out.",
+  [TranslationKey.RECORD]: "Record meow",
+  [TranslationKey.DELETE_RECORD]: "Delete meow",
 };

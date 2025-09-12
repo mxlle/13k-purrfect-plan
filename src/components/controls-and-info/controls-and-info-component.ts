@@ -6,7 +6,7 @@ import styles from "./controls-and-info-component.module.scss";
 import { getTranslation } from "../../translations/i18n";
 import { TranslationKey } from "../../translations/translationKey";
 import { isOnboarding } from "../../logic/onboarding";
-import { hasMoveLimit } from "../../logic/config/config";
+import { hasMoveLimit, isConfigItemEnabled } from "../../logic/config/config";
 import { PubSubEvent, pubSubService } from "../../utils/pub-sub-service";
 import {
   getGameInfoComponent,
@@ -27,14 +27,24 @@ import {
 } from "./controls/controls-component";
 import { collectXp } from "../xp-components/xp-components";
 import { sleep } from "../../utils/promise-utils";
+import { HAS_RECORDED_SOUND_EFFECTS } from "../../env-utils";
+import { createRecordButton } from "./create-record-button";
+import { Tool } from "../../types";
 
 let hasSetupEventListeners = false;
 const controlsAndInfoComponent: HTMLElement = createElement({ cssClass: styles.controlsAndInfo });
+let recordButton: HTMLElement | undefined;
 
 export function getControlsAndInfoComponent(): HTMLElement {
   setupEventListeners();
 
   controlsAndInfoComponent.append(getGameInfoComponent(), initMovementContainer(), initToolContainer(), initHintButton());
+
+  if (HAS_RECORDED_SOUND_EFFECTS) {
+    recordButton = createRecordButton([Tool.MEOW]);
+    controlsAndInfoComponent.append(recordButton);
+    recordButton.classList.toggle(CssClass.OPACITY_HIDDEN, !isConfigItemEnabled(Tool.MEOW));
+  }
 
   updateToolContainer();
   updateGameInfoComponent();
@@ -68,6 +78,7 @@ function setupEventListeners() {
     toggleDoOverButtonVisibility(false);
     updateGameInfoComponent();
     updateControlsOnGameStart();
+    recordButton?.classList.toggle(CssClass.OPACITY_HIDDEN, !isConfigItemEnabled(Tool.MEOW));
   });
 
   setupKeyboardEventListeners();

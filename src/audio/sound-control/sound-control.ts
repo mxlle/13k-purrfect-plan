@@ -1,6 +1,6 @@
 import { TurnMove } from "../../types";
 import { getLocalStorageItem, LocalStorageKey, setLocalStorageItem } from "../../utils/local-storage";
-import { getSoundBoxSrc } from "./sound-control-box";
+import { HAS_ADVANCED_DEBUGGING } from "../../env-utils";
 
 const soundMap: Partial<Record<TurnMove, string>> = {};
 
@@ -82,7 +82,7 @@ function getSoundForAction(action: TurnMove): string | undefined {
     soundMap[action] = getLocalStorageItem(LocalStorageKey.SOUND, action);
   }
 
-  return soundMap[action] ?? getSoundBoxSrc(action);
+  return soundMap[action];
 }
 
 export function saveRecording(action: TurnMove, audioSrc: string) {
@@ -120,20 +120,26 @@ export async function requestMicrophoneAccess(): Promise<boolean> {
 }
 
 export async function startRecording(): Promise<ActiveRecording> {
-  if (!navigator.mediaDevices?.getUserMedia) {
-    throw new Error("Microphone capture is not supported on this device/browser.");
-  }
-  if (typeof MediaRecorder === "undefined") {
-    throw new Error("Recording is not supported on this device/browser.");
+  if (HAS_ADVANCED_DEBUGGING) {
+    if (!navigator.mediaDevices?.getUserMedia) {
+      throw new Error("Microphone capture is not supported on this device/browser.");
+    }
+    if (typeof MediaRecorder === "undefined") {
+      throw new Error("Recording is not supported on this device/browser.");
+    }
   }
 
-  const mimeType = pickSupportedMimeType();
+  // const mimeType = pickSupportedMimeType();
 
   // 1) Always request minimal constraints first
   let stream: MediaStream;
   try {
     stream = await navigator.mediaDevices.getUserMedia({ "audio": true });
   } catch (err: any) {
+    if (!HAS_ADVANCED_DEBUGGING) {
+      return;
+    }
+
     // Some Android variants throw this message even for audio: true — surface a clearer hint
     const name = err?.name ?? "Error";
     const msg = err?.message ?? String(err);
@@ -146,27 +152,7 @@ export async function startRecording(): Promise<ActiveRecording> {
     throw err;
   }
 
-  // 2) Optionally improve audio after acquiring the track
-  try {
-    const [track] = stream.getAudioTracks();
-    if (track?.applyConstraints) {
-      // Use capabilities to decide what to apply (avoids OverconstrainedError on some devices)
-      const caps = (track as any).getCapabilities?.() ?? {};
-      const postConstraints: MediaTrackConstraints = {};
-      if ("echoCancellation" in caps) postConstraints.echoCancellation = true;
-      if ("noiseSuppression" in caps) postConstraints.noiseSuppression = true;
-
-      if (Object.keys(postConstraints).length) {
-        await track.applyConstraints(postConstraints).catch(() => {
-          // Non-fatal if some constraints can't be applied
-        });
-      }
-    }
-  } catch {
-    // Ignore post-constraint errors
-  }
-
-  const recorder = new MediaRecorder(stream, mimeType ? { mimeType } : undefined);
+  const recorder = new MediaRecorder(stream);
   const chunks: BlobPart[] = [];
 
   recorder.addEventListener("dataavailable", (e) => {
@@ -176,7 +162,7 @@ export async function startRecording(): Promise<ActiveRecording> {
   const done = new Promise<string>((resolve, reject) => {
     recorder.addEventListener("stop", async () => {
       try {
-        const type = mimeType || recorder.mimeType || "audio/webm";
+        const type = recorder.mimeType || "audio/webm";
         const blob = new Blob(chunks, { type });
         const base64 = await blobToDataUrl(blob);
         resolve(base64);
@@ -186,13 +172,14 @@ export async function startRecording(): Promise<ActiveRecording> {
         stream.getTracks().forEach((t) => t.stop());
       }
     });
-    recorder.addEventListener("error", (e: Event) => {
-      reject((e as any)?.error ?? e);
-    });
+
+    HAS_ADVANCED_DEBUGGING &&
+      recorder.addEventListener("error", (e: Event) => {
+        reject((e as any)?.error ?? e);
+      });
   });
 
-  // Use a timeslice and flush to make mobile browsers reliably emit dataavailable
-  recorder.start(250);
+  recorder.start();
   const stop = () => {
     if (recorder.state === "recording") {
       try {
