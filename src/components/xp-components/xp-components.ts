@@ -1,26 +1,15 @@
-import { createButton, createElement, resetTransform } from "../../utils/html-utils";
-import { getTranslation } from "../../translations/i18n";
-import { TranslationKey } from "../../translations/translationKey";
-import { getXpText, XP_REP } from "../../logic/data/experience-points";
+import { createElement, resetTransform } from "../../utils/html-utils";
+import { XP_REP } from "../../logic/data/experience-points";
 import { requestAnimationFrameWithTimeout, sleep } from "../../utils/promise-utils";
 import { PubSubEvent, pubSubService } from "../../utils/pub-sub-service";
 import { CssClass } from "../../utils/css-class";
 import styles from "./xp-components.module.scss";
 
-export function getCollectXpButton(newXp: number, afterCollect: () => void): HTMLElement {
-  const xpButton = createButton({
-    text: getTranslation(TranslationKey.COLLECT_XP, getXpText(newXp)),
-    onClick: async () => {
-      sleep(500).then(() => {
-        pubSubService.publish(PubSubEvent.UPDATE_XP, newXp);
-      });
-      await flyMultipleXpAway(newXp, xpButton);
-      xpButton.classList.toggle(CssClass.HIDDEN, true);
-      afterCollect();
-    },
+export async function collectXp(source: HTMLElement, newXp: number) {
+  sleep(500).then(() => {
+    pubSubService.publish(PubSubEvent.UPDATE_XP, newXp);
   });
-
-  return xpButton;
+  await flyMultipleXpAway(newXp, source);
 }
 
 async function flyMultipleXpAway(xp: number, source: HTMLElement) {
