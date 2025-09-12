@@ -1,5 +1,5 @@
 import { TranslationKey } from "./translationKey";
-import { HAS_SHORT_TEXTS } from "../env-utils";
+import { HAS_RECORDED_SOUND_EFFECTS, HAS_SHORT_TEXTS } from "../env-utils";
 
 export const enTranslations: Record<TranslationKey, string> = {
   [TranslationKey.START_GAME]: HAS_SHORT_TEXTS ? "Start" : "Start game",
@@ -36,6 +36,6 @@ export const enTranslations: Record<TranslationKey, string> = {
   [TranslationKey.HINT]: "Hint",
   [TranslationKey.COLLECT_XP]: HAS_SHORT_TEXTS ? "+{0}" : "Collect +{0}",
   [TranslationKey.SKIP_TUTORIAL]: HAS_SHORT_TEXTS ? "Skip tutorial" : "Give me everything! I'll figure it out.",
-  [TranslationKey.RECORD]: "Record meow",
-  [TranslationKey.DELETE_RECORD]: "Delete meow",
+  [TranslationKey.RECORD]: HAS_RECORDED_SOUND_EFFECTS ? "Record meow" : " ",
+  [TranslationKey.DELETE_RECORD]: HAS_RECORDED_SOUND_EFFECTS ? "Delete meow" : " ",
 };

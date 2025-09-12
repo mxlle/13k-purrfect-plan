@@ -108,7 +108,7 @@ export async function startNewGame(options: { isDoOver: boolean }) {
   }
 
   removeAllSpeechBubbles();
-  document.body.classList.remove(CssClass.WON, CssClass.LOST);
+  document.body.classList.remove(CssClass.WON);
 
   if (gameFieldElem) {
     // reset old game field

@@ -78,7 +78,7 @@ function init() {
   });
 
   pubSubService.subscribe(PubSubEvent.GAME_END, (result) => {
-    document.body.classList.add(result.isWon ? CssClass.WON : CssClass.LOST);
+    result.isWon && document.body.classList.add(CssClass.WON);
 
     if (HAS_SIMPLE_SOUND_EFFECTS) {
       const soundEffect = result.isWon ? winSoundSrcUrl : loseSoundSrcUrl;
