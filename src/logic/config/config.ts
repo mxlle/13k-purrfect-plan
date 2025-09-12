@@ -53,7 +53,7 @@ export const preconditions: Partial<Record<ConfigItemId, ConfigItemId[]>> = {
 let knownConfigItems: ConfigItemId[] | undefined;
 export function getKnownConfigItems(): ConfigItemId[] {
   if (knownConfigItems === undefined) {
-    knownConfigItems = getLocalStorageItem(LocalStorageKey.KNOWN_CONFIG_ELEMENTS).split(",").map(Number) as ConfigItemId[];
+    knownConfigItems = (getLocalStorageItem(LocalStorageKey.KNOWN_CONFIG_ELEMENTS)?.split(",").map(Number) ?? []) as ConfigItemId[];
   }
 
   return knownConfigItems;
