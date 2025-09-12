@@ -4,26 +4,23 @@
 .container,
 .choices {
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
   gap: 2rem;
 }
 
-.choices {
-  flex-direction: row;
+.container {
+  flex-direction: column;
 }
 
 .configItem {
-  position: relative;
   height: min(40vh, 40vw);
   width: min(40vh, 40vw);
   display: grid;
   place-items: center;
-  background-color: $bg-alpha-05;
   color: $main-color-secondary;
-  border-radius: $border-radius;
   padding: 0.25rem;
+  hyphens: auto;
   transition:
     transform 0.3s,
     opacity 0.3s;
@@ -34,16 +31,11 @@
 
   &.selected {
     transform: translateX(var(--t-x, 0)) scale(1.2);
-  }
-
-  &:not(.selected):hover {
-    cursor: pointer;
-    background-color: $bg-alpha-10;
+    pointer-events: none;
   }
 
   :global(.#{$CAT_BOX}) {
-    height: 50%;
-    width: 50%;
+    width: 60%;
     pointer-events: none;
   }
 }
@@ -51,15 +43,13 @@
 .explanation {
   max-width: 90vw;
   font-size: 1.2em;
-  transform: scale(0.6);
-  opacity: 0.7;
   transition:
     transform 0.3s,
     opacity 0.3s;
 
-  &.active {
-    transform: scale(1);
-    opacity: 1;
+  &:not(.active) {
+    transform: scale(0.6);
+    opacity: 0.7;
   }
 
   &::before {

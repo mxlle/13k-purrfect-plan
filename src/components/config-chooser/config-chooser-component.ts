@@ -1,10 +1,9 @@
 import { createDialog, Dialog } from "../dialog/dialog";
-import { createElement } from "../../utils/html-utils";
+import { createButton, createElement, resetTransform } from "../../utils/html-utils";
 import { allConfigItems, explanationMap, getNextUnknownConfigItems, getToolText, updateKnownConfigItems } from "../../logic/config/config";
 import { shuffleArray } from "../../utils/random-utils";
 import { getCatElement, isCatId } from "../../logic/data/cats";
 import { ConfigItemId, isTool } from "../../types";
-import { isMoveLimit } from "../../logic/config/move-limit";
 
 import styles from "./config-chooser-component.module.scss";
 import { getTranslation } from "../../translations/i18n";
@@ -54,19 +53,15 @@ export async function createConfigChooserComponent(): Promise<ConfigItemId | boo
       if (choices.length === 2) {
         chosenElement.style.setProperty("--t-x", index === 0 ? "calc(50% + 1rem)" : "calc(-50% - 1rem)");
         otherSibling.classList.add(CssClass.OPACITY_HIDDEN);
-      } else {
-        chosenElement.style.transform = "scale(1.2)";
       }
+
       chosenElement.classList.add(styles.selected);
     }
 
     return getChoiceElement(choice, chooseItem);
   });
 
-  choiceElements.forEach((choiceElement) => {
-    choiceElement.classList.add(styles.configItem);
-    choicesContainer.append(choiceElement);
-  });
+  choicesContainer.append(...choiceElements);
 
   chooserContainer.append(choicesContainer, explanationElement, skipTutorialLink);
 
@@ -96,38 +91,35 @@ function getNextChoice() {
 }
 
 function getChoiceElement(configItem: ConfigItemId, chooseItem: (event: MouseEvent) => void): HTMLElement {
+  const translationKey = isCatId(configItem)
+    ? TranslationKey.CHOICE_KITTEN_BEHAVIOR
+    : isTool(configItem)
+      ? TranslationKey.CHOICE_TOOL
+      : TranslationKey.CHOICE_RULE;
+  let innerChild: HTMLElement | undefined;
+
   if (isCatId(configItem)) {
-    const catElem = getCatElement(configItem).cloneNode(true) as HTMLElement;
-    catElem.style.transform = "none";
-    const catContainer = createElement({
-      text: getTranslation(TranslationKey.CHOICE_KITTEN_BEHAVIOR),
-      onClick: (event) => {
-        catElem.classList.add(getCatIdClass(configItem));
-        chooseItem(event);
-      },
-    });
-    catContainer.append(catElem);
-
-    return catContainer;
+    innerChild = getCatElement(configItem).cloneNode(true) as HTMLElement;
+    resetTransform(innerChild);
   }
 
-  if (isTool(configItem)) {
-    return createElement({
-      text: getTranslation(TranslationKey.CHOICE_TOOL),
-      onClick: (event) => {
-        event.target.innerHTML = getToolText(configItem);
-        chooseItem(event);
-      },
-    });
+  const configItemElement = createButton({
+    cssClass: styles.configItem,
+    text: getTranslation(translationKey),
+    onClick: (event) => {
+      if (isCatId(configItem)) {
+        innerChild.classList.add(getCatIdClass(configItem));
+      } else {
+        event.target.innerHTML = isTool(configItem) ? getToolText(configItem) : configItem;
+      }
+
+      chooseItem(event);
+    },
+  });
+
+  if (innerChild) {
+    configItemElement.append(innerChild);
   }
 
-  if (isMoveLimit(configItem)) {
-    return createElement({
-      text: getTranslation(TranslationKey.CHOICE_RULE),
-      onClick: (event) => {
-        event.target.innerHTML = configItem;
-        chooseItem(event);
-      },
-    });
-  }
+  return configItemElement;
 }
