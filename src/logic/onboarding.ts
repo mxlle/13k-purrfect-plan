@@ -35,14 +35,13 @@ const onboardingFieldSizeMap: Record<OnboardingStep, FieldSize> = {
 };
 
 let defaultPlacedObjects: GameElementPositions | undefined;
-export function getDefaultPlacedObjects(options?: { skipMoon?: boolean }) {
+export function getDefaultPlacedObjects() {
   if (defaultPlacedObjects) {
     return defaultPlacedObjects;
   }
 
   const deserializedGame = deserializeGame(serializedGameOnboardingMap[OnboardingStep.LAST_SETUP], {
     skipParCalculation: true,
-    ...options,
   });
   defaultPlacedObjects = deserializedGame.elementPositions;
 

@@ -57,7 +57,7 @@ export const ConfigCategory = defineEnum({
   TOOLS: "Tools",
   RULES: "Rules",
 });
-export type ConfigItemId = KittenId | ObjectId | Tool | MoveLimit;
+export type ConfigItemId = KittenId | Tool | MoveLimit;
 
 export type Difficulty = (typeof Difficulty)[keyof typeof Difficulty];
 export const Difficulty = Object.freeze({

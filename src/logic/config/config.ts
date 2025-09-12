@@ -1,23 +1,22 @@
 import { ALL_KITTEN_IDS, CatId } from "../data/catId";
-import { ALL_TOOLS, ConfigItemId, ObjectId, Tool } from "../../types";
+import { ALL_TOOLS, ConfigItemId, Tool } from "../../types";
 import { MoveLimit } from "./move-limit";
 import { TranslationKey } from "../../translations/translationKey";
 import { getArrayFromStorage, LocalStorageKey, setLocalStorageItem } from "../../utils/local-storage";
-import { ALL_OBJECT_IDS } from "../data/objects";
 import { getTranslation } from "../../translations/i18n";
 
-export const allConfigItems: ConfigItemId[] = [...ALL_KITTEN_IDS, ...ALL_OBJECT_IDS, ...ALL_TOOLS, ...Object.values(MoveLimit)];
+export const allConfigItems: ConfigItemId[] = [...ALL_KITTEN_IDS, ...ALL_TOOLS, ...Object.values(MoveLimit)];
 
 export function isConfigItemEnabled(configItem: ConfigItemId): boolean {
   return getKnownConfigItems().includes(configItem);
 }
 
 export function showMovesInfo(): boolean {
-  return isConfigItemEnabled(MoveLimit.MOVE_LIMIT_STRICT) || isConfigItemEnabled(MoveLimit.MOVE_LIMIT_SIMPLE);
+  return isConfigItemEnabled(MoveLimit.MOVE_LIMIT_SIMPLE) /* || isConfigItemEnabled(MoveLimit.MOVE_LIMIT_STRICT)*/;
 }
 
 export function showMoon() {
-  return isConfigItemEnabled(ObjectId.MOON) && showMovesInfo();
+  return showMovesInfo();
 }
 
 export function hasMoveLimit(): boolean {
@@ -30,12 +29,8 @@ export const explanationMap: Record<ConfigItemId, TranslationKey | undefined> = 
   [CatId.SPLASHY]: TranslationKey.EXPLANATION_SPLASHY,
   [Tool.MEOW]: TranslationKey.EXPLANATION_MEOW,
   [Tool.WAIT]: TranslationKey.EXPLANATION_WAIT,
-  [MoveLimit.MOVE_LIMIT_NONE]: undefined,
   [MoveLimit.MOVE_LIMIT_SIMPLE]: TranslationKey.EXPLANATION_MOVE_LIMIT_1,
   [MoveLimit.MOVE_LIMIT_STRICT]: TranslationKey.EXPLANATION_MOVE_LIMIT_2,
-  [ObjectId.TREE]: undefined,
-  [ObjectId.MOON]: undefined,
-  [ObjectId.PUDDLE]: undefined,
 };
 
 export const preconditions: Partial<Record<ConfigItemId, ConfigItemId[]>> = {
@@ -51,22 +46,14 @@ export const preconditions: Partial<Record<ConfigItemId, ConfigItemId[]>> = {
 //   [CatId.SPLASHY]: [ObjectId.PUDDLE, Tool.MEOW],
 //   [Tool.MEOW]: [],
 //   [Tool.WAIT]: [Tool.MEOW, CatId.IVY],
-//   [MoveLimit.MOVE_LIMIT_NONE]: [],
 //   [MoveLimit.MOVE_LIMIT_SIMPLE]: [ObjectId.MOON],
 //   [MoveLimit.MOVE_LIMIT_STRICT]: [ObjectId.MOON, MoveLimit.MOVE_LIMIT_SIMPLE],
-//   [ObjectId.TREE]: [],
-//   [ObjectId.MOON]: [],
-//   [ObjectId.PUDDLE]: [],
 // };
 
 let knownConfigItems: ConfigItemId[] | undefined;
 export function getKnownConfigItems(): ConfigItemId[] {
   if (knownConfigItems === undefined) {
-    knownConfigItems = [
-      ...getArrayFromStorage(LocalStorageKey.KNOWN_CONFIG_ELEMENTS),
-      ...ALL_OBJECT_IDS,
-      MoveLimit.MOVE_LIMIT_NONE,
-    ] as ConfigItemId[];
+    knownConfigItems = getArrayFromStorage(LocalStorageKey.KNOWN_CONFIG_ELEMENTS) as ConfigItemId[];
   }
 
   return knownConfigItems;
