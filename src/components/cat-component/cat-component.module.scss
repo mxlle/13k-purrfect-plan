@@ -25,7 +25,16 @@
   width: 100%;
   height: 100%;
 
-  filter: drop-shadow(3px -2px 1px color-mix(in srgb, currentColor 20%, transparent));
+  $colorTransparent: color-mix(in srgb, currentColor 20%, transparent);
+  $colorSolid: color-mix(in srgb, currentColor 40%, rgba(black, 0.5));
+  // $colorSolid: currentColor;
+  $width: 1px;
+  $widthNeg: -1px;
+  $blur: 0px;
+
+  filter: drop-shadow($width $widthNeg $blur $colorSolid) drop-shadow($widthNeg $width $blur $colorSolid)
+    drop-shadow($width $width $blur $colorSolid) drop-shadow($widthNeg $widthNeg $blur $colorSolid);
+  //filter: drop-shadow(3px -2px 1px $colorTransparent);
 
   svg {
     color: currentColor;
