@@ -65,7 +65,7 @@ export async function createConfigChooserComponent(): Promise<ConfigItemId | boo
 
   chooserContainer.append(choicesContainer, explanationElement, skipTutorialButton);
 
-  chooserDialog = createDialog(chooserContainer, { submitButtonText: getTranslation(TranslationKey.CONFIRM), showCloseButton: false });
+  chooserDialog = createDialog(chooserContainer, { submitButtonText: getTranslation(TranslationKey.CONTINUE), showCloseButton: false });
   chooserDialog.toggleSubmitDisabled(true);
 
   return chooserDialog.open().then((isConfirmed): ConfigItemId | boolean => {

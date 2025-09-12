@@ -1,9 +1,7 @@
 import { createButton, createElement } from "../../utils/html-utils";
 
 import styles from "./dialog.module.scss";
-import { getTranslation } from "../../translations/i18n";
 import { PubSubEvent, pubSubService } from "../../utils/pub-sub-service";
-import { TranslationKey } from "../../translations/translationKey";
 import { CssClass } from "../../utils/css-class";
 
 let zIndexCounter = 50; // start at 50 to be above regular content
@@ -45,7 +43,7 @@ export function createDialog(innerElement: HTMLElement, options: DialogOptions):
 
     if (options.cancelButtonText !== undefined) {
       cancelButton = createButton({
-        text: getTranslation(TranslationKey.BACK),
+        text: options.cancelButtonText,
         onClick: () => closeDialog(false),
       });
       buttons.appendChild(cancelButton);
