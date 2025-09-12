@@ -1,4 +1,4 @@
-import { ALL_TURN_MOVES, Difficulty, Direction, isDirection, TurnMove } from "../types";
+import { ALL_TURN_MOVES, Difficulty, Direction, isDirection, Tool, TurnMove } from "../types";
 import { shuffleArray } from "../utils/random-utils";
 import { copyGameState, deepCopyElementsMap, GameSetup, GameState, getInitialGameState } from "./data/game-elements";
 import { difficultyEmoji } from "./difficulty";
@@ -37,6 +37,10 @@ function readableDirection(turnMove: TurnMove): string {
       return "left";
     case Direction.RIGHT:
       return "right";
+    case Tool.MEOW:
+      return "meow";
+    case Tool.WAIT:
+      return "wait";
     default:
       return turnMove;
   }

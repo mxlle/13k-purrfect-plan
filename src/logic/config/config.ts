@@ -37,7 +37,7 @@ export const preconditions: Partial<Record<ConfigItemId, ConfigItemId[]>> = {
   [CatId.MOONY]: [MoveLimit.MOVE_LIMIT_SIMPLE],
   [CatId.SPLASHY]: [Tool.MEOW],
   [Tool.WAIT]: [Tool.MEOW, CatId.IVY],
-  [MoveLimit.MOVE_LIMIT_STRICT]: [MoveLimit.MOVE_LIMIT_SIMPLE],
+  [MoveLimit.MOVE_LIMIT_STRICT]: [MoveLimit.MOVE_LIMIT_SIMPLE, Tool.MEOW, Tool.WAIT],
 };
 
 // export const preconditions: Record<ConfigItemId, ConfigItemId[]> = {

@@ -12,8 +12,8 @@ export const Direction = defineEnum({
 
 export type Tool = defineEnum<typeof Tool>;
 export const Tool = defineEnum({
-  MEOW: "meow",
-  WAIT: "wait",
+  MEOW: "m",
+  WAIT: "w",
 });
 
 type RecoveryTurnCount = number;
