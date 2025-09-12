@@ -12,8 +12,7 @@
   display: grid;
   grid-template-rows: 1fr min-content;
   text-align: center;
-  transform: translateY(0);
-  opacity: 1;
+  z-index: 50;
   transition:
     transform 0.5s,
     opacity 0.5s;
@@ -29,37 +28,17 @@
     overflow-y: auto;
     overflow-x: hidden;
 
-    &.ovrflw {
+    &.overflow {
       align-content: start;
     }
-  }
-
-  :global(.#{$ICON_BTN}) {
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
   }
 }
 
 .btns {
   display: grid;
-  gap: 1rem;
+  place-items: center;
   padding: 1rem;
   padding-bottom: 2rem;
-  grid-template-columns: repeat(2, minmax(auto, 1fr));
-
-  &:has(:only-child) {
-    grid-template-columns: 1fr;
-    place-items: center;
-  }
-
-  > * {
-    white-space: nowrap;
-  }
-
-  button[disabled] {
-    opacity: 0;
-  }
 
   @media (max-height: 600px) {
     padding: 0.5rem;

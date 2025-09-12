@@ -44,7 +44,7 @@ export async function createConfigChooserComponent(): Promise<ConfigItemId | boo
       explanationElement.classList.add(styles.active);
       header.innerHTML = getTranslation(TranslationKey.YOUR_CHOICE);
       selectedConfigItem = choice;
-      chooserDialog?.toggleSubmitDisabled(false);
+      chooserDialog && chooserDialog.submitButton.classList.remove(CssClass.OPACITY_HIDDEN);
 
       const chosenElement = event.target as HTMLElement;
       const otherSibling = (index === 0 ? choicesContainer.lastElementChild : choicesContainer.firstElementChild) as HTMLElement;
@@ -62,11 +62,10 @@ export async function createConfigChooserComponent(): Promise<ConfigItemId | boo
   });
 
   choicesContainer.append(...choiceElements);
-
   chooserContainer.append(choicesContainer, explanationElement, skipTutorialButton);
 
-  chooserDialog = createDialog(chooserContainer, { submitButtonText: getTranslation(TranslationKey.CONTINUE), showCloseButton: false });
-  chooserDialog.toggleSubmitDisabled(true);
+  chooserDialog = createDialog(chooserContainer);
+  chooserDialog.submitButton.classList.add(CssClass.OPACITY_HIDDEN);
 
   return chooserDialog.open().then((isConfirmed): ConfigItemId | boolean => {
     if (isConfirmed && selectedConfigItem) {
