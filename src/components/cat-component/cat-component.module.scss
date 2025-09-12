@@ -8,6 +8,15 @@
   height: 100%;
   color: color.mix(#ff2ea6, white, 30%);
   transition: color 0.2s;
+
+  // needs to be this way, because the cat specific classes are only set once they have their behaviour
+  &:nth-child(2) {
+    --t-x: -35%;
+  }
+
+  &:nth-child(3) {
+    --t-x: 35%;
+  }
 }
 
 .cat {
@@ -33,12 +42,10 @@
 
 .ivy {
   color: #009e28;
-  --t-x: 35%;
 }
 
 .splashy {
   color: #106dff;
-  --t-x: -35%;
 }
 
 :global(.#{$CELL}) {
