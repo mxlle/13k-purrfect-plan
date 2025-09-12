@@ -14,7 +14,7 @@ import { TranslationKey } from "../../translations/translationKey";
 import { pokiSdk } from "../../poki-integration";
 import { isValidMove } from "./movement";
 import { calculateNewPositions } from "./calculate-new-positions";
-import { HAS_SIMPLE_SOUND_EFFECTS, HAS_SOUND_EFFECTS, IS_POKI_ENABLED } from "../../env-utils";
+import { HAS_KITTEN_MEOWS, HAS_MEOW, IS_POKI_ENABLED } from "../../env-utils";
 
 let isPerformingMove = false;
 
@@ -62,7 +62,7 @@ export async function performMove(gameState: GameState, turnMove: TurnMove) {
 
     updateAllPositions(gameState, globals.nextPositionsIfWait, isWon);
 
-    if (HAS_SOUND_EFFECTS) {
+    if (HAS_KITTEN_MEOWS) {
       const newKittensOnCell = kittensOnCellAfter.filter((kitten) => !kittensOnCellBefore.includes(kitten));
       !isWon && (await kittenMeows(newKittensOnCell));
     }
@@ -71,7 +71,7 @@ export async function performMove(gameState: GameState, turnMove: TurnMove) {
       await sleep(300); // to finish moving
       showSpeechBubble(getHtmlElementForGameElement(CatId.MOTHER), getTranslation(isWon ? TranslationKey.UNITED : TranslationKey.LOST));
       pubSubService.publish(PubSubEvent.GAME_END, { isWon });
-      if (HAS_SOUND_EFFECTS) {
+      if (HAS_KITTEN_MEOWS) {
         isWon && (await kittenMeows(ALL_KITTEN_IDS, false));
       }
     }
@@ -87,7 +87,7 @@ async function preToolAction(_gameState: GameState, tool: Tool) {
     case Tool.MEOW:
       showSpeechBubble(getHtmlElementForGameElement(CatId.MOTHER), getTranslation(TranslationKey.MEOW), MEOW_TIME);
 
-      if (HAS_SOUND_EFFECTS || HAS_SIMPLE_SOUND_EFFECTS) {
+      if (HAS_MEOW) {
         void meow(CatId.MOTHER);
       }
 
