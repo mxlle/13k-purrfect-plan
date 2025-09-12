@@ -8,24 +8,14 @@ import { CssClass } from "./src/utils/css-class";
 import { PubSubEvent } from "./src/utils/pub-sub-service";
 import { LocalStorageKey } from "./src/utils/local-storage";
 import { mapEntries, memoize } from "./src/utils/utils";
-import { ConfigCategory, Direction, ObjectId, OnboardingStep, Tool } from "./src/types";
+import { Direction, ObjectId, OnboardingStep, Tool } from "./src/types";
 import { CatId } from "./src/logic/data/catId";
 import { MoveLimit } from "./src/logic/config/move-limit";
 import { visualizer } from "rollup-plugin-visualizer";
 
-const replaceEnum = (name: string, object: object) => mapEntries(object, ([key, value]) => [`${name}.${key}`, JSON.stringify(value)]);
-
-const idGenerator =
-  (i = 0) =>
-  () => {
-    const dict = "1234567890-qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM_";
-    let str = "";
-    if (i % dict.length === 0) i += 11;
-    for (let x = i++; x > 0; x = Math.floor(x / dict.length)) {
-      str += dict[x % dict.length];
-    }
-    return str;
-  };
+import AST from "unplugin-ast/vite";
+import { Transformer } from "unplugin-ast";
+import { Literal, NumericLiteral, ObjectExpression, ObjectProperty } from "@babel/types";
 
 export default defineConfig(({ mode, command }) => {
   const production = command === "build";
@@ -44,15 +34,16 @@ export default defineConfig(({ mode, command }) => {
       cssMinify: production ? "lightningcss" : false,
       terserOptions: production &&
         !poki && {
+          ecma: 2015,
           mangle: {
             properties: {
               keep_quoted: true,
             },
           },
           compress: {
+            ecma: 2015,
             booleans_as_integers: true,
             drop_console: js13k,
-            hoist_funs: true,
             keep_fargs: false,
             passes: 3,
             unsafe: true,
@@ -80,18 +71,24 @@ export default defineConfig(({ mode, command }) => {
         replace({
           preventAssignment: true,
           delimiters: ["\\b", "\\b"],
-          ...replaceEnum("CssClass", CssClass),
-          ...replaceEnum("TranslationKey", TranslationKey),
-          ...replaceEnum("PubSubEvent", PubSubEvent),
-          ...replaceEnum("LocalStorageKey", LocalStorageKey),
-          ...replaceEnum("Direction", Direction),
-          ...replaceEnum("Tool", Tool),
-          ...replaceEnum("CatId", CatId),
-          ...replaceEnum("ObjectId", ObjectId),
-          ...replaceEnum("ConfigCategory", ConfigCategory),
-          ...replaceEnum("OnboardingStep", OnboardingStep),
-          ...replaceEnum("MoveLimit", MoveLimit),
+          ...replaceEnums({
+            CssClass,
+            TranslationKey,
+            PubSubEvent,
+            LocalStorageKey,
+            Direction,
+            Tool,
+            CatId,
+            ObjectId,
+            OnboardingStep,
+            MoveLimit,
+          }),
           ...mapEntries(CssClass, ([, name]) => [name, getCssIdentifier(name)]),
+        }),
+      production &&
+        AST({
+          include: ["src/**/*.ts"],
+          transformer: [replaceMapsTransformer],
         }),
       viteAwesomeSvgLoader(),
       createHtmlPlugin({
@@ -126,3 +123,50 @@ export default defineConfig(({ mode, command }) => {
     ],
   };
 });
+
+interface Obj<K, V> extends ObjectExpression {
+  properties: (ObjectProperty & { key: K; value: V })[];
+}
+const replaceMapsTransformer: Transformer = {
+  onNode: (node) =>
+    node.type === "ObjectExpression" &&
+    node.properties.length &&
+    node.properties.every((p) => p.type === "ObjectProperty" && p.key.type === "NumericLiteral" && p.value.type.endsWith("Literal")),
+  transform: (node: Obj<NumericLiteral, Literal>) => {
+    let best = { value: node, length: node.end - node.start };
+    function addCandidate(value) {
+      if (value.length < best.length) best = { value, length: value.length };
+    }
+
+    // try ["a","b",,,"c"]
+    const arr = node.properties.reduce((arr, p) => ((arr[p.key.value] = (p.value as any).value), arr), []);
+    addCandidate(JSON.stringify(arr).replaceAll("null,", ""));
+
+    // try "a|b|c".split("|")
+    if (node.properties.every((p) => p.value.type === "StringLiteral")) {
+      const str = arr.join("");
+      const sep: any = [..."0123456789|,"].find((sep) => !str.includes(sep));
+      if (sep !== undefined) {
+        addCandidate(JSON.stringify(arr.join(sep)) + `.split(${sep == +sep ? +sep : JSON.stringify(sep)})`);
+      }
+    }
+    return best.value;
+  },
+};
+
+const replaceEnums = (enums: object) =>
+  Object.fromEntries(
+    Object.entries(enums).flatMap(([name, obj]) => Object.entries(obj).map(([key, value]) => [`${name}.${key}`, JSON.stringify(value)])),
+  );
+
+const idGenerator =
+  (i = 0) =>
+  () => {
+    const dict = "1234567890-qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM_";
+    let str = "";
+    if (i % dict.length === 0) i += 11;
+    for (let x = i++; x > 0; x = Math.floor(x / dict.length)) {
+      str += dict[x % dict.length];
+    }
+    return str;
+  };
