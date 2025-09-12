@@ -32,7 +32,8 @@
       width: 60%;
       height: 60%;
       border-radius: 50%;
-      background: radial-gradient(circle at 40% 35%, #33cc55 0%, #009e28 60%, /* kitten’s eye color */ #00751e 100%);
+      background: #009e28 /* kitten’s eye color */;
+      // background: radial-gradient(circle at 40% 35%, #33cc55 0%, #009e28 60%, /* kitten’s eye color */ #00751e 100%);
       filter: brightness(0.6);
     }
   }
@@ -47,9 +48,10 @@
     top: 10%;
     left: 10%;
 
-    background:
-      radial-gradient(120px 90px at 62% 38%, rgba(170, 210, 255, 0.25), rgba(170, 210, 255, 0) 60%),
-      radial-gradient(80px 60px at 34% 68%, rgba(140, 190, 255, 0.2), rgba(140, 190, 255, 0) 60%), $water;
+    background: $water;
+    //background:
+    //  radial-gradient(120px 90px at 62% 38%, rgba(170, 210, 255, 0.25), rgba(170, 210, 255, 0) 60%),
+    //  radial-gradient(80px 60px at 34% 68%, rgba(140, 190, 255, 0.2), rgba(140, 190, 255, 0) 60%), $water;
   }
 
   .moon {
@@ -60,19 +62,18 @@
     width: 50%;
     height: 50%;
     border-radius: 50%;
-    background: radial-gradient(circle at 30% 30%, #ffc878 0%, #ffb450 40%, #a96800 85%);
+    background: #ffb450;
+    // background: radial-gradient(circle at 30% 30%, #ffc878 0%, #ffb450 40%, #a96800 85%);
     z-index: 1;
-    overflow: hidden;
 
     &::after {
       content: "";
-      width: 110%;
-      height: 110%;
-      transform: translateX(35%); /* x shift = crescent thickness */
+      width: 90%;
+      height: 90%;
+      transform: translateX(40%); /* x shift = crescent thickness */
       position: absolute;
       border-radius: 50%;
       background: var(--t); /* same as grass/sky background color */
-      z-index: 2;
     }
   }
 }
