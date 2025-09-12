@@ -6,9 +6,9 @@ import catSvg from "./black-cat-pink-eyes-2.svg";
 import styles from "./cat-component.module.scss";
 import { isMom } from "../../logic/data/cats";
 import { sleep } from "../../utils/promise-utils";
-import { hasSoundForAction, playSoundForAction } from "../../audio/sound-control/sound-control";
+import { hasSoundForAction, playSoundForAction, speak } from "../../audio/sound-control/sound-control";
 import { Tool } from "../../types";
-import { HAS_SOUND_EFFECTS } from "../../env-utils";
+import { HAS_SIMPLE_SOUND_EFFECTS, HAS_SOUND_EFFECTS } from "../../env-utils";
 
 export { styles };
 
@@ -21,11 +21,18 @@ const playbackRateMap: Record<CatId, number> = {
   [CatId.SPLASHY]: MOM_PLAYBACK_RATE * 1.4,
 };
 
+const pitchMap: Record<CatId, number> = {
+  [CatId.MOTHER]: 1.7,
+  [CatId.MOONY]: 2,
+  [CatId.IVY]: 1.8,
+  [CatId.SPLASHY]: 1.9,
+};
+
 export function createCatElement(catId: CatId): HTMLElement {
   return createElement(
     {
       cssClass: CssClass.CAT_BOX,
-      ...(HAS_SOUND_EFFECTS
+      ...(HAS_SOUND_EFFECTS || HAS_SIMPLE_SOUND_EFFECTS
         ? {
             onClick: () => {
               void meow(catId);
@@ -43,6 +50,10 @@ export function createCatElement(catId: CatId): HTMLElement {
 }
 
 export function meow(catId: CatId): Promise<void> {
+  if (HAS_SIMPLE_SOUND_EFFECTS) {
+    return speak("meow", 0.5, pitchMap[catId]);
+  }
+
   if (!HAS_SOUND_EFFECTS) {
     return Promise.resolve();
   }

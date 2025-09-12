@@ -4,6 +4,8 @@ import { getSoundBoxSrc } from "./sound-control-box";
 
 const soundMap: Partial<Record<TurnMove, string>> = {};
 
+const synth = window.speechSynthesis;
+
 export function hasSoundForAction(action: TurnMove): boolean {
   return Boolean(getSoundForAction(action));
 }
@@ -13,6 +15,46 @@ export async function playSoundForAction(action: TurnMove, playbackRate: number 
   if (!soundSrc) return;
 
   await playSound(soundSrc, playbackRate);
+}
+
+export function speak(text: string, rate: number = 1, pitch: number = 1): Promise<void> {
+  if (!synth) return Promise.resolve();
+
+  const utterThis = new SpeechSynthesisUtterance();
+  utterThis.text = text;
+  utterThis.rate = rate;
+  utterThis.pitch = pitch;
+  utterThis.voice = getPreferredVoice();
+
+  return new Promise((resolve) => {
+    utterThis.onend = () => {
+      resolve();
+    };
+    synth.speak(utterThis);
+  });
+}
+
+let preferredVoice: SpeechSynthesisVoice | undefined;
+function getPreferredVoice() {
+  if (!preferredVoice) {
+    const voices = synth.getVoices();
+    const englishVoices = voices.filter((voice) => voice.lang.startsWith("en"));
+    console.debug("English voices:", englishVoices.map((voice) => voice.name).join("\n") || "none");
+    const grandma = englishVoices.find((voice) => voice.name.toLowerCase().includes("grandma"));
+
+    if (grandma) {
+      preferredVoice = grandma;
+    } else {
+      const englishFemale = englishVoices.find((voice) => voice.name.toLowerCase().includes("female"));
+      if (englishFemale) {
+        preferredVoice = englishFemale;
+      } else {
+        preferredVoice = englishVoices[0] || voices[0] || undefined;
+      }
+    }
+  }
+
+  return preferredVoice;
 }
 
 export function playSound(audioSrc: string, playbackRate: number = 1) {

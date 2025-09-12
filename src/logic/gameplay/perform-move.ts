@@ -14,7 +14,7 @@ import { TranslationKey } from "../../translations/translationKey";
 import { pokiSdk } from "../../poki-integration";
 import { isValidMove } from "./movement";
 import { calculateNewPositions } from "./calculate-new-positions";
-import { HAS_SOUND_EFFECTS, IS_POKI_ENABLED } from "../../env-utils";
+import { HAS_SIMPLE_SOUND_EFFECTS, HAS_SOUND_EFFECTS, IS_POKI_ENABLED } from "../../env-utils";
 
 let isPerformingMove = false;
 
@@ -87,11 +87,11 @@ async function preToolAction(_gameState: GameState, tool: Tool) {
     case Tool.MEOW:
       showSpeechBubble(getHtmlElementForGameElement(CatId.MOTHER), getTranslation(TranslationKey.MEOW), MEOW_TIME);
 
-      if (HAS_SOUND_EFFECTS) {
-        await Promise.all([meow(CatId.MOTHER), sleep(300)]); // Wait for meow speech bubble to appear
-      } else {
-        await sleep(300); // Wait for meow speech bubble to appear
+      if (HAS_SOUND_EFFECTS || HAS_SIMPLE_SOUND_EFFECTS) {
+        void meow(CatId.MOTHER);
       }
+
+      await sleep(300); // Wait for meow speech bubble to appear
 
       break;
   }
