@@ -30,17 +30,17 @@ const HINT = "hint" as const;
 type Action = Direction | Tool | typeof HINT;
 
 const KEYMAP: Record<KeyboardEvent["key"], Action> = {
-  ArrowUp: Direction.UP,
-  ArrowDown: Direction.DOWN,
-  ArrowLeft: Direction.LEFT,
-  ArrowRight: Direction.RIGHT,
-  w: Direction.UP,
-  a: Direction.LEFT,
-  s: Direction.DOWN,
-  d: Direction.RIGHT,
-  e: Tool.MEOW,
-  q: Tool.WAIT,
-  F1: HINT,
+  "ArrowUp": Direction.UP,
+  "ArrowDown": Direction.DOWN,
+  "ArrowLeft": Direction.LEFT,
+  "ArrowRight": Direction.RIGHT,
+  "w": Direction.UP,
+  "a": Direction.LEFT,
+  "s": Direction.DOWN,
+  "d": Direction.RIGHT,
+  "e": Tool.MEOW,
+  "q": Tool.WAIT,
+  "F1": HINT,
 };
 
 export function initMovementContainer(): HTMLElement {
