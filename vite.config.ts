@@ -140,7 +140,7 @@ const replaceMapsTransformer: Transformer = {
 
     // try ["a","b",,,"c"]
     const arr = node.properties.reduce((arr, p) => ((arr[p.key.value] = (p.value as any).value), arr), []);
-    addCandidate(JSON.stringify(arr).replaceAll("null,", ""));
+    addCandidate(JSON.stringify(arr).replaceAll("null,", ","));
 
     // try "a|b|c".split("|")
     if (node.properties.every((p) => p.value.type === "StringLiteral")) {
