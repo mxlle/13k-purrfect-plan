@@ -39,4 +39,6 @@ const deTranslations: Record<TranslationKey, string> = {
   [TranslationKey.HINT]: "Hinweis",
   [TranslationKey.COLLECT_XP]: "+{0} einsammeln",
   [TranslationKey.SKIP_TUTORIAL]: "Her mit allem! Ich krieg das schon hin.",
+  [TranslationKey.RECORD]: "Miau aufnehmen",
+  [TranslationKey.DELETE_RECORD]: "Miau löschen",
 };

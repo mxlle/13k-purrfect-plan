@@ -1,8 +1,7 @@
-import { CPlayer } from "./small-player";
 import { song } from "./songs/music-and-sounds";
 import { LocalStorageKey, setLocalStorageItem } from "../utils/local-storage";
 import { PubSubEvent, pubSubService } from "../utils/pub-sub-service";
-import { HAS_SOUND_EFFECTS, IS_POKI_ENABLED } from "../env-utils";
+import { IS_POKI_ENABLED } from "../env-utils";
 import { CPlayerSimple } from "./small-player-simple";
 
 let audioElem: HTMLAudioElement;
@@ -10,7 +9,7 @@ let isActive = false;
 let initialized = false;
 
 export async function initAudio(initializeMuted: boolean) {
-  const player = HAS_SOUND_EFFECTS ? new CPlayer() : new CPlayerSimple();
+  const player = new CPlayerSimple();
   player.init(song);
 
   await generateUntilDone(player);
@@ -59,14 +58,19 @@ export function generateUntilDone(player): Promise<void> {
 
 export function togglePlayer(): boolean {
   isActive = !isActive;
-  const isCurrentlyPlaying = !audioElem.paused && !audioElem.ended;
-  if (isActive && !isCurrentlyPlaying) {
-    audioElem.play();
-  } else if (!isActive && isCurrentlyPlaying) {
-    audioElem.pause();
-  }
+  playOrPauseMusicIfApplicable();
 
   setLocalStorageItem(LocalStorageKey.MUTED, isActive ? "false" : "true");
 
   return isActive;
+}
+
+export function playOrPauseMusicIfApplicable(shouldPlay: boolean = isActive) {
+  const isCurrentlyPlaying = !audioElem.paused && !audioElem.ended;
+
+  if (shouldPlay && !isCurrentlyPlaying) {
+    audioElem.play();
+  } else if (!shouldPlay && isCurrentlyPlaying) {
+    audioElem.pause();
+  }
 }
