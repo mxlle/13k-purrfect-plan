@@ -36,7 +36,7 @@ export const explanationMap: Record<ConfigItemId, TranslationKey | undefined> = 
 export const preconditions: Partial<Record<ConfigItemId, ConfigItemId[]>> = {
   [CatId.MOONY]: [MoveLimit.MOVE_LIMIT_SIMPLE],
   [CatId.SPLASHY]: [Tool.MEOW],
-  [Tool.WAIT]: [Tool.MEOW, CatId.IVY],
+  [Tool.WAIT]: [CatId.IVY],
   [MoveLimit.MOVE_LIMIT_STRICT]: [MoveLimit.MOVE_LIMIT_SIMPLE, Tool.MEOW, Tool.WAIT],
 };
 
