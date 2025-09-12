@@ -2,7 +2,8 @@ import { CPlayer } from "./small-player";
 import { song } from "./songs/soft-kitty";
 import { LocalStorageKey, setLocalStorageItem } from "../utils/local-storage";
 import { PubSubEvent, pubSubService } from "../utils/pub-sub-service";
-import { IS_POKI_ENABLED } from "../env-utils";
+import { HAS_SOUND_EFFECTS, IS_POKI_ENABLED } from "../env-utils";
+import { CPlayerSimple } from "./small-player-simple";
 
 let audioElem: HTMLAudioElement;
 let isActive = false;
@@ -11,10 +12,10 @@ let initialized = false;
 export async function initAudio(initializeMuted: boolean) {
   audioElem = document.createElement("audio");
   audioElem.loop = true;
-  audioElem.volume = 0.4;
+  audioElem.volume = 0.5;
   audioElem.playbackRate = 1;
 
-  const player = new CPlayer();
+  const player = HAS_SOUND_EFFECTS ? new CPlayer() : new CPlayerSimple();
   player.init(song);
 
   await generateUntilDone(player);
