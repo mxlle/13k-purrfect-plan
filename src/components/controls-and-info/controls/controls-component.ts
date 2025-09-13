@@ -170,7 +170,7 @@ export function setupKeyboardEventListeners() {
       const buttons = movementContainer.querySelectorAll<HTMLButtonElement>(`& div button:not(.${CssClass.HIDDEN})`).values().toArray();
       const current = buttons.indexOf(document.activeElement as any);
       console.log({ buttons, current, action });
-      buttons[(current + 1) % buttons.length].focus();
+      buttons[(current + 1) % buttons.length]?.focus();
     }
   });
 }
