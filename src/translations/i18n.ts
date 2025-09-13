@@ -2,6 +2,7 @@ import { getShortLanguageName } from "../utils/language-util";
 import { enTranslations } from "./en";
 import { getDeTranslationMap } from "./de";
 import { TranslationKey } from "./translationKey";
+import { HAS_SHORT_TEXTS } from "../env-utils";
 
 function getTranslationRecords(): Record<TranslationKey, string> {
   if (import.meta.env.GERMAN_ENABLED === "true") {
@@ -28,5 +29,11 @@ export function getTranslation(key, ...args) {
 
   document.documentElement.setAttribute("lang", language);
 
-  return getTranslationRecords()[key].replace(/\{(\d+)}/g, ([v, i]) => args[i]);
+  const translation = getTranslationRecords()[key];
+
+  if (HAS_SHORT_TEXTS) {
+    return translation;
+  }
+
+  return translation.replace(/\{(\d+)}/g, ([v, i]) => args[i]);
 }

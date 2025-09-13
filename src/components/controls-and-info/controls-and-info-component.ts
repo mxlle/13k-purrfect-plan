@@ -27,7 +27,7 @@ import {
 } from "./controls/controls-component";
 import { collectXp } from "../xp-components/xp-components";
 import { sleep } from "../../utils/promise-utils";
-import { HAS_RECORDED_SOUND_EFFECTS } from "../../env-utils";
+import { HAS_RECORDED_SOUND_EFFECTS, HAS_SHORT_TEXTS } from "../../env-utils";
 import { createRecordButton } from "./create-record-button";
 import { Tool } from "../../types";
 
@@ -113,7 +113,7 @@ function addNewGameButtons(isInitialStart = false) {
 
   if (hasAchievedGoal) {
     const xpElement = createElement({
-      text: getTranslation(TranslationKey.COLLECT_XP, getXpText(newXp)),
+      text: HAS_SHORT_TEXTS ? `+${getXpText(newXp)}` : getTranslation(TranslationKey.COLLECT_XP, getXpText(newXp)),
       cssClass: styles.xpInfo,
     });
     newGameContainer.append(xpElement);

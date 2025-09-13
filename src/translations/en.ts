@@ -34,7 +34,7 @@ export const enTranslations: Record<TranslationKey, string> = {
   [TranslationKey.WAIT]: "Wait",
   [TranslationKey.LOADING]: "Loading...",
   [TranslationKey.HINT]: "Hint",
-  [TranslationKey.COLLECT_XP]: HAS_SHORT_TEXTS ? "+{0}" : "Collect +{0}",
+  [TranslationKey.COLLECT_XP]: HAS_SHORT_TEXTS ? "" : "Collect +{0}",
   [TranslationKey.SKIP_TUTORIAL]: HAS_SHORT_TEXTS ? "Skip tutorial" : "Give me everything! I'll figure it out.",
   [TranslationKey.RECORD]: HAS_RECORDED_SOUND_EFFECTS ? "Record meow" : " ",
   [TranslationKey.DELETE_RECORD]: HAS_RECORDED_SOUND_EFFECTS ? "Delete meow" : " ",
