@@ -17,6 +17,8 @@ import { animateXpFlyAway } from "../../xp-components/xp-components";
 import { isValidMove } from "../../../logic/gameplay/movement";
 import { getBestNextMove } from "../../../logic/gameplay/hint";
 import { getRemainingToolRecoveryTime } from "../../../logic/checks";
+import { getOpenDialog } from "../../dialog/dialog";
+import { getNewGameContainer } from "../controls-and-info-component";
 
 const movementContainer: HTMLElement = createElement({ cssClass: styles.movementControls });
 const toolContainer: HTMLElement = createElement({ cssClass: styles.toolControls });
@@ -96,7 +98,8 @@ export function showNewGameButtonsAndHideControls(newGameButtonContainer: HTMLEl
   movementContainer.classList.toggle(styles.disabled, true);
   toolContainer.classList.toggle(CssClass.OPACITY_HIDDEN, true);
   hintButton.classList.toggle(CssClass.OPACITY_HIDDEN, true);
-  newGameButtonContainer.querySelector<HTMLButtonElement>(`button.${CssClass.PRIMARY}`).focus();
+  const buttons = newGameButtonContainer.querySelectorAll("button").values();
+  (buttons.find((b) => b.classList.contains(CssClass.PRIMARY)) ?? buttons[0])?.focus();
 }
 
 function reshowControls() {
@@ -166,11 +169,17 @@ export function setupKeyboardEventListeners() {
         void handleMove(action);
       }
     } else if (isDirection(action)) {
-      // Focus next new game button
-      const buttons = movementContainer.querySelectorAll<HTMLButtonElement>(`& div button:not(.${CssClass.HIDDEN})`).values().toArray();
+      const buttons = (getOpenDialog() ?? getNewGameContainer())
+        ?.querySelectorAll("button")
+        .values()
+        .filter((b) => !b.disabled && !b.classList.contains(CssClass.HIDDEN) && !b.classList.contains(CssClass.OPACITY_HIDDEN))
+        .toArray();
+      if (!buttons.length) return;
+
       const current = buttons.indexOf(document.activeElement as any);
-      console.log({ buttons, current, action });
-      buttons[(current + 1) % buttons.length]?.focus();
+      const dir = action == Direction.RIGHT || action == Direction.DOWN ? +1 : -1;
+      const next = (current + dir + buttons.length) % buttons.length;
+      buttons[next]?.focus();
     }
   });
 }
