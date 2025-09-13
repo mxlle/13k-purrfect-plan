@@ -9,6 +9,7 @@ import { FALLBACK_PAR } from "../par";
 import { getDefaultPlacedObjects, isOnboarding, OnboardingData } from "../onboarding";
 import { deserializeGame } from "../serializer";
 import { globals } from "../../globals";
+import { HAS_LOCATION_SERIALIZATION } from "../../env-utils";
 
 export type GameElementId = CatId | ObjectId;
 
@@ -37,32 +38,36 @@ export interface GameState {
 export function determineGameSetup(options: { isDoOver: boolean }, onboardingData: OnboardingData | undefined): GameSetup | null {
   const existingGameState = globals.gameState;
   const isInitialStart = !existingGameState;
-  const gameSetupFromHash = location.hash.replace("#", "");
 
-  let gameSetupFromUrl: GameSetup | undefined;
-  if (isInitialStart && gameSetupFromHash && !onboardingData && !hasUnknownConfigItems()) {
-    try {
-      gameSetupFromUrl = deserializeGame(decodeURI(gameSetupFromHash));
-      console.debug("Loaded game setup from hash:", gameSetupFromUrl);
+  if (HAS_LOCATION_SERIALIZATION) {
+    const gameSetupFromHash = location.hash.replace("#", "");
 
-      if (!isValidGameSetup(gameSetupFromUrl)) {
-        console.warn("Invalid game setup in URL hash, ignoring it.");
-        gameSetupFromUrl = undefined;
+    let gameSetupFromUrl: GameSetup | undefined;
+    if (isInitialStart && gameSetupFromHash && !onboardingData && !hasUnknownConfigItems()) {
+      try {
+        gameSetupFromUrl = deserializeGame(decodeURI(gameSetupFromHash));
+        console.debug("Loaded game setup from hash:", gameSetupFromUrl);
+
+        if (!isValidGameSetup(gameSetupFromUrl)) {
+          console.warn("Invalid game setup in URL hash, ignoring it.");
+          gameSetupFromUrl = undefined;
+        }
+      } catch (error) {
+        console.error("Failed to parse game setup from hash:", error);
       }
-    } catch (error) {
-      console.error("Failed to parse game setup from hash:", error);
+    }
+
+    if (gameSetupFromUrl) {
+      return gameSetupFromUrl;
     }
   }
 
   let gameSetup: GameSetup | null;
-  if (gameSetupFromUrl) {
-    gameSetup = gameSetupFromUrl;
+
+  if (options.isDoOver && globals.gameState) {
+    gameSetup = globals.gameState.setup;
   } else {
-    if (options.isDoOver && globals.gameState) {
-      gameSetup = globals.gameState.setup;
-    } else {
-      gameSetup = onboardingData ? onboardingData.gameSetup : null;
-    }
+    gameSetup = onboardingData ? onboardingData.gameSetup : null;
   }
 
   return gameSetup;

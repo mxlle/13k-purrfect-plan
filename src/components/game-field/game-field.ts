@@ -44,7 +44,7 @@ import { isCatId } from "../../logic/data/cats";
 import { calculateNewPositions } from "../../logic/gameplay/calculate-new-positions";
 import { getControlsAndInfoComponent } from "../controls-and-info/controls-and-info-component";
 import { MAX_PAR } from "../../logic/par";
-import { IS_DEV, IS_POKI_ENABLED } from "../../env-utils";
+import { HAS_LOCATION_SERIALIZATION, IS_DEV, IS_POKI_ENABLED } from "../../env-utils";
 import { isMoon } from "../../logic/data/objects";
 
 let mainContainer: HTMLElement | undefined;
@@ -157,8 +157,12 @@ export async function refreshFieldWithSetup(
 ) {
   globals.gameState = getInitialGameState(gameSetup);
   globals.nextPositionsIfWait = calculateNewPositions(globals.gameState, Tool.WAIT);
-  const serializedGameSetup = serializeGame(gameSetup);
-  location.hash = onboardingData || hasUnknownConfigItems() ? "" : `#${serializedGameSetup}`;
+
+  if (HAS_LOCATION_SERIALIZATION) {
+    const serializedGameSetup = serializeGame(gameSetup);
+    location.hash = onboardingData || hasUnknownConfigItems() ? "" : `#${serializedGameSetup}`;
+  }
+
   document.body.style.setProperty("--s-cnt", gameSetup.fieldSize.toString());
 
   pubSubService.publish(PubSubEvent.GAME_START);
