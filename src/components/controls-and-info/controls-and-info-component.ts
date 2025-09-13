@@ -105,6 +105,7 @@ function addNewGameButtons(isInitialStart = false) {
     cssClass: CssClass.PRIMARY,
     onClick: async () => {
       if (hasAchievedGoal) {
+        continueButton.classList.add(CssClass.OPACITY_HIDDEN);
         await collectXp(continueButton, newXp);
       }
 
