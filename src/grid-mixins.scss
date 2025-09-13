@@ -1,13 +1,15 @@
 $squareCount: var(--s-cnt, 5);
-$buffer: 1.5rem; // = 2 * margin
+$bufferVertical: 1rem; // = 1 * margin
+$bufferVerticalPortrait: 2rem; // = 1 * margin + 1 * gap
 $bufferLandscape: 3rem; // = 2 * margin
 $headerHeight: 2.5rem;
-$controls-width: 300px;
+$controls-width: 17rem;
+$controls-height: 13.5rem;
 $gap: 1px;
 $totalGap: calc($gap * ($squareCount - 1));
 // $maxWidth: 40rem + $buffer + $totalGap;
-$totalSizeLandscape: calc(min(calc(100vw - $controls-width - $bufferLandscape), calc(100vh - $headerHeight)) - $buffer - $totalGap);
-$totalSizePortrait: calc(min(100vw, calc(100vh - $headerHeight)) - $buffer - $totalGap);
+$totalSizeLandscape: calc(min(calc(100vw - $controls-width - $bufferLandscape), calc(100vh - $headerHeight)) - $bufferVertical - $totalGap);
+$totalSizePortrait: calc(min(100vw, calc(100vh - $controls-height - $headerHeight)) - $bufferVerticalPortrait - $totalGap);
 $squareSizeLandscape: calc(#{$totalSizeLandscape} / calc(#{$squareCount} + 0.2));
 $squareSizePortrait: calc(#{$totalSizePortrait} / calc(#{$squareCount} + 0.2));
 $font-size: calc(0.6 * var(--s-size));

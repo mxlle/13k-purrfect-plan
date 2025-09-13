@@ -50,7 +50,7 @@ export function updateGameInfoComponent(isReset: boolean = false) {
 
   turnMovesContainer.classList.toggle(CssClass.HIDDEN, !showMoves);
   const par = getParFromGameState(globals.gameState);
-  const parString = par && showMoveLimit && !isReset ? ` / ${par < FALLBACK_PAR ? par : "?"}` : "";
+  const parString = par && showMoveLimit ? ` / ${par < FALLBACK_PAR && !isReset ? par : "?"}` : "";
   turnMovesComponent.innerHTML = `${getTranslation(TranslationKey.MOVES)}: ${isReset ? 0 : (globals.gameState?.moves.length ?? 0)}${parString}`;
 
   const difficulty = globals.gameState?.setup.difficulty;
