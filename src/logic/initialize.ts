@@ -66,11 +66,15 @@ export async function generateRandomGameSetup(fieldSize: FieldSize = DEFAULT_FIE
     performanceStart = performance.now();
   }
 
+  const simpleAllowLessMovesChance = Math.random() < 0.8;
+  const simpleDesiredParChance = Math.random() < 0.2;
+  const shouldUseSmallerPar = HAS_GAMEPLAY_NICE_TO_HAVES ? shouldStartWithParMinus1() : simpleDesiredParChance;
+
   const finalGameSetup = randomlyPlaceGameElementsOnField(tempGameSetup, {
     shouldCalculatePar: hasMoveLimit(),
     randomMoonPosition: false,
-    allowLessMoves: HAS_GAMEPLAY_NICE_TO_HAVES ? shouldAllowLessMoves() : true,
-    desiredPar: HAS_GAMEPLAY_NICE_TO_HAVES && shouldStartWithParMinus1() ? MAX_PAR - 1 : MAX_PAR,
+    allowLessMoves: HAS_GAMEPLAY_NICE_TO_HAVES ? shouldAllowLessMoves() : simpleAllowLessMovesChance,
+    desiredPar: shouldUseSmallerPar ? MAX_PAR - 1 : MAX_PAR,
   });
 
   if (IS_DEV) {

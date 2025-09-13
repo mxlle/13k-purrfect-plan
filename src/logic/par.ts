@@ -84,7 +84,7 @@ function calculateDifficulty(gameState: GameState, parInfo: ParInfoWithoutDiffic
   }
 
   if (!HAS_GAMEPLAY_NICE_TO_HAVES) {
-    return numberOfSolutions < 5 ? Difficulty.MEDIUM : Difficulty.EASY;
+    return numberOfSolutions < 8 ? Difficulty.MEDIUM : Difficulty.EASY;
   }
 
   const containsSpecialMoves = parInfo.possibleSolutions.every((solution) => solution.some((move) => !isDirection(move)));
