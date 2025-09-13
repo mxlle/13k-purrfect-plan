@@ -95,7 +95,7 @@ async function shuffleFieldAnimation() {
   loader.remove();
 }
 
-export async function startNewGame(options: { isDoOver: boolean }) {
+export async function startNewGame(options: { isDoOver: boolean; serializedGameSetup?: string }) {
   const notYetAllConfigItems = hasUnknownConfigItems();
   let newConfigItem: ConfigItemId | boolean = false;
 

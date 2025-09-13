@@ -15,6 +15,11 @@ import { getLocalStorageItem, LocalStorageKey } from "./utils/local-storage";
 import { GAME_TITLE, HAS_MUTE_BUTTON, HAS_SIMPLE_SOUND_EFFECTS, HAS_VISUAL_NICE_TO_HAVES, IS_POKI_ENABLED } from "./env-utils";
 import { initWinLoseSoundEffects, loseSoundSrcUrl, winSoundSrcUrl } from "./audio/sound-control/sound-control-box";
 import { playSound } from "./audio/sound-control/sound-control";
+import { globals } from "./globals";
+import { serializeGame } from "./logic/serializer";
+import { hasUnknownConfigItems } from "./logic/config/config";
+import { getTranslation } from "./translations/i18n";
+import { TranslationKey } from "./translations/translationKey";
 
 if (HAS_VISUAL_NICE_TO_HAVES) {
   import("./globals.nice2have.scss");
@@ -45,6 +50,27 @@ function init() {
   const btnContainer = createElement({
     cssClass: styles.headerButtons,
   });
+
+  const loadGameButton = createButton({
+    text: "📂",
+    onClick: () => {
+      const currentSerializedGame = globals.gameState ? serializeGame(globals.gameState.setup) : "";
+      const serializedGameSetup = window.prompt(getTranslation(TranslationKey.SHARE_LOAD_GAME), currentSerializedGame);
+
+      if (serializedGameSetup) {
+        void startNewGame({ serializedGameSetup, isDoOver: false });
+      }
+    },
+    cssClass: [CssClass.ICON_BTN, CssClass.SECONDARY],
+  });
+
+  btnContainer.append(loadGameButton);
+
+  function updateLoadButtonVisibility() {
+    loadGameButton.classList.toggle(CssClass.OPACITY_HIDDEN, hasUnknownConfigItems());
+  }
+
+  updateLoadButtonVisibility();
 
   if (HAS_MUTE_BUTTON) {
     const muteButton = createButton({
@@ -79,6 +105,8 @@ function init() {
 
   pubSubService.subscribe(PubSubEvent.GAME_END, (result) => {
     result.isWon && document.body.classList.add(CssClass.WON);
+
+    updateLoadButtonVisibility();
 
     if (HAS_SIMPLE_SOUND_EFFECTS) {
       const soundEffect = result.isWon ? winSoundSrcUrl : loseSoundSrcUrl;

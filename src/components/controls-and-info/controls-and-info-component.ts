@@ -93,6 +93,10 @@ function addNewGameButtons(isInitialStart = false) {
 
   const newGameContainer = createElement({ cssClass: styles.newGameContainer });
 
+  pubSubService.subscribe(PubSubEvent.GAME_START, () => {
+    newGameContainer.remove();
+  });
+
   const continueButton = createButton({
     text: getTranslation(
       isInitialStart ? TranslationKey.START_GAME : shouldShowRedoButton ? TranslationKey.NEW_GAME : TranslationKey.CONTINUE,

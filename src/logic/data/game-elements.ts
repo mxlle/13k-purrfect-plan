@@ -35,9 +35,26 @@ export interface GameState {
   moves: TurnMove[];
 }
 
-export function determineGameSetup(options: { isDoOver: boolean }, onboardingData: OnboardingData | undefined): GameSetup | null {
+export function determineGameSetup(
+  options: { isDoOver: boolean; serializedGameSetup?: string },
+  onboardingData: OnboardingData | undefined,
+): GameSetup | null {
   const existingGameState = globals.gameState;
   const isInitialStart = !existingGameState;
+
+  if (options.serializedGameSetup) {
+    let gameSetupFromString: GameSetup | undefined;
+    try {
+      gameSetupFromString = deserializeGame(options.serializedGameSetup);
+      console.debug("Loaded game setup from URL:", gameSetupFromString);
+    } catch (error) {
+      console.error("Failed to parse game setup from string:", error);
+    }
+
+    if (gameSetupFromString) {
+      return gameSetupFromString;
+    }
+  }
 
   if (HAS_LOCATION_SERIALIZATION) {
     const gameSetupFromHash = location.hash.replace("#", "");

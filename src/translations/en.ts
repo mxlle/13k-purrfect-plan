@@ -38,4 +38,5 @@ export const enTranslations: Record<TranslationKey, string> = {
   [TranslationKey.SKIP_TUTORIAL]: HAS_SHORT_TEXTS ? "Skip tutorial" : "Give me everything! I'll figure it out.",
   [TranslationKey.RECORD]: HAS_RECORDED_SOUND_EFFECTS ? "Record meow" : " ",
   [TranslationKey.DELETE_RECORD]: HAS_RECORDED_SOUND_EFFECTS ? "Delete meow" : " ",
+  [TranslationKey.SHARE_LOAD_GAME]: HAS_SHORT_TEXTS ? "Share/load game" : "Share or load a game via the emoji string",
 };

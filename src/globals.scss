@@ -73,6 +73,7 @@ button {
     text-decoration: underline;
     cursor: pointer;
     border-radius: 0;
+    width: fit-content;
   }
 
   &[disabled] {
