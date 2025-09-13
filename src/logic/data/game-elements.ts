@@ -123,6 +123,10 @@ export function getParFromGameState(gameState: GameState | null): number | null 
     return null;
   }
 
+  if (gameState.setup.possibleSolutions.length === 0) {
+    return FALLBACK_PAR;
+  }
+
   return getParFromMoonPosition(gameState.setup);
 }
 
