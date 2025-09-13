@@ -38,9 +38,4 @@
   @extend %gridCentered;
   padding: 1rem;
   padding-bottom: 2rem;
-
-  @media (max-height: 600px) {
-    padding: 0.5rem;
-    padding-bottom: 0.5rem;
-  }
 }

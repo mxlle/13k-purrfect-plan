@@ -2,7 +2,7 @@ import { ActiveRecording, hasSoundForAction, saveRecording, startRecording } fro
 import { Tool, TurnMove } from "../../types";
 import { createButton } from "../../utils/html-utils";
 import { CssClass } from "../../utils/css-class";
-import { HAS_GAMEPLAY_NICE_TO_HAVES } from "../../env-utils";
+import { HAS_ADVANCED_DEBUGGING } from "../../env-utils";
 import { sleep } from "../../utils/promise-utils";
 import { getTranslation } from "../../translations/i18n";
 import { TranslationKey } from "../../translations/translationKey";
@@ -57,7 +57,7 @@ async function toggleRecordSoundEffect(btn: HTMLButtonElement, actions: TurnMove
     activeRecording?.stop();
   } catch (error) {
     console.error("Error starting recording:", error);
-    HAS_GAMEPLAY_NICE_TO_HAVES && alert(error instanceof Error ? error.message : "unknown error");
+    HAS_ADVANCED_DEBUGGING && alert(error instanceof Error ? error.message : "unknown error");
   } finally {
     btn.classList.remove(CssClass.PRIMARY);
     activeRecording = undefined;
