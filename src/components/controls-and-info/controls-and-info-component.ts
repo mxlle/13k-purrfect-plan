@@ -87,7 +87,8 @@ function setupEventListeners() {
 }
 
 function addNewGameButtons(isInitialStart = false) {
-  const hasAchievedGoal = isWinConditionMet(globals.gameState) && globals.gameState.moves.length <= getParFromGameState(globals.gameState);
+  const hasAchievedGoal =
+    isWinConditionMet(globals.gameState) && (!hasMoveLimit() || globals.gameState.moves.length <= getParFromGameState(globals.gameState));
   const shouldShowRedoButton = !isInitialStart && hasMoveLimit() && !hasAchievedGoal;
   const newXp = hasAchievedGoal ? calculateNewXP() : 0;
 
