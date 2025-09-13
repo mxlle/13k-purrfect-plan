@@ -14,6 +14,10 @@ export interface Dialog {
   destroy: () => void;
 }
 
+export function getOpenDialog() {
+  return document.getElementsByClassName(styles.open)?.[0];
+}
+
 export function createDialog(innerElement: HTMLElement): Dialog {
   const dialog = createElement({
     cssClass: styles.dialog,
