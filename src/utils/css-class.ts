@@ -13,4 +13,5 @@ export const CssClass = defineEnum({
   ICON_BTN: "global__icon-btn",
   HIDDEN: "global__hidden",
   OPACITY_HIDDEN: "global__opacity_hidden",
+  RECORD_BUTTON: "global__record_button",
 });

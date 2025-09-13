@@ -7,13 +7,12 @@ import { sleep } from "../../utils/promise-utils";
 import { getTranslation } from "../../translations/i18n";
 import { TranslationKey } from "../../translations/translationKey";
 import { playOrPauseMusicIfApplicable } from "../../audio/music-control";
-import styles from "./controls-and-info-component.module.scss";
 
 let activeRecording: ActiveRecording | undefined;
 
 export function createRecordButton(actions: TurnMove[]): HTMLElement {
   const recordButton = createButton({
-    cssClass: [CssClass.SECONDARY, styles.recordBtn],
+    cssClass: [CssClass.SECONDARY, CssClass.RECORD_BUTTON],
     onClick: () => void toggleRecordSoundEffect(recordButton, actions),
   });
 

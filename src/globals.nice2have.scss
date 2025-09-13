@@ -1,3 +1,5 @@
+@use "names" as *;
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -5,4 +7,13 @@
     animation: none !important;
     transition: none !important;
   }
+}
+
+body button.#{$RECORD_BUTTON} {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  font-size: 0.5em;
+  padding: 0.25rem;
+  background: none;
 }
