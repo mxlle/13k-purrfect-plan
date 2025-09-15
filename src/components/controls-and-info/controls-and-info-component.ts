@@ -141,3 +141,7 @@ function addNewGameButtons(isInitialStart = false) {
 
   return newGameContainer;
 }
+
+export function getNewGameContainer() {
+  return document.getElementsByClassName(styles.newGameContainer)?.[0];
+}
