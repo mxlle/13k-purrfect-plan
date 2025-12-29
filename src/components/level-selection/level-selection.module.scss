@@ -1,0 +1,17 @@
+@use "../../theme";
+
+.level-grid {
+  font-family: theme.$font-family-special;
+  display: grid;
+  gap: 1rem;
+  padding: 1rem;
+  width: min(90vw, 600px);
+  margin: 0 auto;
+  place-content: center;
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+
+  .level-button {
+    font-size: 2em;
+    aspect-ratio: 1;
+  }
+}

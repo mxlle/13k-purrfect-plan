@@ -30,6 +30,7 @@ import { sleep } from "../../utils/promise-utils";
 import { HAS_RECORDED_SOUND_EFFECTS, HAS_SHORT_TEXTS } from "../../env-utils";
 import { createRecordButton } from "./create-record-button";
 import { Tool } from "../../types";
+import { openLevelSelection } from "../level-selection/level-selection";
 
 let hasSetupEventListeners = false;
 const controlsAndInfoComponent: HTMLElement = createElement({ cssClass: styles.controlsAndInfo });
@@ -109,9 +110,10 @@ function addNewGameButtons(isInitialStart = false) {
         await collectXp(continueButton, newXp);
       }
 
-      pubSubService.publish(PubSubEvent.START_NEW_GAME, { isDoOver: false });
+      // pubSubService.publish(PubSubEvent.START_NEW_GAME, { isDoOver: false });
       newGameContainer.remove();
       hideRetryInfo();
+      openLevelSelection();
     },
   });
 

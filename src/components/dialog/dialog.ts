@@ -38,8 +38,12 @@ export function createDialog(innerElement: HTMLElement): Dialog {
   document.body.appendChild(dialog);
 
   return {
-    open: () => {
-      sleep(0).then(() => dialog.classList.add(styles.open));
+    open: (openImmediately?: boolean) => {
+      function addOpenClass() {
+        dialog.classList.add(styles.open);
+      }
+
+      openImmediately ? addOpenClass() : sleep(0).then(addOpenClass);
       dialogContent.classList.toggle(styles.overflow, dialogContent.scrollHeight > dialogContent.clientHeight);
 
       return new Promise((resolve, _reject) => {

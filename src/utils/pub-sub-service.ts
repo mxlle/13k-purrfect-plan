@@ -12,7 +12,7 @@ export const PubSubEvent = defineEnum({
 });
 
 type EventDataTypes = {
-  [PubSubEvent.START_NEW_GAME]: { isDoOver: boolean };
+  [PubSubEvent.START_NEW_GAME]: { isDoOver: boolean; serializedGameSetup?: string };
   [PubSubEvent.GAME_START]: undefined;
   [PubSubEvent.GAME_END]: { isWon: boolean };
   [PubSubEvent.MUTE_MUSIC]: undefined;

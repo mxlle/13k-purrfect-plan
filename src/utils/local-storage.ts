@@ -9,13 +9,14 @@ export const LocalStorageKey = defineEnum({
   SOUND: "s",
   KNOWN_CONFIG_ELEMENTS: "k",
   XP: "x",
+  LEVEL: "l",
 });
 
 export function setLocalStorageItem(key: LocalStorageKey, value: string, postfix?: string) {
   localStorage.setItem(LOCAL_STORAGE_PREFIX + "." + key + (postfix ? "." + postfix : ""), value);
 }
 
-export function getLocalStorageItem(key: LocalStorageKey, postfix?: string) {
+export function getLocalStorageItem(key: LocalStorageKey, postfix?: string): string | null {
   return localStorage.getItem(LOCAL_STORAGE_PREFIX + "." + key + (postfix ? "." + postfix : ""));
 }
 

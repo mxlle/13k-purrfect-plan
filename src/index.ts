@@ -21,6 +21,7 @@ import { hasUnknownConfigItems } from "./logic/config/config";
 import { getTranslation } from "./translations/i18n";
 import { TranslationKey } from "./translations/translationKey";
 import { getStarBackground } from "./components/background/star-background";
+import { updateActiveLevel } from "./components/level-selection/level-selection";
 
 if (HAS_VISUAL_NICE_TO_HAVES) {
   import("./globals.nice2have.scss");
@@ -117,6 +118,8 @@ function init() {
     result.isWon && document.body.classList.add(CssClass.WON);
 
     updateLoadButtonVisibility();
+
+    updateActiveLevel(decodeURI(location.hash.replace("#", "")));
 
     if (HAS_SIMPLE_SOUND_EFFECTS) {
       const soundEffect = result.isWon ? winSoundSrcUrl : loseSoundSrcUrl;
