@@ -14,7 +14,7 @@ import {
   toggleDoOverButtonVisibility,
   updateGameInfoComponent,
 } from "./game-info/game-info-component";
-import { calculateNewXP, getXpText } from "../../logic/data/experience-points";
+import { calculateNewXP, getXpInnerHtml } from "../../logic/data/experience-points";
 import { CssClass } from "../../utils/css-class";
 import {
   initHintButton,
@@ -119,7 +119,7 @@ function addNewGameButtons(isInitialStart = false) {
 
   if (hasAchievedGoal) {
     const xpElement = createElement({
-      text: HAS_SHORT_TEXTS ? `+${getXpText(newXp)}` : getTranslation(TranslationKey.COLLECT_XP, getXpText(newXp)),
+      html: HAS_SHORT_TEXTS ? `+${getXpInnerHtml(newXp)}` : getTranslation(TranslationKey.COLLECT_XP, getXpInnerHtml(newXp)),
       cssClass: styles.xpInfo,
     });
     newGameContainer.append(xpElement);

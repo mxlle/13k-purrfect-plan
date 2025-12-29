@@ -14,4 +14,6 @@ export const CssClass = defineEnum({
   HIDDEN: "global__hidden",
   OPACITY_HIDDEN: "global__opacity_hidden",
   RECORD_BUTTON: "global__record_button",
+  EMOJI: "global__emoji",
+  ONE_LINER: "global__one_liner",
 });

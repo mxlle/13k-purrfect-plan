@@ -3,6 +3,7 @@ import { globals } from "../../globals";
 import { Difficulty } from "../../types";
 import { hasMoveLimit } from "../config/config";
 import { getParFromMoonPosition } from "./game-elements";
+import { CssClass } from "../../utils/css-class";
 
 export const XP_REP = "🧶";
 const XP_FOR_UNION = 10;
@@ -27,8 +28,8 @@ export function changeXP(newXP: number) {
   return newTotalXP;
 }
 
-export function getXpText(xp: number = getCurrentXP()): string {
-  return `${xp} ${XP_REP}`;
+export function getXpInnerHtml(xp: number = getCurrentXP()): string {
+  return `${xp} <span class="${CssClass.EMOJI}">${XP_REP}</span>`;
 }
 
 export function calculateNewXP(): number {

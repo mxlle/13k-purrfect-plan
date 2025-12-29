@@ -1,6 +1,12 @@
 import { createDialog, Dialog } from "../dialog/dialog";
 import { createButton, createElement, resetTransform } from "../../utils/html-utils";
-import { allConfigItems, explanationMap, getNextUnknownConfigItems, getToolText, updateKnownConfigItems } from "../../logic/config/config";
+import {
+  allConfigItems,
+  explanationMap,
+  getNextUnknownConfigItems,
+  getToolInnerHtml,
+  updateKnownConfigItems,
+} from "../../logic/config/config";
 import { shuffleArray } from "../../utils/random-utils";
 import { getCatElement, isCatId } from "../../logic/data/cats";
 import { ConfigItemId, isTool } from "../../types";
@@ -110,7 +116,9 @@ function getChoiceElement(configItem: ConfigItemId, chooseItem: (event: MouseEve
       if (isCatId(configItem)) {
         innerChild.classList.add(getCatIdClass(configItem));
       } else {
-        event.target.innerHTML = isTool(configItem) ? getToolText(configItem) : moveLimitLabels[configItem];
+        event.target.innerHTML = `<span class="${CssClass.ONE_LINER}">${
+          isTool(configItem) ? getToolInnerHtml(configItem) : moveLimitLabels[configItem]
+        }</span>`;
       }
 
       chooseItem(event);

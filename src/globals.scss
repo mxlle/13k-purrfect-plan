@@ -84,6 +84,7 @@ button {
 }
 
 button.#{$ICON_BTN} {
+  font-family: "Noto Color Emoji", sans-serif;
   width: 2rem;
   height: 2rem;
   //display: grid;
@@ -109,4 +110,12 @@ button.#{$ICON_BTN} {
 .#{$OPACITY_HIDDEN} {
   opacity: 0 !important;
   pointer-events: none !important;
+}
+
+.#{$EMOJI} {
+  font-family: "Noto Color Emoji", sans-serif;
+}
+
+.#{$ONE_LINER} {
+  white-space: nowrap;
 }

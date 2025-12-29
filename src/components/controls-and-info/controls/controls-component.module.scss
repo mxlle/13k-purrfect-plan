@@ -95,6 +95,7 @@
     grid-area: 1 / 1;
 
     &::before {
+      font-family: "Noto Color Emoji", sans-serif;
       content: "⏳ ";
     }
   }

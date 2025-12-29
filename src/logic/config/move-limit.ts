@@ -1,4 +1,5 @@
 import { defineEnum } from "../../utils/enums";
+import { CssClass } from "../../utils/css-class";
 
 export type MoveLimit = defineEnum<typeof MoveLimit>;
 export const MoveLimit = defineEnum({
@@ -7,6 +8,6 @@ export const MoveLimit = defineEnum({
 });
 
 export const moveLimitLabels = {
-  [MoveLimit.MOVE_LIMIT_SIMPLE]: "⏳🌜",
-  [MoveLimit.MOVE_LIMIT_STRICT]: "⏳5!",
+  [MoveLimit.MOVE_LIMIT_SIMPLE]: `<span class="${CssClass.EMOJI}">⏳🌜</span>`,
+  [MoveLimit.MOVE_LIMIT_STRICT]: `<span class="${CssClass.EMOJI}">⏳</span>5!`,
 };

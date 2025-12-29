@@ -10,8 +10,8 @@ import { getTranslation } from "../../../translations/i18n";
 import { TranslationKey } from "../../../translations/translationKey";
 import { globals } from "../../../globals";
 
-import { getToolText, hasMoveLimit, isConfigItemEnabled } from "../../../logic/config/config";
-import { getXpText, XP_FOR_HINT } from "../../../logic/data/experience-points";
+import { getToolInnerHtml, hasMoveLimit, isConfigItemEnabled } from "../../../logic/config/config";
+import { getXpInnerHtml, XP_FOR_HINT } from "../../../logic/data/experience-points";
 import { toggleDoOverButtonVisibility, updateGameInfoComponent } from "../game-info/game-info-component";
 import { animateXpFlyAway } from "../../xp-components/xp-components";
 import { isValidMove } from "../../../logic/gameplay/movement";
@@ -68,7 +68,7 @@ export function initHintButton(): HTMLButtonElement {
         if (!globals.gameState) return;
 
         hintButton.disabled = true;
-        await animateXpFlyAway(getXpText(XP_FOR_HINT), hintButton);
+        await animateXpFlyAway(getXpInnerHtml(XP_FOR_HINT), hintButton);
         pubSubService.publish(PubSubEvent.UPDATE_XP, XP_FOR_HINT);
 
         const hint = getBestNextMove(globals.gameState);
@@ -79,7 +79,7 @@ export function initHintButton(): HTMLButtonElement {
         }
       },
     },
-    [getTranslation(TranslationKey.HINT), " ", getXpText(XP_FOR_HINT), createKeyboardHint(HINT)],
+    [getTranslation(TranslationKey.HINT), " ", createElement({ tag: "span", html: getXpInnerHtml(XP_FOR_HINT) }), createKeyboardHint(HINT)],
   ));
 }
 
@@ -142,7 +142,7 @@ function getMoveButton(direction: Direction): HTMLButtonElement {
 
 function getToolButton(tool: Tool) {
   return (buttons[tool] ??= createButton({ onClick: () => handleMove(tool) }, [
-    createElement({ tag: "span" }, [getToolText(tool)]),
+    createElement({ tag: "span", cssClass: CssClass.ONE_LINER, html: getToolInnerHtml(tool) }),
     createKeyboardHint(tool),
   ]));
 }

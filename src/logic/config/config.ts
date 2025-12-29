@@ -4,6 +4,7 @@ import { MoveLimit } from "./move-limit";
 import { TranslationKey } from "../../translations/translationKey";
 import { getLocalStorageItem, LocalStorageKey, setLocalStorageItem } from "../../utils/local-storage";
 import { getTranslation } from "../../translations/i18n";
+import { CssClass } from "../../utils/css-class";
 
 export const allConfigItems: ConfigItemId[] = [...ALL_KITTEN_IDS, ...ALL_TOOLS, ...Object.values(MoveLimit)];
 
@@ -79,6 +80,8 @@ export function updateKnownConfigItems(newConfigItems: ConfigItemId[]) {
   knownConfigItems = newKnownConfigItems;
 }
 
-export function getToolText(tool: Tool) {
-  return tool === Tool.MEOW ? `💬 ${getTranslation(TranslationKey.MEOW)}` : `💤 ${getTranslation(TranslationKey.WAIT)}`;
+export function getToolInnerHtml(tool: Tool) {
+  return tool === Tool.MEOW
+    ? `<span class="${CssClass.EMOJI}">💬</span> ${getTranslation(TranslationKey.MEOW)}`
+    : `<span class="${CssClass.EMOJI}">💤</span> ${getTranslation(TranslationKey.WAIT)}`;
 }
