@@ -41,8 +41,9 @@ button {
   font-size: 1em;
   cursor: pointer;
   color: $text-primary;
-  border: none;
-  background: $bg-alpha-05;
+  border: 1px solid $bg-alpha-05;
+  border-bottom-width: 3px;
+  background: $bg-alpha-10;
   backdrop-filter: blur(2px);
   padding: 0.5rem 1rem;
   border-radius: $border-radius;
@@ -54,6 +55,7 @@ button {
 
   &.#{$PRIMARY}:not([disabled]) {
     background: $main-color;
+    border-color: $bg-alpha-25;
 
     @include hover {
       background: rgba($main-color, 0.7);
@@ -68,6 +70,7 @@ button {
 
   &.#{$TERTIARY} {
     background: none;
+    border: none;
     padding: 0;
     font-size: 0.8em;
     color: $main-color-tertiary;

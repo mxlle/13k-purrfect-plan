@@ -17,6 +17,10 @@ export function createObjectElement(objectId: ObjectId): HTMLElement {
     cssClass: CssClass.OBJECT_BOX,
   });
 
+  if (objectId === ObjectId.MOON) {
+    objectBox.classList.add(styles.moonBox);
+  }
+
   const objectElem = createElement({
     cssClass: `${cellTypeToCssClass[objectId]}`,
   });

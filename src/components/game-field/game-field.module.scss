@@ -30,7 +30,9 @@ $border-style: outset;
   margin: 0 auto;
   justify-content: center;
   height: fit-content;
-  border: calc(var(--s-size) / 10) solid $tile-color-alpha;
+  border: calc(var(--s-size) / 20) solid $tile-color-alpha;
+  border-bottom-width: calc(var(--s-size) / 10);
+  border-radius: 1.75rem;
   overflow: hidden;
   transition: border-color 0.3s;
 
