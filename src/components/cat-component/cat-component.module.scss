@@ -47,19 +47,19 @@ $mom: #ff2ea6;
 }
 
 .moony {
-  $moony: #c09402;
+  $moony: #ffc400;
   color: $moony;
   --d: #{color.mix($moony, rgba(black, 0.5), 50%)};
 }
 
 .ivy {
-  $ivy: #009e28;
+  $ivy: #00b22d;
   color: $ivy;
   --d: #{color.mix($ivy, rgba(black, 0.5), 50%)};
 }
 
 .splashy {
-  $splashy: #106dff;
+  $splashy: #0090ff;
   color: $splashy;
   --d: #{color.mix($splashy, rgba(black, 0.5), 50%)};
 }

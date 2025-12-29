@@ -19,7 +19,7 @@
       left: 40%;
       width: 20%;
       height: 35%;
-      background: #3d2209;
+      background: #381e06;
       border-radius: 15% / 10%;
     }
 
@@ -32,15 +32,14 @@
       width: 60%;
       height: 60%;
       border-radius: 50%;
-      background: #009e28 /* kitten’s eye color */;
-      // background: radial-gradient(circle at 40% 35%, #33cc55 0%, #009e28 60%, /* kitten’s eye color */ #00751e 100%);
+      background: #00b22d /* kitten’s eye color */;
       filter: brightness(0.6);
     }
   }
 
   .puddle {
     position: absolute;
-    $water: #105a99;
+    $water: #1063aa;
 
     border-radius: 55% 45% 62% 38% / 48% 60% 40% 52%;
     width: 80%;

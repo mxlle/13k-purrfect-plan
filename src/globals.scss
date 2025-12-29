@@ -24,7 +24,7 @@ html {
 }
 
 body {
-  background: $bg-primary;
+  background: linear-gradient(to bottom, #020111 60%, #20202c 100%);
   color: $text-primary;
   font-family: $font-family;
   user-select: none;
@@ -43,6 +43,7 @@ button {
   color: $text-primary;
   border: none;
   background: $bg-alpha-05;
+  backdrop-filter: blur(2px);
   padding: 0.5rem 1rem;
   border-radius: $border-radius;
   hyphens: none;
