@@ -20,6 +20,7 @@ import { serializeGame } from "./logic/serializer";
 import { hasUnknownConfigItems } from "./logic/config/config";
 import { getTranslation } from "./translations/i18n";
 import { TranslationKey } from "./translations/translationKey";
+import { getStarBackground } from "./components/background/star-background";
 
 if (HAS_VISUAL_NICE_TO_HAVES) {
   import("./globals.nice2have.scss");
@@ -35,6 +36,13 @@ let isInitialized = false;
 function init() {
   if (isInitialized) return;
   isInitialized = true;
+
+  const pixelCount = window.innerHeight * window.innerWidth;
+  const starCount = Math.round(pixelCount / 10000);
+
+  console.debug(`Pixel count: ${pixelCount}, star count: ${starCount}`);
+
+  document.body.append(getStarBackground(starCount));
 
   const header = createElement({
     cssClass: styles.header,
