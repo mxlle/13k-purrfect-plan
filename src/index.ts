@@ -1,9 +1,6 @@
 import "./globals.scss";
 import { PubSubEvent, pubSubService } from "./utils/pub-sub-service";
-import { initializeEmptyGameField, startNewGame } from "./components/game-field/game-field";
 import { initPoki, pokiSdk } from "./poki-integration";
-import { isOnboarding } from "./logic/onboarding";
-import { DEFAULT_FIELD_SIZE } from "./logic/data/field-size";
 import { CssClass } from "./utils/css-class";
 import { sleep } from "./utils/promise-utils";
 import { initAudio } from "./audio/music-control";
@@ -16,6 +13,8 @@ import { HeaderComponent } from "./framework/components/header/header.component"
 import { LoadGameButton } from "./components/load-game-button/load-game-button";
 import { MuteButton } from "./components/mute-button/mute-button";
 import { TotalXpInfoComponent } from "./components/xp-components/total-xp-info.component";
+import { GameAreaComponent } from "./components/game-area/game-area.component";
+import { globals } from "./globals";
 
 if (HAS_VISUAL_NICE_TO_HAVES) {
   import("./globals.nice2have.scss");
@@ -25,16 +24,20 @@ const initializeMuted = getLocalStorageItem(LocalStorageKey.MUTED) === "true";
 
 let isInitialized = false;
 
-function init() {
+async function init() {
   if (isInitialized) return;
   isInitialized = true;
 
-  document.body.append(StarBackground(), HeaderComponent(GAME_TITLE, [LoadGameButton(), MuteButton(), TotalXpInfoComponent()]));
+  const [gameArea, startNewGame] = await GameAreaComponent();
 
-  if (isOnboarding() || location.hash.length > 1) {
-    void startNewGame({ isDoOver: false });
-  } else {
-    void initializeEmptyGameField(DEFAULT_FIELD_SIZE);
+  document.body.append(
+    StarBackground(),
+    HeaderComponent(GAME_TITLE, [LoadGameButton(startNewGame), MuteButton(), TotalXpInfoComponent()]),
+    gameArea,
+  );
+
+  if (globals.gameState) {
+    void startNewGame({ isFirstGame: true, gameSetup: globals.gameState.setup });
   }
 
   pubSubService.subscribe(PubSubEvent.START_NEW_GAME, (options) => {
@@ -57,7 +60,7 @@ function init() {
 
 // INIT
 const initApp = async () => {
-  init();
+  await init();
   await sleep(0); // to make it a real promise
   await initAudio(initializeMuted);
   HAS_SIMPLE_SOUND_EFFECTS && (await initWinLoseSoundEffects());

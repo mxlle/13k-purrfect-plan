@@ -6,24 +6,6 @@
 
 $border-style: outset;
 
-.main {
-  // height: 100%;
-  // width: 100%;
-  @extend %gridCentered;
-  overflow: auto;
-  padding: 0 1rem 1rem;
-  gap: 1rem;
-  grid-template-columns: minmax(min-content, 1fr) minmax(360px, 1fr);
-  margin: 0 auto;
-  max-width: min-content;
-
-  @media (orientation: portrait) {
-    grid-template-columns: 1fr;
-    grid-template-rows: min-content auto;
-    max-width: initial;
-  }
-}
-
 .field {
   --t: #{$tile-color-1};
   position: relative;
