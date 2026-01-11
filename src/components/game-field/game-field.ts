@@ -15,6 +15,7 @@ import { isValidCellPosition } from "../../logic/checks";
 import {
   ALL_GAME_ELEMENT_IDS,
   GameElementPositions,
+  GameSetup,
   GameState,
   getHtmlElementForGameElement,
   getInitialGameState,
@@ -27,54 +28,29 @@ import { calculateNewPositions } from "../../logic/gameplay/calculate-new-positi
 import { MAX_PAR } from "../../logic/par";
 import { isMoon } from "../../logic/data/objects";
 
-const cellElements: HTMLElement[][] = [];
+interface GameFieldComponentResult {
+  element: HTMLElement;
+  initializeElementsOnGameField: (options: InitializeElementsOptions) => Promise<void>;
+  generateRandomGameWhileAnimating: (fieldSize?: FieldSize) => Promise<GameSetup>;
+}
+
+interface InitializeElementsOptions {
+  gameState: GameState;
+  nextPositionsIfWait?: GameElementPositions;
+  isInitialStart?: boolean;
+  shouldResetToInitialPosition?: boolean;
+}
 
 const TIMEOUT_BETWEEN_GAMES = 300;
 
-async function shuffleFieldAnimation(gameFieldElem: HTMLElement | undefined) {
-  if (!gameFieldElem) {
-    console.error("shuffleFieldAnimation should only be called after gameFieldElem is initialized");
-    return;
-  }
-
-  const loader = createElement({ cssClass: styles.loader, text: getTranslation(TranslationKey.LOADING) });
-
-  gameFieldElem.append(loader);
-
-  for (let i = 0; i < 2; i++) {
-    const randomState = getInitialGameState(
-      randomlyPlaceGameElementsOnField(getInitialGameSetup(), {
-        shouldCalculatePar: false,
-        randomMoonPosition: true,
-        allowLessMoves: true,
-        desiredPar: MAX_PAR,
-      }),
-    );
-    const nextPositionsIfWait = calculateNewPositions(randomState, Tool.WAIT);
-    await initializeElementsOnGameField(randomState, nextPositionsIfWait, false, true);
-    await requestAnimationFrameWithTimeout(TIMEOUT_BETWEEN_GAMES);
-  }
-
-  loader.remove();
-}
-
-export async function generateRandomGameWhileAnimating(gameFieldElem: HTMLElement | undefined, fieldSize: FieldSize = DEFAULT_FIELD_SIZE) {
-  const gameSetupPromise = generateRandomGameSetup(fieldSize);
-  const animatePromise = shuffleFieldAnimation(gameFieldElem);
-
-  const [gameSetup] = await Promise.all([gameSetupPromise, animatePromise]);
-
-  return gameSetup;
-}
-
-export function GameFieldComponent(fieldSize: FieldSize) {
-  const gameField = createElement({ cssClass: styles.field });
-  cellElements.length = 0;
+export function GameFieldComponent(fieldSize: FieldSize): GameFieldComponentResult {
+  const gameFieldElement = createElement({ cssClass: styles.field });
+  const cellElements: HTMLElement[][] = [];
 
   for (let rowIndex = 0; rowIndex < fieldSize; rowIndex++) {
     const rowElements: HTMLElement[] = [];
     const rowElem = createElement({ cssClass: styles.row });
-    gameField.append(rowElem);
+    gameFieldElement.append(rowElem);
 
     for (let columnIndex = 0; columnIndex < fieldSize; columnIndex++) {
       const cellElement = createElement({ cssClass: CssClass.CELL });
@@ -86,40 +62,68 @@ export function GameFieldComponent(fieldSize: FieldSize) {
     cellElements.push(rowElements);
   }
 
-  return gameField;
-}
+  async function shuffleFieldAnimation() {
+    const loader = createElement({ cssClass: styles.loader, text: getTranslation(TranslationKey.LOADING) });
 
-export async function initializeElementsOnGameField(
-  gameState: GameState,
-  nextPositionsIfWait: GameElementPositions | undefined,
-  isInitialStart: boolean,
-  shouldResetToInitialPosition: boolean,
-) {
-  for (const gameElementId of ALL_GAME_ELEMENT_IDS) {
-    const htmlElement = getHtmlElementForGameElement(gameElementId);
-    const initialPosition = getInitialPositionOfGameElement(gameState.setup, gameElementId);
+    gameFieldElement.append(loader);
 
-    if (initialPosition) {
-      const cellElement = cellElements[initialPosition.row]?.[initialPosition.column];
+    for (let i = 0; i < 2; i++) {
+      const randomState = getInitialGameState(
+        randomlyPlaceGameElementsOnField(getInitialGameSetup(), {
+          shouldCalculatePar: false,
+          randomMoonPosition: true,
+          allowLessMoves: true,
+          desiredPar: MAX_PAR,
+        }),
+      );
+      const nextPositionsIfWait = calculateNewPositions(randomState, Tool.WAIT);
+      await initializeElementsOnGameField({ gameState: randomState, nextPositionsIfWait, shouldResetToInitialPosition: true });
+      await requestAnimationFrameWithTimeout(TIMEOUT_BETWEEN_GAMES);
+    }
 
-      // append if not already there
-      if (!cellElement.contains(htmlElement)) {
-        cellElement.append(htmlElement);
-      } else if (shouldResetToInitialPosition) {
-        resetTransform(htmlElement);
-      }
+    loader.remove();
+  }
 
-      if (isCatId(gameElementId)) {
-        htmlElement.classList.toggle(getCatIdClass(gameElementId), !isKittenId(gameElementId) || isConfigItemEnabled(gameElementId));
+  async function generateRandomGameWhileAnimating(fieldSize: FieldSize = DEFAULT_FIELD_SIZE) {
+    const gameSetupPromise = generateRandomGameSetup(fieldSize);
+    const animatePromise = shuffleFieldAnimation();
+
+    const [gameSetup] = await Promise.all([gameSetupPromise, animatePromise]);
+
+    return gameSetup;
+  }
+
+  async function initializeElementsOnGameField(options: InitializeElementsOptions) {
+    const { gameState, nextPositionsIfWait, isInitialStart, shouldResetToInitialPosition } = options;
+
+    for (const gameElementId of ALL_GAME_ELEMENT_IDS) {
+      const htmlElement = getHtmlElementForGameElement(gameElementId);
+      const initialPosition = getInitialPositionOfGameElement(gameState.setup, gameElementId);
+
+      if (initialPosition) {
+        const cellElement = cellElements[initialPosition.row]?.[initialPosition.column];
+
+        // append if not already there
+        if (!cellElement.contains(htmlElement)) {
+          cellElement.append(htmlElement);
+        } else if (shouldResetToInitialPosition) {
+          resetTransform(htmlElement);
+        }
+
+        if (isCatId(gameElementId)) {
+          htmlElement.classList.toggle(getCatIdClass(gameElementId), !isKittenId(gameElementId) || isConfigItemEnabled(gameElementId));
+        }
       }
     }
+
+    if (!isInitialStart) {
+      await requestAnimationFrameWithTimeout(TIMEOUT_BETWEEN_GAMES);
+    }
+
+    updateAllPositions(gameState, nextPositionsIfWait);
   }
 
-  if (!isInitialStart) {
-    await requestAnimationFrameWithTimeout(TIMEOUT_BETWEEN_GAMES);
-  }
-
-  updateAllPositions(gameState, nextPositionsIfWait);
+  return { element: gameFieldElement, initializeElementsOnGameField, generateRandomGameWhileAnimating };
 }
 
 export function updateAllPositions(gameState: GameState, nextPositionsIfWait: GameElementPositions | undefined, hasWon: boolean = false) {

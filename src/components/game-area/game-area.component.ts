@@ -9,7 +9,7 @@ import {
   OnboardingData,
   wasLastOnboardingStep,
 } from "../../logic/onboarding";
-import { GameFieldComponent, generateRandomGameWhileAnimating, initializeElementsOnGameField } from "../game-field/game-field";
+import { GameFieldComponent } from "../game-field/game-field";
 import { hasUnknownConfigItems } from "../../logic/config/config";
 import { ComponentDefinition, ConfigItemId, isTool, Tool } from "../../types";
 import { isWinConditionMet } from "../../logic/checks";
@@ -35,18 +35,22 @@ type BetweenGamesCheckResult = { newConfigItem?: ConfigItemId | boolean; shouldR
 export async function GameAreaComponent(): Promise<ComponentDefinition<StartNewGameOptions>> {
   const autoStartGame = isOnboarding() || location.hash.length > 1;
   let [gameSetup] = await getGameSetup({ isInitialization: true });
-  let gameFieldElem = GameFieldComponent(gameSetup.fieldSize);
+  let gameFieldComponent = GameFieldComponent(gameSetup.fieldSize);
 
   const controlsElem = getControlsAndInfoComponent();
 
-  const hostElement = createElement({ cssClass: styles.host }, [gameFieldElem, controlsElem]);
+  const hostElement = createElement({ cssClass: styles.host }, [gameFieldComponent.element, controlsElem]);
 
   hostElement.addEventListener("scroll", () => {
     removeAllSpeechBubbles();
   });
 
   if (!autoStartGame) {
-    void initializeElementsOnGameField(globals.gameState ?? getInitialGameState(gameSetup), globals.nextPositionsIfWait, true, true);
+    void gameFieldComponent.initializeElementsOnGameField({
+      gameState: globals.gameState ?? getInitialGameState(gameSetup),
+      nextPositionsIfWait: globals.nextPositionsIfWait,
+      isInitialStart: true,
+    });
   }
 
   async function startNewGame(options: StartNewGameOptions) {
@@ -60,9 +64,7 @@ export async function GameAreaComponent(): Promise<ComponentDefinition<StartNewG
     removeAllSpeechBubbles();
     document.body.classList.remove(CssClass.WON);
 
-    const [gameSetup, onboardingData] = options.gameSetup
-      ? [options.gameSetup, getOnboardingData()]
-      : await getGameSetup(options, gameFieldElem);
+    const [gameSetup, onboardingData] = options.gameSetup ? [options.gameSetup, getOnboardingData()] : await getGameSetup(options);
 
     globals.failedAttempts = options.isDoOver ? globals.failedAttempts + 1 : 0;
     globals.nextPositionsIfWait = calculateNewPositions(globals.gameState, Tool.WAIT);
@@ -78,44 +80,47 @@ export async function GameAreaComponent(): Promise<ComponentDefinition<StartNewG
 
     if (betweenGamesCheckResult.shouldReplaceGameField) {
       console.debug("Replacing game field for new setup", gameSetup);
-      const newGameFieldElem = GameFieldComponent(gameSetup.fieldSize);
-      gameFieldElem.replaceWith(newGameFieldElem);
-      gameFieldElem = newGameFieldElem;
+      const newGameFieldComponent = GameFieldComponent(gameSetup.fieldSize);
+      gameFieldComponent.element.replaceWith(newGameFieldComponent.element);
+      gameFieldComponent = newGameFieldComponent;
       await requestAnimationFrameWithTimeout(TIMEOUT_BETWEEN_GAMES);
     }
 
-    await initializeElementsOnGameField(globals.gameState, globals.nextPositionsIfWait, false, !options.isDoOver);
+    await gameFieldComponent.initializeElementsOnGameField({
+      gameState: globals.gameState,
+      nextPositionsIfWait: globals.nextPositionsIfWait,
+      shouldResetToInitialPosition: !options.isDoOver,
+    });
 
     addOnboardingSuggestionIfApplicable(onboardingData, betweenGamesCheckResult.newConfigItem);
   }
 
-  return [hostElement, startNewGame];
-}
+  async function getGameSetup(
+    options: StartNewGameOptions & { isInitialization?: boolean },
+  ): Promise<[gameSetup: GameSetup, onboardingData: OnboardingData | undefined]> {
+    const onboardingData: OnboardingData | undefined = getOnboardingData();
 
-async function getGameSetup(
-  options: StartNewGameOptions & { isInitialization?: boolean },
-  gameFieldElem?: HTMLElement | undefined,
-): Promise<[gameSetup: GameSetup, onboardingData: OnboardingData | undefined]> {
-  const onboardingData: OnboardingData | undefined = getOnboardingData();
-
-  if (options.isInitialization && !onboardingData && !location.hash.length) {
-    return [getInitialGameSetup(), undefined];
-  }
-
-  let gameSetup = determineGameSetup(options, onboardingData);
-  if (gameSetup === null) {
-    gameSetup = await generateRandomGameWhileAnimating(gameFieldElem);
-  }
-
-  if (IS_DEV) {
-    if (!isValidGameSetup(gameSetup)) {
-      throw new Error("Generated or provided game setup is invalid, cannot start game.", { cause: gameSetup });
+    if (options.isInitialization && !onboardingData && !location.hash.length) {
+      return [getInitialGameSetup(), undefined];
     }
+
+    let gameSetup = determineGameSetup(options, onboardingData);
+    if (gameSetup === null) {
+      gameSetup = await gameFieldComponent.generateRandomGameWhileAnimating();
+    }
+
+    if (IS_DEV) {
+      if (!isValidGameSetup(gameSetup)) {
+        throw new Error("Generated or provided game setup is invalid, cannot start game.", { cause: gameSetup });
+      }
+    }
+
+    globals.gameState = getInitialGameState(gameSetup);
+
+    return [gameSetup, onboardingData];
   }
 
-  globals.gameState = getInitialGameState(gameSetup);
-
-  return [gameSetup, onboardingData];
+  return [hostElement, startNewGame];
 }
 
 async function betweenGamesCheck(): Promise<BetweenGamesCheckResult> {
