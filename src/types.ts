@@ -59,3 +59,8 @@ export const Difficulty = defineEnum({
   MEDIUM: 2,
   HARD: 3,
 });
+
+export type ComponentDefinition<UpdateOptions = unknown, R = void> = [
+  hostElement: HTMLElement,
+  updateFunction?: (options?: UpdateOptions) => R,
+];

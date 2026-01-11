@@ -5,7 +5,6 @@ export const HAS_VISUAL_NICE_TO_HAVES = !IS_JS13K;
 export const HAS_GAMEPLAY_NICE_TO_HAVES = !IS_JS13K;
 export const HAS_ADVANCED_DEBUGGING = !IS_JS13K;
 export const HAS_SHORT_TEXTS = IS_JS13K;
-export const HAS_MUTE_BUTTON = true;
 export const HAS_SIMPLE_SOUND_EFFECTS = true;
 export const HAS_SPOKEN_MEOW = false;
 export const HAS_RECORDED_SOUND_EFFECTS = !IS_JS13K && !IS_POKI_ENABLED;
