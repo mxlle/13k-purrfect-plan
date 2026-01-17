@@ -63,8 +63,8 @@ export function openLevelSelection(onClose: (isSubmit: boolean) => void = () => 
   dialog.open();
 }
 
-export function updateAvailableLevels(configStringOfWonLevel: string): void {
-  let activeLevel = levels.findIndex((level) => level.configString === configStringOfWonLevel);
+export function updateAvailableLevels(): void {
+  let activeLevel = getCurrentLevelIndexFromLocation();
 
   if (activeLevel === -1) {
     return;
@@ -81,4 +81,10 @@ export function updateAvailableLevels(configStringOfWonLevel: string): void {
 
   console.debug("updating active level to", newHighestLevel + 1); // another plus one for humans
   setLocalStorageItem(LocalStorageKey.LEVEL, newHighestLevel.toString());
+}
+
+export function getCurrentLevelIndexFromLocation(): number {
+  const configString = decodeURI(location.hash.replace("#", ""));
+
+  return levels.findIndex((level) => level.configString === configString);
 }
