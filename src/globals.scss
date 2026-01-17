@@ -26,7 +26,7 @@ html {
 body {
   background: linear-gradient(to bottom, #020111 60%, #20202c 100%);
   color: $text-primary;
-  font-family: $font-family;
+  font-family: $font-family-special;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
   hyphens: auto;
@@ -37,7 +37,7 @@ body {
 }
 
 button {
-  // font-family: $font-family;
+  font-family: inherit;
   font-size: 1em;
   cursor: pointer;
   color: $text-primary;

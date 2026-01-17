@@ -2,7 +2,7 @@ import { createButton, createElement } from "../../utils/html-utils";
 import styles from "./level-selection.module.scss";
 import { levels } from "../../logic/levels";
 import { CssClass } from "../../utils/css-class";
-import { createDialog, Dialog } from "../dialog/dialog";
+import { createDialog, Dialog } from "../../framework/components/dialog/dialog";
 import { getLocalStorageItem, LocalStorageKey, setLocalStorageItem } from "../../utils/local-storage";
 import { PubSubEvent, pubSubService } from "../../utils/pub-sub-service";
 

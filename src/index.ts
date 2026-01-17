@@ -1,113 +1,44 @@
 import "./globals.scss";
-import styles from "./index.module.scss";
-import { createButton, createElement } from "./utils/html-utils";
 import { PubSubEvent, pubSubService } from "./utils/pub-sub-service";
-import { initializeEmptyGameField, startNewGame } from "./components/game-field/game-field";
 import { initPoki, pokiSdk } from "./poki-integration";
-import { isOnboarding } from "./logic/onboarding";
-import { DEFAULT_FIELD_SIZE } from "./logic/data/field-size";
 import { CssClass } from "./utils/css-class";
 import { sleep } from "./utils/promise-utils";
-import { changeXP, getCurrentXP, getXpInnerHtml } from "./logic/data/experience-points";
-import { animateNumber } from "./utils/custom-animation-util";
-import { initAudio, togglePlayer } from "./audio/music-control";
+import { initAudio } from "./audio/music-control";
 import { getLocalStorageItem, LocalStorageKey } from "./utils/local-storage";
-import { GAME_TITLE, HAS_MUTE_BUTTON, HAS_SIMPLE_SOUND_EFFECTS, HAS_VISUAL_NICE_TO_HAVES, IS_POKI_ENABLED } from "./env-utils";
+import { GAME_TITLE, HAS_SIMPLE_SOUND_EFFECTS, HAS_VISUAL_NICE_TO_HAVES, IS_POKI_ENABLED } from "./env-utils";
 import { initWinLoseSoundEffects, loseSoundSrcUrl, winSoundSrcUrl } from "./audio/sound-control/sound-control-box";
 import { playSound } from "./audio/sound-control/sound-control";
+import { StarBackground } from "./components/background/star-background";
+import { HeaderComponent } from "./framework/components/header/header.component";
+import { LoadGameButton } from "./components/global-elements/load-game-button/load-game-button";
+import { MuteButton } from "./components/global-elements/mute-button/mute-button";
+import { TotalXpInfoComponent } from "./components/global-elements/xp-components/total-xp-info.component";
+import { GameAreaComponent } from "./components/game-area/game-area.component";
 import { globals } from "./globals";
-import { serializeGame } from "./logic/serializer";
-import { hasUnknownConfigItems } from "./logic/config/config";
-import { getTranslation } from "./translations/i18n";
-import { TranslationKey } from "./translations/translationKey";
-import { getStarBackground } from "./components/background/star-background";
 import { updateActiveLevel } from "./components/level-selection/level-selection";
 
 if (HAS_VISUAL_NICE_TO_HAVES) {
   import("./globals.nice2have.scss");
 }
 
-let titleElement: HTMLElement;
-let xpElement: HTMLElement;
-
 const initializeMuted = getLocalStorageItem(LocalStorageKey.MUTED) === "true";
 
 let isInitialized = false;
 
-function init() {
+async function init() {
   if (isInitialized) return;
   isInitialized = true;
 
-  const pixelCount = window.innerHeight * window.innerWidth;
-  const starCount = Math.round(pixelCount / 10000);
+  const [gameArea, startNewGame] = await GameAreaComponent();
 
-  console.debug(`Pixel count: ${pixelCount}, star count: ${starCount}`);
+  document.body.append(
+    StarBackground(),
+    HeaderComponent(GAME_TITLE, [LoadGameButton(startNewGame), MuteButton(), TotalXpInfoComponent()]),
+    gameArea,
+  );
 
-  document.body.append(getStarBackground(starCount));
-
-  const header = createElement({
-    cssClass: styles.header,
-  });
-
-  titleElement = createElement({
-    cssClass: styles.title,
-    text: GAME_TITLE,
-  });
-
-  header.append(titleElement);
-
-  const btnContainer = createElement({
-    cssClass: styles.headerButtons,
-  });
-
-  const loadGameButton = createButton({
-    text: "📂",
-    onClick: () => {
-      const currentSerializedGame = globals.gameState ? serializeGame(globals.gameState.setup) : "";
-      const serializedGameSetup = window.prompt(getTranslation(TranslationKey.SHARE_LOAD_GAME), currentSerializedGame);
-
-      if (serializedGameSetup) {
-        void startNewGame({ serializedGameSetup, isDoOver: false });
-      }
-    },
-    cssClass: [CssClass.ICON_BTN, CssClass.SECONDARY],
-  });
-
-  loadGameButton.style.setProperty("filter", "saturate(0)");
-
-  btnContainer.append(loadGameButton);
-
-  function updateLoadButtonVisibility() {
-    loadGameButton.classList.toggle(CssClass.OPACITY_HIDDEN, hasUnknownConfigItems());
-  }
-
-  updateLoadButtonVisibility();
-
-  if (HAS_MUTE_BUTTON) {
-    const muteButton = createButton({
-      text: initializeMuted ? "🔇" : "🔊",
-      onClick: (event: MouseEvent) => {
-        const isActive = togglePlayer();
-        (event.target as HTMLElement).textContent = isActive ? "🔊" : "🔇";
-      },
-      cssClass: [CssClass.ICON_BTN, CssClass.SECONDARY],
-    });
-
-    btnContainer.append(muteButton);
-  }
-
-  xpElement = createElement();
-  updateXpElement();
-  btnContainer.append(xpElement);
-
-  header.append(btnContainer);
-
-  document.body.append(header);
-
-  if (isOnboarding() || location.hash.length > 1) {
-    void startNewGame({ isDoOver: false });
-  } else {
-    void initializeEmptyGameField(DEFAULT_FIELD_SIZE);
+  if (globals.gameState) {
+    void startNewGame({ isFirstGame: true, gameSetup: globals.gameState.setup });
   }
 
   pubSubService.subscribe(PubSubEvent.START_NEW_GAME, (options) => {
@@ -116,8 +47,6 @@ function init() {
 
   pubSubService.subscribe(PubSubEvent.GAME_END, (result) => {
     result.isWon && document.body.classList.add(CssClass.WON);
-
-    updateLoadButtonVisibility();
 
     updateActiveLevel(decodeURI(location.hash.replace("#", "")));
 
@@ -130,37 +59,11 @@ function init() {
       sleep(300).then(() => pokiSdk.gameplayStop()); // to avoid issue that stop is called before start
     }
   });
-
-  pubSubService.subscribe(PubSubEvent.UPDATE_XP, (newXP) => {
-    updateXpWithAnimation(newXP);
-  });
-}
-
-function updateXpWithAnimation(newXP: number) {
-  const oldXP = getCurrentXP();
-  const targetXP = changeXP(newXP);
-
-  if (HAS_VISUAL_NICE_TO_HAVES) {
-    animateNumber({
-      keyframeDuration: Math.abs(newXP) * 80,
-      initialState: oldXP,
-      exitState: targetXP,
-      onProgress: (current) => {
-        updateXpElement(Math.round(current));
-      },
-    });
-  } else {
-    updateXpElement(targetXP);
-  }
-}
-
-function updateXpElement(xp: number = getCurrentXP()) {
-  xpElement.innerHTML = getXpInnerHtml(xp);
 }
 
 // INIT
 const initApp = async () => {
-  init();
+  await init();
   await sleep(0); // to make it a real promise
   await initAudio(initializeMuted);
   HAS_SIMPLE_SOUND_EFFECTS && (await initWinLoseSoundEffects());

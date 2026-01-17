@@ -1,5 +1,5 @@
 import { CellPosition } from "./cell";
-import { createObjectElement } from "../../components/object-component/object-component";
+import { createObjectElement } from "../../components/game-elements/object-component/object-component";
 import { ObjectId } from "../../types";
 
 export const ALL_OBJECT_IDS: ObjectId[] = Object.values(ObjectId);

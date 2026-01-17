@@ -1,4 +1,4 @@
-import { createDialog, Dialog } from "../dialog/dialog";
+import { createDialog, Dialog } from "../../framework/components/dialog/dialog";
 import { createButton, createElement, resetTransform } from "../../utils/html-utils";
 import {
   allConfigItems,
@@ -14,10 +14,10 @@ import { ConfigItemId, isTool } from "../../types";
 import styles from "./config-chooser-component.module.scss";
 import { getTranslation } from "../../translations/i18n";
 import { TranslationKey } from "../../translations/translationKey";
-import { getCatIdClass } from "../cat-component/cat-component";
+import { getCatIdClass } from "../game-elements/cat-component/cat-component";
 import { sleep } from "../../utils/promise-utils";
 import { CssClass } from "../../utils/css-class";
-import { moveLimitLabels } from "../../logic/config/move-limit";
+import { MoveLimit } from "../../logic/config/move-limit";
 
 let chooserDialog: Dialog | undefined;
 
@@ -117,7 +117,7 @@ function getChoiceElement(configItem: ConfigItemId, chooseItem: (event: MouseEve
         innerChild.classList.add(getCatIdClass(configItem));
       } else {
         event.target.innerHTML = `<span class="${CssClass.ONE_LINER}">${
-          isTool(configItem) ? getToolInnerHtml(configItem) : moveLimitLabels[configItem]
+          isTool(configItem) ? getToolInnerHtml(configItem) : getMoveLimitLabel(configItem)
         }</span>`;
       }
 
@@ -130,4 +130,13 @@ function getChoiceElement(configItem: ConfigItemId, chooseItem: (event: MouseEve
   }
 
   return configItemElement;
+}
+
+function getMoveLimitLabel(moveLimit: MoveLimit) {
+  switch (moveLimit) {
+    case MoveLimit.MOVE_LIMIT_SIMPLE:
+      return `<span class="${CssClass.EMOJI}">⏳🌜</span>`;
+    case MoveLimit.MOVE_LIMIT_STRICT:
+      return `<span class="${CssClass.EMOJI}">⏳</span>5!`;
+  }
 }

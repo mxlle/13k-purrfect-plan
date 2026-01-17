@@ -1,0 +1,36 @@
+@use "../../../theme";
+@use "../../../names" as *;
+
+.arrow {
+  @extend %gridCentered;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.3s;
+
+  svg {
+    color: currentColor;
+    width: 75%;
+    height: 75%;
+  }
+
+  &.right {
+  }
+  &.left {
+    transform: rotate(180deg);
+  }
+
+  &.up {
+    transform: rotate(270deg);
+  }
+
+  &.down {
+    transform: rotate(90deg);
+  }
+
+  :global(.#{$CAT_BOX}) & {
+    position: absolute;
+    top: 0;
+    opacity: 0.15;
+    z-index: -1;
+  }
+}

@@ -1,0 +1,22 @@
+@use "../../../theme";
+@use "../../../names";
+
+.host {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 1rem 0;
+  align-items: center;
+  gap: 1rem;
+  font-family: theme.$font-family-special;
+}
+
+.title {
+  color: theme.$main-color;
+}
+
+.endElements {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+}

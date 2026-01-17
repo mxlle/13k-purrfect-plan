@@ -1,0 +1,94 @@
+@use "../../../theme" as *;
+@use "../../../names" as *;
+
+$moon: #ffb450;
+
+:global(.#{$OBJECT_BOX}) {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transition: opacity 0.3s;
+
+  &.moon-box::before {
+    $shadowSize: calc(var(--s-size) * var(--s-cnt) * 2);
+    content: "";
+    width: $shadowSize;
+    height: $shadowSize;
+    transform: translate(-50%, -50%);
+    top: 50%;
+    left: 50%;
+    background: radial-gradient(circle, rgba($moon, 0.175) 0%, rgba($moon, 0.075) 20%, rgba($moon, 0) 40%);
+    display: block;
+    position: absolute;
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  :global(.#{$DARKNESS}):not(:global(.#{$WON})) & {
+    opacity: 0.2;
+  }
+
+  .tree {
+    &::before {
+      content: "";
+      position: absolute;
+      bottom: 10%;
+      left: 40%;
+      width: 20%;
+      height: 35%;
+      background: #381e06;
+      border-radius: 15% / 10%;
+    }
+
+    /* crown */
+    &::after {
+      content: "";
+      position: absolute;
+      bottom: 35%;
+      left: 20%;
+      width: 60%;
+      height: 60%;
+      border-radius: 50%;
+      background: #00b22d /* kitten’s eye color */;
+      filter: brightness(0.6);
+    }
+  }
+
+  .puddle {
+    position: absolute;
+    $water: #1063aa;
+
+    border-radius: 55% 45% 62% 38% / 48% 60% 40% 52%;
+    width: 80%;
+    height: 80%;
+    top: 10%;
+    left: 10%;
+
+    background: $water;
+    //background:
+    //  radial-gradient(120px 90px at 62% 38%, rgba(170, 210, 255, 0.25), rgba(170, 210, 255, 0) 60%),
+    //  radial-gradient(80px 60px at 34% 68%, rgba(140, 190, 255, 0.2), rgba(140, 190, 255, 0) 60%), $water;
+  }
+
+  .moon {
+    position: absolute;
+    top: 5%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 50%;
+    height: 50%;
+    border-radius: 50%;
+    background: $moon;
+    z-index: 1;
+
+    &::after {
+      content: "";
+      width: 90%;
+      height: 90%;
+      transform: translateX(40%); /* x shift = crescent thickness */
+      position: absolute;
+      border-radius: 50%;
+      background: var(--t); /* same as grass/sky background color */
+    }
+  }
+}

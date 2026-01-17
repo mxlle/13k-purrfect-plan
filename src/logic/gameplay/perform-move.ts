@@ -2,13 +2,13 @@ import { isTool, Tool, TurnMove } from "../../types";
 import { PubSubEvent, pubSubService } from "../../utils/pub-sub-service";
 import { getKittensOnCell, isMoveLimitExceeded, isWinConditionMet } from "../checks";
 import { ALL_KITTEN_IDS, CatId } from "../data/catId";
-import { updateAllPositions } from "../../components/game-field/game-field";
+import { updateAllPositions } from "../../components/game-area/game-field/game-field";
 import { sleep } from "../../utils/promise-utils";
 import { GameState, getHtmlElementForGameElement } from "../data/game-elements";
 
-import { kittenMeows, meow } from "../../components/cat-component/cat-component";
+import { kittenMeows, meow } from "../../components/game-elements/cat-component/cat-component";
 import { globals, isGameInProgress } from "../../globals";
-import { removeAllSpeechBubbles, showSpeechBubble } from "../../components/speech-bubble/speech-bubble";
+import { removeAllSpeechBubbles, showSpeechBubble } from "../../components/game-elements/speech-bubble/speech-bubble";
 import { getTranslation } from "../../translations/i18n";
 import { TranslationKey } from "../../translations/translationKey";
 import { pokiSdk } from "../../poki-integration";

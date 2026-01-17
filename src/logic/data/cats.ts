@@ -1,4 +1,4 @@
-import { createCatElement } from "../../components/cat-component/cat-component";
+import { createCatElement } from "../../components/game-elements/cat-component/cat-component";
 import { ALL_CAT_IDS, CatId } from "./catId";
 
 export const CAT_NAMES: Record<CatId, string> = {
