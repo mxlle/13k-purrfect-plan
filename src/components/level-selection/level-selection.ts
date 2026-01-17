@@ -49,15 +49,22 @@ export function openLevelSelection(): void {
   dialog.open();
 }
 
-export function updateActiveLevel(configString: string): void {
-  let activeLevel = levels.findIndex((level) => level.configString === configString);
+export function updateAvailableLevels(configStringOfWonLevel: string): void {
+  let activeLevel = levels.findIndex((level) => level.configString === configStringOfWonLevel);
 
   if (activeLevel === -1) {
     return;
   }
 
-  activeLevel++;
+  const currentHighestLevelString = getLocalStorageItem(LocalStorageKey.LEVEL) || "0";
+  const currentHighestLevel = parseInt(currentHighestLevelString);
 
-  console.debug("updating active level to", activeLevel + 1);
-  setLocalStorageItem(LocalStorageKey.LEVEL, activeLevel.toString());
+  if (activeLevel < currentHighestLevel) {
+    return;
+  }
+
+  const newHighestLevel = activeLevel + 1;
+
+  console.debug("updating active level to", newHighestLevel + 1); // another plus one for humans
+  setLocalStorageItem(LocalStorageKey.LEVEL, newHighestLevel.toString());
 }

@@ -15,7 +15,7 @@ import { MuteButton } from "./components/global-elements/mute-button/mute-button
 import { TotalXpInfoComponent } from "./components/global-elements/xp-components/total-xp-info.component";
 import { GameAreaComponent } from "./components/game-area/game-area.component";
 import { globals } from "./globals";
-import { updateActiveLevel } from "./components/level-selection/level-selection";
+import { updateAvailableLevels } from "./components/level-selection/level-selection";
 import { LoadLevelButton } from "./components/global-elements/load-level-button/load-level-button";
 
 if (HAS_VISUAL_NICE_TO_HAVES) {
@@ -49,7 +49,7 @@ async function init() {
   pubSubService.subscribe(PubSubEvent.GAME_END, (result) => {
     if (result.isWon) {
       document.body.classList.add(CssClass.WON);
-      updateActiveLevel(decodeURI(location.hash.replace("#", "")));
+      updateAvailableLevels(decodeURI(location.hash.replace("#", "")));
     }
 
     if (HAS_SIMPLE_SOUND_EFFECTS) {
