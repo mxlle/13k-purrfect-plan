@@ -1,0 +1,41 @@
+@use "../../../theme";
+@use "../../../names" as *;
+
+.dialog {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background: theme.$dialog-bg;
+  color: theme.$text-primary;
+  display: grid;
+  grid-template-rows: 1fr min-content;
+  text-align: center;
+  z-index: 50;
+  transition:
+    transform 0.5s,
+    opacity 0.5s;
+
+  &:not(.open) {
+    transform: translateY(100%);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .content {
+    display: grid;
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    &.overflow {
+      align-content: start;
+    }
+  }
+}
+
+.btns {
+  @extend %gridCentered;
+  padding: 1rem;
+  padding-bottom: 2rem;
+}

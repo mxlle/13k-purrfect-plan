@@ -10,9 +10,9 @@ import { initWinLoseSoundEffects, loseSoundSrcUrl, winSoundSrcUrl } from "./audi
 import { playSound } from "./audio/sound-control/sound-control";
 import { StarBackground } from "./components/background/star-background";
 import { HeaderComponent } from "./framework/components/header/header.component";
-import { LoadGameButton } from "./components/load-game-button/load-game-button";
-import { MuteButton } from "./components/mute-button/mute-button";
-import { TotalXpInfoComponent } from "./components/xp-components/total-xp-info.component";
+import { LoadGameButton } from "./components/global-elements/load-game-button/load-game-button";
+import { MuteButton } from "./components/global-elements/mute-button/mute-button";
+import { TotalXpInfoComponent } from "./components/global-elements/xp-components/total-xp-info.component";
 import { GameAreaComponent } from "./components/game-area/game-area.component";
 import { globals } from "./globals";
 

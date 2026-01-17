@@ -1,4 +1,4 @@
-import { createDialog, Dialog } from "../dialog/dialog";
+import { createDialog, Dialog } from "../../framework/components/dialog/dialog";
 import { createButton, createElement, resetTransform } from "../../utils/html-utils";
 import {
   allConfigItems,
@@ -14,7 +14,7 @@ import { ConfigItemId, isTool } from "../../types";
 import styles from "./config-chooser-component.module.scss";
 import { getTranslation } from "../../translations/i18n";
 import { TranslationKey } from "../../translations/translationKey";
-import { getCatIdClass } from "../cat-component/cat-component";
+import { getCatIdClass } from "../game-elements/cat-component/cat-component";
 import { sleep } from "../../utils/promise-utils";
 import { CssClass } from "../../utils/css-class";
 import { MoveLimit } from "../../logic/config/move-limit";

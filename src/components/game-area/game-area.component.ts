@@ -1,6 +1,6 @@
 import { createElement } from "../../utils/html-utils";
 import styles from "./game-area.module.scss";
-import { removeAllSpeechBubbles } from "../speech-bubble/speech-bubble";
+import { removeAllSpeechBubbles } from "../game-elements/speech-bubble/speech-bubble";
 import {
   getOnboardingData,
   increaseOnboardingStepIfApplicable,
@@ -9,7 +9,7 @@ import {
   OnboardingData,
   wasLastOnboardingStep,
 } from "../../logic/onboarding";
-import { GameFieldComponent } from "../game-field/game-field";
+import { GameFieldComponent } from "./game-field/game-field";
 import { hasUnknownConfigItems } from "../../logic/config/config";
 import { ComponentDefinition, ConfigItemId, isTool, Tool } from "../../types";
 import { isWinConditionMet } from "../../logic/checks";
@@ -20,12 +20,12 @@ import { HAS_LOCATION_SERIALIZATION, IS_DEV, IS_POKI_ENABLED } from "../../env-u
 import { handlePokiCommercial } from "../../poki-integration";
 import { determineGameSetup, GameSetup, getInitialGameState, isValidGameSetup } from "../../logic/data/game-elements";
 import { getInitialGameSetup } from "../../logic/initialize";
-import { getControlsAndInfoComponent } from "../controls-and-info/controls-and-info-component";
+import { getControlsAndInfoComponent } from "./controls-and-info/controls-and-info-component";
 import { calculateNewPositions } from "../../logic/gameplay/calculate-new-positions";
 import { serializeGame } from "../../logic/serializer";
 import { PubSubEvent, pubSubService } from "../../utils/pub-sub-service";
 import { requestAnimationFrameWithTimeout } from "../../utils/promise-utils";
-import { activateOnboardingHighlight } from "../controls-and-info/controls/controls-component";
+import { activateOnboardingHighlight } from "./controls-and-info/controls/controls-component";
 
 const TIMEOUT_BETWEEN_GAMES = 300;
 
