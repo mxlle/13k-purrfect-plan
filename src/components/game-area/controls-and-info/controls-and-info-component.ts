@@ -6,7 +6,7 @@ import styles from "./controls-and-info-component.module.scss";
 import { getTranslation } from "../../../translations/i18n";
 import { TranslationKey } from "../../../translations/translationKey";
 import { isOnboarding } from "../../../logic/onboarding";
-import { hasMoveLimit, isConfigItemEnabled } from "../../../logic/config/config";
+import { hasMoveLimit, hasUnknownConfigItems, isConfigItemEnabled } from "../../../logic/config/config";
 import { PubSubEvent, pubSubService } from "../../../utils/pub-sub-service";
 import {
   getGameInfoComponent,
@@ -92,6 +92,8 @@ function addNewGameButtons(isInitialStart = false) {
     isWinConditionMet(globals.gameState) && (!hasMoveLimit() || globals.gameState.moves.length <= getParFromGameState(globals.gameState));
   const shouldShowRedoButton = !isInitialStart && hasMoveLimit() && !hasAchievedGoal;
   const newXp = hasAchievedGoal ? calculateNewXP() : 0;
+  let hasCollectedXp = false;
+  let xpElement: HTMLElement | undefined;
 
   const newGameContainer = createElement({ cssClass: styles.newGameContainer });
 
@@ -99,33 +101,42 @@ function addNewGameButtons(isInitialStart = false) {
     newGameContainer.remove();
   });
 
+  if (hasAchievedGoal) {
+    xpElement = createElement({
+      html: HAS_SHORT_TEXTS ? `+${getXpInnerHtml(newXp)}` : getTranslation(TranslationKey.COLLECT_XP, getXpInnerHtml(newXp)),
+      cssClass: styles.xpInfo,
+    });
+  }
+
   const continueButton = createButton({
     text: getTranslation(
       isInitialStart ? TranslationKey.START_GAME : shouldShowRedoButton ? TranslationKey.NEW_GAME : TranslationKey.CONTINUE,
     ),
     cssClass: CssClass.PRIMARY,
     onClick: async () => {
-      if (hasAchievedGoal) {
-        continueButton.classList.add(CssClass.OPACITY_HIDDEN);
+      if (hasAchievedGoal && !hasCollectedXp) {
+        hasCollectedXp = true;
+        continueButton.disabled = true;
+        xpElement?.classList.add(CssClass.OPACITY_HIDDEN);
         await collectXp(continueButton, newXp);
       }
 
-      // pubSubService.publish(PubSubEvent.START_NEW_GAME, { isDoOver: false });
-      newGameContainer.remove();
-      hideRetryInfo();
-      openLevelSelection();
+      if (hasUnknownConfigItems()) {
+        pubSubService.publish(PubSubEvent.START_NEW_GAME, { isDoOver: false });
+        newGameContainer.remove();
+        newGameContainer.remove();
+      } else {
+        openLevelSelection((isSubmit: boolean) => {
+          continueButton.disabled = false;
+          isSubmit && hideRetryInfo();
+        });
+      }
     },
   });
 
   newGameContainer.append(continueButton);
 
-  if (hasAchievedGoal) {
-    const xpElement = createElement({
-      html: HAS_SHORT_TEXTS ? `+${getXpInnerHtml(newXp)}` : getTranslation(TranslationKey.COLLECT_XP, getXpInnerHtml(newXp)),
-      cssClass: styles.xpInfo,
-    });
-    newGameContainer.append(xpElement);
-  }
+  if (xpElement) newGameContainer.append(xpElement);
 
   if (shouldShowRedoButton) {
     const restartButton = createButton({

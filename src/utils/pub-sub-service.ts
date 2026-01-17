@@ -73,8 +73,6 @@ export class PubSubService {
       return;
     }
 
-    console.debug("PubSubService.publish", { event, data });
-
     this._subscriptions[event].forEach((cb) => cb(data));
   }
 }

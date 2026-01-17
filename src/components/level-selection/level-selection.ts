@@ -6,12 +6,15 @@ import { createDialog, Dialog } from "../../framework/components/dialog/dialog";
 import { getLocalStorageItem, LocalStorageKey, setLocalStorageItem } from "../../utils/local-storage";
 import { PubSubEvent, pubSubService } from "../../utils/pub-sub-service";
 import { deserializeGame } from "../../logic/serializer";
+import { getTranslation } from "../../translations/i18n";
+import { TranslationKey } from "../../translations/translationKey";
 
 let dialog: Dialog | undefined;
 
-export function openLevelSelection(): void {
+export function openLevelSelection(onClose: (isSubmit: boolean) => void = () => {}): void {
   const activeLevelString = getLocalStorageItem(LocalStorageKey.LEVEL) || "0";
   const activeLevel = parseInt(activeLevelString);
+  let hasHighlightedLevel = false;
 
   const levelGrid = createElement({ cssClass: styles.levelGrid });
   for (let i = 0; i < levels.length; i++) {
@@ -21,9 +24,7 @@ export function openLevelSelection(): void {
       cssClass: [CssClass.SECONDARY, styles.levelButton],
       text: levelNumber.toString(),
       onClick: () => {
-        if (dialog) {
-          dialog.close(true);
-        }
+        dialog?.close(true);
 
         console.debug("level selected", level);
 
@@ -39,13 +40,26 @@ export function openLevelSelection(): void {
     } else if (i === activeLevel) {
       levelButton.classList.remove(CssClass.SECONDARY);
       levelButton.classList.add(CssClass.PRIMARY);
+      hasHighlightedLevel = true;
     }
 
     levelGrid.append(levelButton);
   }
 
-  dialog = createDialog(levelGrid);
-  dialog.submitButton.classList.add(CssClass.OPACITY_HIDDEN);
+  levelGrid.append(
+    createButton({
+      cssClass: [styles.randomGameButton, hasHighlightedLevel ? CssClass.SECONDARY : CssClass.PRIMARY],
+      text: getTranslation(TranslationKey.RANDOM_GAME),
+      onClick: () => {
+        dialog?.close(true);
+        pubSubService.publish(PubSubEvent.START_NEW_GAME, { isDoOver: false });
+      },
+    }),
+  );
+
+  dialog = createDialog(levelGrid, onClose);
+  dialog.submitButton.innerText = getTranslation(TranslationKey.CANCEL);
+  dialog.submitButton.classList.remove(CssClass.PRIMARY);
   dialog.open();
 }
 

@@ -42,4 +42,6 @@ const deTranslations: Record<TranslationKey, string> = {
   [TranslationKey.RECORD]: "Miau aufnehmen",
   [TranslationKey.DELETE_RECORD]: "Miau löschen",
   [TranslationKey.SHARE_LOAD_GAME]: "Spiel teilen oder laden mit Emoji-Code",
+  [TranslationKey.CANCEL]: "Abbrechen",
+  [TranslationKey.RANDOM_GAME]: "Zufälliges Spiel",
 };

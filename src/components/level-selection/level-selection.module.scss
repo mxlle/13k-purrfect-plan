@@ -14,4 +14,12 @@
     font-size: 2em;
     aspect-ratio: 1;
   }
+
+  .random-game-button {
+    grid-column: 1 / -1;
+    justify-self: center;
+    font-size: 1.5em;
+    min-height: 80px;
+    max-width: 400px;
+  }
 }

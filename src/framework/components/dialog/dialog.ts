@@ -14,7 +14,7 @@ export interface Dialog {
   destroy: () => void;
 }
 
-export function createDialog(innerElement: HTMLElement): Dialog {
+export function createDialog(innerElement: HTMLElement, onClose: (isSubmit: boolean) => void = () => {}): Dialog {
   const dialog = createElement({
     cssClass: styles.dialog,
     onClick: (event) => event.stopPropagation(), // TODO - why?
@@ -24,6 +24,7 @@ export function createDialog(innerElement: HTMLElement): Dialog {
 
   function closeDialog(confirm: boolean) {
     dialog.classList.remove(styles.open);
+    onClose(confirm);
     pubSubService.publish(PubSubEvent.CLOSE_DIALOG, confirm);
   }
 

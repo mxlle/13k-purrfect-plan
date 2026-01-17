@@ -33,4 +33,6 @@ export const TranslationKey = defineEnum({
   RECORD: 28,
   DELETE_RECORD: 29,
   SHARE_LOAD_GAME: 30,
+  CANCEL: 31,
+  RANDOM_GAME: 32,
 });
