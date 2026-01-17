@@ -16,6 +16,7 @@ import { TotalXpInfoComponent } from "./components/global-elements/xp-components
 import { GameAreaComponent } from "./components/game-area/game-area.component";
 import { globals } from "./globals";
 import { updateActiveLevel } from "./components/level-selection/level-selection";
+import { LoadLevelButton } from "./components/global-elements/load-level-button/load-level-button";
 
 if (HAS_VISUAL_NICE_TO_HAVES) {
   import("./globals.nice2have.scss");
@@ -33,7 +34,7 @@ async function init() {
 
   document.body.append(
     StarBackground(),
-    HeaderComponent(GAME_TITLE, [LoadGameButton(startNewGame), MuteButton(), TotalXpInfoComponent()]),
+    HeaderComponent(GAME_TITLE, [LoadLevelButton(), LoadGameButton(startNewGame), MuteButton(), TotalXpInfoComponent()]),
     gameArea,
   );
 
