@@ -38,6 +38,18 @@ export function createElement<TagName extends HTMLTagName = "div">(
   return elem;
 }
 
+export function createElements<TagName extends HTMLTagName = "div">(
+  options: CreateElementOptions<TagName>,
+  amount: number,
+  childCallback?: (index: number) => (Node | string)[],
+) {
+  const elements: ElementByTag<TagName>[] = [];
+  for (let i = 0; i < amount; i++) {
+    elements.push(createElement(options, childCallback ? childCallback(i) : []));
+  }
+  return elements;
+}
+
 export function createButton(props: Omit<CreateElementOptions<"button">, "tag">, children: (Node | string)[] = []) {
   return createElement({ tag: "button", ...props }, children);
 }

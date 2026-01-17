@@ -24,6 +24,13 @@ interface RandomGameSetupOptions {
   desiredPar: number;
 }
 
+export const GAME_SETUP_OPTIONS_FOR_SHUFFLE: RandomGameSetupOptions = {
+  shouldCalculatePar: false,
+  randomMoonPosition: true,
+  allowLessMoves: true,
+  desiredPar: MAX_PAR,
+};
+
 function shouldAllowLessMoves() {
   // 50% change or more depending on the xp
   return Math.random() < 1 - 0.5 * getXpLevelModifier();

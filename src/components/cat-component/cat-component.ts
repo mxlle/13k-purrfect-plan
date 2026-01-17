@@ -1,14 +1,17 @@
-import { CatId, KittenId } from "../../logic/data/catId";
+import { CatId, isKittenId, KittenId } from "../../logic/data/catId";
 import { createElement } from "../../utils/html-utils";
 import { CssClass } from "../../utils/css-class";
 import catSvg from "./black-cat-pink-eyes-2.svg";
 
 import styles from "./cat-component.module.scss";
-import { isMom } from "../../logic/data/cats";
+import { isCatId, isMom } from "../../logic/data/cats";
 import { sleep } from "../../utils/promise-utils";
 import { hasSoundForAction, playSoundForAction, speak } from "../../audio/sound-control/sound-control";
-import { Tool } from "../../types";
+import { Direction, Tool } from "../../types";
 import { HAS_KITTEN_MEOWS, HAS_MEOW, HAS_SPOKEN_MEOW } from "../../env-utils";
+import { isConfigItemEnabled } from "../../logic/config/config";
+import { GameElementId, getHtmlElementForGameElement } from "../../logic/data/game-elements";
+import { getArrowComponent, styles as arrowStyles, updateArrowComponent } from "../arrow-component/arrow-component";
 
 export { styles };
 
@@ -81,4 +84,28 @@ export function getCatIdClass(catId: CatId): string {
     [CatId.IVY]: styles.ivy,
     [CatId.SPLASHY]: styles.splashy,
   }[catId];
+}
+
+export function initializeCatElementStylesIfApplicable(gameElementId: GameElementId): void {
+  if (isCatId(gameElementId)) {
+    getHtmlElementForGameElement(gameElementId).classList.toggle(
+      getCatIdClass(gameElementId),
+      !isKittenId(gameElementId) || isConfigItemEnabled(gameElementId),
+    );
+  }
+}
+
+export function updateKittenArrow(kittenId: KittenId, nextDirection: Direction | undefined): void {
+  const gameElementNode = getHtmlElementForGameElement(kittenId);
+  const existingArrow = gameElementNode.querySelector(`.${arrowStyles.arrow}`) as HTMLElement | undefined;
+
+  if (nextDirection) {
+    if (existingArrow) {
+      updateArrowComponent(existingArrow, nextDirection);
+    } else {
+      gameElementNode.append(getArrowComponent(nextDirection));
+    }
+  } else {
+    existingArrow?.remove();
+  }
 }
