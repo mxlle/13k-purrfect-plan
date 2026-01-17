@@ -29,7 +29,7 @@ export function openLevelSelection(): void {
 
         pubSubService.publish(PubSubEvent.START_NEW_GAME, {
           isDoOver: false,
-          gameSetup: deserializeGame(level.configString, { skipParCalculation: true }),
+          gameSetup: deserializeGame(level.configString),
         });
       },
     });
@@ -58,5 +58,6 @@ export function updateActiveLevel(configString: string): void {
 
   activeLevel++;
 
+  console.debug("updating active level to", activeLevel + 1);
   setLocalStorageItem(LocalStorageKey.LEVEL, activeLevel.toString());
 }

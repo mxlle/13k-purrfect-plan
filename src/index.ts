@@ -47,9 +47,10 @@ async function init() {
   });
 
   pubSubService.subscribe(PubSubEvent.GAME_END, (result) => {
-    result.isWon && document.body.classList.add(CssClass.WON);
-
-    updateActiveLevel(decodeURI(location.hash.replace("#", "")));
+    if (result.isWon) {
+      document.body.classList.add(CssClass.WON);
+      updateActiveLevel(decodeURI(location.hash.replace("#", "")));
+    }
 
     if (HAS_SIMPLE_SOUND_EFFECTS) {
       const soundEffect = result.isWon ? winSoundSrcUrl : loseSoundSrcUrl;

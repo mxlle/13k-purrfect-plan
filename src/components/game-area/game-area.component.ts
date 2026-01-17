@@ -66,6 +66,7 @@ export async function GameAreaComponent(): Promise<ComponentDefinition<StartNewG
 
     const [gameSetup, onboardingData] = options.gameSetup ? [options.gameSetup, getOnboardingData()] : await getGameSetup(options);
 
+    if (options.gameSetup) globals.gameState = getInitialGameState(gameSetup);
     globals.failedAttempts = options.isDoOver ? globals.failedAttempts + 1 : 0;
     globals.nextPositionsIfWait = calculateNewPositions(globals.gameState, Tool.WAIT);
 
