@@ -5,6 +5,7 @@ import { CssClass } from "../../utils/css-class";
 import { createDialog, Dialog } from "../../framework/components/dialog/dialog";
 import { getLocalStorageItem, LocalStorageKey, setLocalStorageItem } from "../../utils/local-storage";
 import { PubSubEvent, pubSubService } from "../../utils/pub-sub-service";
+import { deserializeGame } from "../../logic/serializer";
 
 let dialog: Dialog | undefined;
 
@@ -26,7 +27,10 @@ export function openLevelSelection(): void {
 
         console.debug("level selected", level);
 
-        pubSubService.publish(PubSubEvent.START_NEW_GAME, { isDoOver: false, serializedGameSetup: level.configString });
+        pubSubService.publish(PubSubEvent.START_NEW_GAME, {
+          isDoOver: false,
+          gameSetup: deserializeGame(level.configString, { skipParCalculation: true }),
+        });
       },
     });
 
