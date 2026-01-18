@@ -46,7 +46,7 @@ function readableDirection(turnMove: TurnMove): string {
   }
 }
 
-export function calculatePar(gameSetup: GameSetup, options: ParOptions = { returnAllSolutions: false }): ParInfo {
+export function calculatePar(gameSetup: GameSetup, options: ParOptions = {}): ParInfo {
   let performanceStart;
   if (IS_DEV) {
     performanceStart = performance.now();

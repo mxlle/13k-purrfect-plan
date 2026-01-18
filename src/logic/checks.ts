@@ -25,7 +25,7 @@ export function isMoveLimitExceeded(gameState: GameState | null): boolean {
     return false;
   }
 
-  return gameState.moves.length >= getParFromGameState(gameState) && !isWinConditionMet(gameState);
+  return gameState.moves.length >= getParFromGameState(gameState, { skipSolutionCheck: true }) && !isWinConditionMet(gameState);
 }
 
 export function getKittensOnCell(gameState: GameState, cell: CellPosition): KittenId[] {

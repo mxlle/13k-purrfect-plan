@@ -101,12 +101,12 @@ export function getInitialGameState(setup: GameSetup): GameState {
   };
 }
 
-export function getParFromGameState(gameState: GameState | null): number | null {
+export function getParFromGameState(gameState: GameState | null, options?: { skipSolutionCheck: boolean }): number | null {
   if (!gameState) {
     return null;
   }
 
-  if (gameState.setup.possibleSolutions.length === 0) {
+  if (!options?.skipSolutionCheck && gameState.setup.possibleSolutions.length === 0) {
     return FALLBACK_PAR;
   }
 
