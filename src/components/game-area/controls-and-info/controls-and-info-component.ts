@@ -30,6 +30,8 @@ import { HAS_RECORDED_SOUND_EFFECTS, HAS_SHORT_TEXTS } from "../../../env-utils"
 import { createRecordButton } from "./create-record-button";
 import { Tool } from "../../../types";
 import { openLevelSelection } from "../../level-selection/level-selection";
+import { getCurrentHighestLevelIndex, isOnboardingLevel, readableLevel } from "../../../logic/levels";
+import { deserializeGame } from "../../../logic/serializer";
 
 let hasSetupEventListeners = false;
 const controlsAndInfoComponent: HTMLElement = createElement({ cssClass: styles.controlsAndInfo });
@@ -120,15 +122,18 @@ function addNewGameButtons(isInitialStart = false) {
         await collectXp(continueButton, newXp);
       }
 
-      // if (hasUnknownConfigItems()) {
-      //   pubSubService.publish(PubSubEvent.START_NEW_GAME, { isDoOver: false });
-      //   newGameContainer.remove();
-      // } else {
-      openLevelSelection((isSubmit: boolean) => {
-        continueButton.disabled = false;
-        isSubmit && hideRetryInfo();
-      });
-      // }
+      if (isOnboardingLevel()) {
+        pubSubService.publish(PubSubEvent.START_NEW_GAME, {
+          isDoOver: false,
+          gameSetup: deserializeGame(readableLevel(getCurrentHighestLevelIndex()).toString()),
+        });
+        newGameContainer.remove();
+      } else {
+        openLevelSelection((isSubmit: boolean) => {
+          continueButton.disabled = false;
+          isSubmit && hideRetryInfo();
+        });
+      }
     },
   });
 

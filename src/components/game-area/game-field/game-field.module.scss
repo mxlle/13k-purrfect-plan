@@ -65,7 +65,6 @@ $border-style: outset;
   }
 
   :global(.#{$OBJECT_BOX}) {
-    z-index: 2;
     transition:
       transform 0.3s,
       opacity 0.3s;

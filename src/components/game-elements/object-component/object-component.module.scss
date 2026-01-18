@@ -3,6 +3,16 @@
 
 $moon: #ffb450;
 
+:global(.#{$CELL}) {
+  :global(.#{$OBJECT_BOX}) {
+    z-index: 2;
+
+    &.moon-box {
+      z-index: 3;
+    }
+  }
+}
+
 :global(.#{$OBJECT_BOX}) {
   width: 100%;
   height: 100%;
