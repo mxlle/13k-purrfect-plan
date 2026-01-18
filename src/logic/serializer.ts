@@ -4,6 +4,9 @@ import { ObjectId } from "../types";
 import { EMPTY_ELEMENT_MAP, GameElementId, GameElementPositions, GameSetup } from "./data/game-elements";
 import { calculatePar } from "./par";
 import { CatId } from "./data/catId";
+import { getCurrentLevelIndexFromConfigString } from "./levels";
+import { configItemsWithout, hasMoveLimit, showMoon } from "./config/config";
+import { levels } from "./level-definition";
 
 const serializeStrings = {
   [CatId.MOTHER]: "🟣",
@@ -21,8 +24,8 @@ export function serializeGame(gameSetup: GameSetup): string {
     .join("");
 }
 
-export function deserializeGame(serializedGame: string, options?: { skipParCalculation?: boolean; removeMoon?: boolean }): GameSetup {
-  console.info("Deserializing game:", serializedGame);
+export function deserializeGame(serializedGame: string, options?: { skipParCalculation?: boolean }): GameSetup {
+  !options?.skipParCalculation && console.info("Deserializing game:", serializedGame);
 
   const elementPositions: GameElementPositions = EMPTY_ELEMENT_MAP();
   elementPositions[ObjectId.MOON] = { ...DEFAULT_MOON_POSITION };
@@ -36,17 +39,22 @@ export function deserializeGame(serializedGame: string, options?: { skipParCalcu
     };
   }
 
-  if (options?.removeMoon) {
+  const levelIndex = getCurrentLevelIndexFromConfigString(serializedGame);
+  const predefinedLevel = levels[levelIndex];
+  const availableConfigItems = configItemsWithout(predefinedLevel?.excludedConfigItems);
+
+  if (!showMoon(availableConfigItems)) {
     elementPositions[ObjectId.MOON] = null;
   }
 
   const gameSetup: GameSetup = {
-    fieldSize: DEFAULT_FIELD_SIZE,
+    fieldSize: predefinedLevel?.fieldSize ?? DEFAULT_FIELD_SIZE,
     elementPositions,
     possibleSolutions: [],
+    levelIndex,
   };
 
-  if (options?.skipParCalculation) {
+  if (options?.skipParCalculation || !hasMoveLimit(availableConfigItems)) {
     return gameSetup;
   }
 

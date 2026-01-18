@@ -2,14 +2,16 @@ import { ALL_CAT_IDS, CatId } from "./catId";
 import { getCatElement } from "./cats";
 import { ALL_OBJECT_IDS, getObjectElement, isMoon, isObjectId } from "./objects";
 import { CellPosition } from "./cell";
-import { FieldSize, getMiddleCoordinates } from "./field-size";
-import { hasUnknownConfigItems, showMoon } from "../config/config";
+import { DEFAULT_FIELD_SIZE, FieldSize, getMiddleCoordinates } from "./field-size";
+import { showMoon } from "../config/config";
 import { Difficulty, ObjectId, TurnMove } from "../../types";
 import { FALLBACK_PAR } from "../par";
-import { getDefaultPlacedObjects, isOnboarding, OnboardingData } from "../onboarding";
 import { deserializeGame } from "../serializer";
 import { globals } from "../../globals";
 import { HAS_LOCATION_SERIALIZATION } from "../../env-utils";
+import { getCurrentHighestLevelIndex, getLevelIndexFromHash } from "../levels";
+import { getDefaultPlacedObjects } from "../initialize";
+import { levels } from "../level-definition";
 
 export type GameElementId = CatId | ObjectId;
 
@@ -27,6 +29,7 @@ export interface GameSetup {
   elementPositions: GameElementPositions;
   possibleSolutions: TurnMove[][];
   difficulty?: Difficulty | undefined;
+  levelIndex: number;
 }
 
 export interface GameState {
@@ -35,7 +38,7 @@ export interface GameState {
   moves: TurnMove[];
 }
 
-export function determineGameSetup(options: { isDoOver?: boolean }, onboardingData: OnboardingData | undefined): GameSetup | null {
+export function determineGameSetup(options: { isDoOver?: boolean } = {}): GameSetup | undefined {
   const existingGameState = globals.gameState;
   const isInitialStart = !existingGameState;
 
@@ -43,9 +46,11 @@ export function determineGameSetup(options: { isDoOver?: boolean }, onboardingDa
     const gameSetupFromHash = location.hash.replace("#", "");
 
     let gameSetupFromUrl: GameSetup | undefined;
-    if (isInitialStart && gameSetupFromHash && !onboardingData && !hasUnknownConfigItems()) {
+    if (isInitialStart && gameSetupFromHash) {
       try {
-        gameSetupFromUrl = deserializeGame(decodeURI(gameSetupFromHash));
+        const decodedHash = decodeURI(gameSetupFromHash);
+        const level = levels[getLevelIndexFromHash(decodedHash)];
+        gameSetupFromUrl = deserializeGame(level?.configString ?? decodedHash);
         console.debug("Loaded game setup from hash:", gameSetupFromUrl);
 
         if (!isValidGameSetup(gameSetupFromUrl)) {
@@ -62,12 +67,17 @@ export function determineGameSetup(options: { isDoOver?: boolean }, onboardingDa
     }
   }
 
-  let gameSetup: GameSetup | null;
+  let gameSetup: GameSetup | undefined = undefined;
 
   if (options.isDoOver && globals.gameState) {
     gameSetup = globals.gameState.setup;
   } else {
-    gameSetup = onboardingData ? onboardingData.gameSetup : null;
+    const currentHighestLevelIndex = getCurrentHighestLevelIndex();
+    const nextLevel = levels[currentHighestLevelIndex];
+
+    if (nextLevel) {
+      gameSetup = deserializeGame(nextLevel.configString);
+    }
   }
 
   return gameSetup;
@@ -86,7 +96,11 @@ export function getHtmlElementForGameElement(id: GameElementId): HTMLElement {
 
 export function getInitialPositionOfGameElement(setup: GameSetup, id: GameElementId): CellPosition | null {
   if (isObjectId(id)) {
-    return isOnboarding() ? setup.elementPositions[id] : isMoon(id) && !showMoon() ? null : getDefaultPlacedObjects()[id];
+    return isMoon(id) && !showMoon()
+      ? null
+      : setup.fieldSize !== DEFAULT_FIELD_SIZE
+        ? setup.elementPositions[id]
+        : getDefaultPlacedObjects()[id];
   } else {
     // cats
     return getMiddleCoordinates(setup.fieldSize);
@@ -147,6 +161,7 @@ export function copyGameSetup(setup: GameSetup): GameSetup {
     fieldSize: setup.fieldSize,
     elementPositions: deepCopyElementsMap(setup.elementPositions),
     possibleSolutions: setup.possibleSolutions.map((solution) => [...solution]),
+    levelIndex: setup.levelIndex,
   };
 }
 

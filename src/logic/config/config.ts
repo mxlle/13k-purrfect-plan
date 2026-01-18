@@ -8,20 +8,20 @@ import { CssClass } from "../../utils/css-class";
 
 export const allConfigItems: ConfigItemId[] = [...ALL_KITTEN_IDS, ...ALL_TOOLS, ...Object.values(MoveLimit)];
 
-export function isConfigItemEnabled(configItem: ConfigItemId): boolean {
-  return getKnownConfigItems().includes(configItem);
+export function isConfigItemEnabled(configItem: ConfigItemId, configItems: ConfigItemId[] = getKnownConfigItems()): boolean {
+  return configItems.includes(configItem);
 }
 
-export function showMovesInfo(): boolean {
-  return isConfigItemEnabled(MoveLimit.MOVE_LIMIT_SIMPLE) /* || isConfigItemEnabled(MoveLimit.MOVE_LIMIT_STRICT)*/;
+export function showMovesInfo(configItems: ConfigItemId[] = getKnownConfigItems()): boolean {
+  return isConfigItemEnabled(MoveLimit.MOVE_LIMIT_SIMPLE, configItems) || isConfigItemEnabled(MoveLimit.MOVE_LIMIT_STRICT, configItems);
 }
 
-export function showMoon() {
-  return showMovesInfo();
+export function showMoon(configItems: ConfigItemId[] = getKnownConfigItems()) {
+  return showMovesInfo(configItems);
 }
 
-export function hasMoveLimit(): boolean {
-  return isConfigItemEnabled(MoveLimit.MOVE_LIMIT_STRICT);
+export function hasMoveLimit(configItems: ConfigItemId[] = getKnownConfigItems()): boolean {
+  return isConfigItemEnabled(MoveLimit.MOVE_LIMIT_STRICT, configItems);
 }
 
 export const explanationMap: Record<ConfigItemId, TranslationKey | undefined> = {
@@ -78,6 +78,15 @@ export function updateKnownConfigItems(newConfigItems: ConfigItemId[]) {
   const newKnownConfigItems = [...new Set([...currentlyKnownConfigItems, ...newConfigItems])];
   setLocalStorageItem(LocalStorageKey.KNOWN_CONFIG_ELEMENTS, newKnownConfigItems.join(","));
   knownConfigItems = newKnownConfigItems;
+}
+
+export function setKnownConfigItems(configItems: ConfigItemId[]) {
+  setLocalStorageItem(LocalStorageKey.KNOWN_CONFIG_ELEMENTS, configItems.join(","));
+  knownConfigItems = configItems;
+}
+
+export function configItemsWithout(configItemsToRemove: ConfigItemId[] = []): ConfigItemId[] {
+  return allConfigItems.filter((item) => !configItemsToRemove.includes(item));
 }
 
 export function getToolInnerHtml(tool: Tool) {

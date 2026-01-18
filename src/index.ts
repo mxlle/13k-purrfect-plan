@@ -14,8 +14,8 @@ import { MuteButton } from "./components/global-elements/mute-button/mute-button
 import { TotalXpInfoComponent } from "./components/global-elements/xp-components/total-xp-info.component";
 import { GameAreaComponent } from "./components/game-area/game-area.component";
 import { globals } from "./globals";
-import { updateAvailableLevels } from "./components/level-selection/level-selection";
 import { LoadLevelButton } from "./components/global-elements/load-level-button/load-level-button";
+import { updateAvailableLevels } from "./logic/levels";
 
 if (HAS_VISUAL_NICE_TO_HAVES) {
   import("./globals.nice2have.scss");

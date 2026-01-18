@@ -1,21 +1,14 @@
-import { getLocalStorageItem, LocalStorageKey } from "./utils/local-storage";
 import { GameElementPositions, GameState } from "./logic/data/game-elements";
 import { isMoveLimitExceeded, isWinConditionMet } from "./logic/checks";
 
 interface GameGlobals {
-  previousOnboardingStep: number | undefined;
-  onboardingStep: number;
   gameState: GameState | undefined;
   nextPositionsIfWait: GameElementPositions | undefined;
   language: string;
   failedAttempts: number;
 }
 
-const onboardingStepSetting = getLocalStorageItem(LocalStorageKey.ONBOARDING_STEP);
-
 const defaultGlobals: GameGlobals = {
-  previousOnboardingStep: undefined,
-  onboardingStep: onboardingStepSetting ? Number(onboardingStepSetting) : 0,
   gameState: undefined,
   nextPositionsIfWait: undefined,
   language: "en",

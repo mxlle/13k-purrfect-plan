@@ -5,8 +5,7 @@ import { createButton, createElement } from "../../../utils/html-utils";
 import styles from "./controls-and-info-component.module.scss";
 import { getTranslation } from "../../../translations/i18n";
 import { TranslationKey } from "../../../translations/translationKey";
-import { isOnboarding } from "../../../logic/onboarding";
-import { hasMoveLimit, hasUnknownConfigItems, isConfigItemEnabled } from "../../../logic/config/config";
+import { hasMoveLimit, isConfigItemEnabled } from "../../../logic/config/config";
 import { PubSubEvent, pubSubService } from "../../../utils/pub-sub-service";
 import {
   getGameInfoComponent,
@@ -50,7 +49,7 @@ export function getControlsAndInfoComponent(): HTMLElement {
   updateToolContainer();
   updateGameInfoComponent();
 
-  if (!globals.gameState && !isOnboarding()) {
+  if (!globals.gameState) {
     showNewGameButtons(true);
   }
 
@@ -121,16 +120,15 @@ function addNewGameButtons(isInitialStart = false) {
         await collectXp(continueButton, newXp);
       }
 
-      if (hasUnknownConfigItems()) {
-        pubSubService.publish(PubSubEvent.START_NEW_GAME, { isDoOver: false });
-        newGameContainer.remove();
-        newGameContainer.remove();
-      } else {
-        openLevelSelection((isSubmit: boolean) => {
-          continueButton.disabled = false;
-          isSubmit && hideRetryInfo();
-        });
-      }
+      // if (hasUnknownConfigItems()) {
+      //   pubSubService.publish(PubSubEvent.START_NEW_GAME, { isDoOver: false });
+      //   newGameContainer.remove();
+      // } else {
+      openLevelSelection((isSubmit: boolean) => {
+        continueButton.disabled = false;
+        isSubmit && hideRetryInfo();
+      });
+      // }
     },
   });
 
