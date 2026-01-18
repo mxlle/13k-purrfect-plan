@@ -1,6 +1,6 @@
 import { defineEnum } from "./enums";
 
-const LOCAL_STORAGE_PREFIX = "mxlle13";
+const LOCAL_STORAGE_PREFIX = "mxlle";
 
 export type LocalStorageKey = defineEnum<typeof LocalStorageKey>;
 export const LocalStorageKey = defineEnum({
