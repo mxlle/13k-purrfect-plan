@@ -4,6 +4,7 @@ import { CatId, KittenId } from "../data/catId";
 import { ObjectId } from "../../types";
 import { moveCatTowardsCell } from "./movement";
 import { isConfigItemEnabled } from "../config/config";
+import { isValidCellPosition } from "../checks";
 
 export function handleKittenBehavior(
   gameState: GameState,
@@ -45,7 +46,7 @@ function doMoonyMove(gameState: GameState): CellPosition {
   const catId = CatId.MOONY;
   const moonPosition = gameState.currentPositions[ObjectId.MOON];
 
-  if (moonPosition) {
+  if (moonPosition && isValidCellPosition(gameState, moonPosition, catId)) {
     return moveCatTowardsCell(gameState, catId, moonPosition);
   }
 

@@ -1,13 +1,14 @@
 import { createButton, createElement } from "../../utils/html-utils";
 import styles from "./level-selection.module.scss";
-import { levels } from "../../logic/levels";
 import { CssClass } from "../../utils/css-class";
 import { createDialog, Dialog } from "../../framework/components/dialog/dialog";
-import { getLocalStorageItem, LocalStorageKey, setLocalStorageItem } from "../../utils/local-storage";
+import { getLocalStorageItem, LocalStorageKey } from "../../utils/local-storage";
 import { PubSubEvent, pubSubService } from "../../utils/pub-sub-service";
 import { deserializeGame } from "../../logic/serializer";
 import { getTranslation } from "../../translations/i18n";
 import { TranslationKey } from "../../translations/translationKey";
+import { levels } from "../../logic/level-definition";
+import { readableLevel } from "../../logic/levels";
 
 let dialog: Dialog | undefined;
 
@@ -19,18 +20,18 @@ export function openLevelSelection(onClose: (isSubmit: boolean) => void = () => 
   const levelGrid = createElement({ cssClass: styles.levelGrid });
   for (let i = 0; i < levels.length; i++) {
     const level = levels[i];
-    const levelNumber = i + 1;
+    const levelLabel = readableLevel(i).toString();
     const levelButton = createButton({
       cssClass: [CssClass.SECONDARY, styles.levelButton],
-      text: levelNumber.toString(),
+      text: levelLabel,
       onClick: () => {
         dialog?.close(true);
 
-        console.debug("level selected", level);
+        console.debug("level selected", levelLabel, level);
 
         pubSubService.publish(PubSubEvent.START_NEW_GAME, {
           isDoOver: false,
-          gameSetup: deserializeGame(level.configString),
+          gameSetup: deserializeGame(levelLabel),
         });
       },
     });
@@ -61,30 +62,4 @@ export function openLevelSelection(onClose: (isSubmit: boolean) => void = () => 
   dialog.submitButton.innerText = getTranslation(TranslationKey.CANCEL);
   dialog.submitButton.classList.remove(CssClass.PRIMARY);
   dialog.open();
-}
-
-export function updateAvailableLevels(): void {
-  let activeLevel = getCurrentLevelIndexFromLocation();
-
-  if (activeLevel === -1) {
-    return;
-  }
-
-  const currentHighestLevelString = getLocalStorageItem(LocalStorageKey.LEVEL) || "0";
-  const currentHighestLevel = parseInt(currentHighestLevelString);
-
-  if (activeLevel < currentHighestLevel) {
-    return;
-  }
-
-  const newHighestLevel = activeLevel + 1;
-
-  console.debug("updating active level to", newHighestLevel + 1); // another plus one for humans
-  setLocalStorageItem(LocalStorageKey.LEVEL, newHighestLevel.toString());
-}
-
-export function getCurrentLevelIndexFromLocation(): number {
-  const configString = decodeURI(location.hash.replace("#", ""));
-
-  return levels.findIndex((level) => level.configString === configString);
 }

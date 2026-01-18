@@ -1,21 +1,52 @@
-export interface LevelDefinition {
-  fieldSize: number;
-  configString: string;
-  description: string;
+import { getLocalStorageItem, LocalStorageKey, setLocalStorageItem } from "../utils/local-storage";
+import { globals } from "../globals";
+import { levels, onboardingLevels } from "./level-definition";
+
+export function getCurrentHighestLevelIndex(): number {
+  const currentHighestLevelString = getLocalStorageItem(LocalStorageKey.LEVEL) || "0";
+  return parseInt(currentHighestLevelString);
 }
 
-export const levels: LevelDefinition[] = [
-  { fieldSize: 5, configString: `🟣04🔵03🟢43🟡30🌙00🌳32💧34`, description: "" },
-  { fieldSize: 5, configString: `🟣24🔵43🟢03🟡40🌙00🌳21💧20`, description: "" },
-  { fieldSize: 5, configString: `🟣02🔵31🟢32🟡33🌙00🌳12💧13`, description: "" },
-  { fieldSize: 5, configString: `🟣30🔵02🟢11🟡41🌙00🌳23💧24`, description: "" },
-  { fieldSize: 5, configString: `🟣30🔵03🟢41🟡33🌙00🌳13💧21`, description: "" },
-  { fieldSize: 5, configString: `🟣22🔵23🟢33🟡14🌙00🌳32💧21`, description: "" },
-  { fieldSize: 5, configString: `🟣21🔵20🟢24🟡03🌙00🌳22💧31`, description: "" },
-  { fieldSize: 5, configString: `🟣03🔵34🟢04🟡21🌙01🌳11💧22`, description: "" },
-  { fieldSize: 5, configString: `🟣22🔵20🟢31🟡11🌙02🌳32💧14`, description: "" },
-  { fieldSize: 5, configString: `🟣14🔵22🟢04🟡44🌙02🌳13💧24`, description: "Trap" },
-  { fieldSize: 5, configString: `🟣22🔵24🟢11🟡42🌙03🌳21💧23`, description: "Short" },
-  { fieldSize: 5, configString: `🟣21🔵24🟢13🟡02🌙32🌳12💧22`, description: "Upside down" },
-  { fieldSize: 5, configString: `🟣12🔵32🟢23🟡21🌙40🌳22💧04`, description: "Upside down long" },
-];
+export function isOnboardingLevel(levelIndex: number = getCurrentHighestLevelIndex()): boolean {
+  return levelIndex < onboardingLevels.length;
+}
+
+export function hasMoreLevels(): boolean {
+  const currentHighestLevel = getCurrentHighestLevelIndex();
+  return currentHighestLevel < levels.length;
+}
+
+export function updateAvailableLevels(): void {
+  let activeLevel = globals.gameState?.setup.levelIndex ?? -1;
+
+  if (activeLevel === -1) {
+    return;
+  }
+
+  const currentHighestLevel = getCurrentHighestLevelIndex();
+
+  if (activeLevel < currentHighestLevel) {
+    return;
+  }
+
+  const newHighestLevel = activeLevel + 1;
+
+  console.debug("updating active level to", readableLevel(newHighestLevel)); // another plus one for humans
+  setLocalStorageItem(LocalStorageKey.LEVEL, newHighestLevel.toString());
+}
+
+export function readableLevel(levelIndex: number): number {
+  return levelIndex + 1;
+}
+
+export function getLevelIndexFromHash(hash: string): number {
+  const parsedLevelIndex = parseInt(hash);
+
+  if (isNaN(parsedLevelIndex) || parsedLevelIndex > levels.length) {
+    return -1;
+  }
+
+  const levelIndex = parsedLevelIndex - 1; // minus one for zero-based index
+
+  return Math.min(levelIndex, getCurrentHighestLevelIndex());
+}

@@ -1,4 +1,3 @@
-import { getDefaultPlacedObjects } from "./onboarding";
 import { shuffleArray } from "../utils/random-utils";
 import { getAllCellPositions, getEmptyFields } from "./checks";
 import { ALL_CAT_IDS } from "./data/catId";
@@ -14,6 +13,7 @@ import { getRandomItem } from "../utils/array-utils";
 import { difficultyEmoji } from "./difficulty";
 import { getXpLevelModifier, hasXpLevelOfPlayedGames } from "./data/experience-points";
 import { HAS_GAMEPLAY_NICE_TO_HAVES, IS_DEV } from "../env-utils";
+import { deserializeGame } from "./serializer";
 
 const MAX_ITERATIONS_FOR_RANDOM_PLACEMENT = 13;
 
@@ -41,14 +41,32 @@ function shouldStartWithParMinus1() {
   return Math.random() < 0.3 * getXpLevelModifier();
 }
 
+const defaultPlacedObjectsString = "🟣11🟡32🟢31🔵33🌳23💧21🌙12";
+let defaultPlacedObjects: GameElementPositions | undefined;
+
+export function getDefaultPlacedObjects() {
+  if (defaultPlacedObjects) {
+    return defaultPlacedObjects;
+  }
+
+  const deserializedGame = deserializeGame(defaultPlacedObjectsString, {
+    skipParCalculation: true,
+  });
+  defaultPlacedObjects = deserializedGame.elementPositions;
+
+  return defaultPlacedObjects;
+}
+
 export function getInitialGameSetup(fieldSize: FieldSize = DEFAULT_FIELD_SIZE): GameSetup {
   const placedObjects = getDefaultPlacedObjects();
   const elementPositions: GameElementPositions = EMPTY_ELEMENT_MAP();
 
   for (const obj of ALL_OBJECT_IDS) {
     if (isMoon(obj) && !showMoon()) {
+      console.log("Skipping moon placement as moon is disabled");
       continue;
     }
+    console.info("Placing object", obj, "at", placedObjects[obj]);
     elementPositions[obj] = { ...placedObjects[obj] };
   }
 
@@ -60,6 +78,7 @@ export function getInitialGameSetup(fieldSize: FieldSize = DEFAULT_FIELD_SIZE): 
     fieldSize,
     elementPositions,
     possibleSolutions: [],
+    levelIndex: -1,
   };
 }
 

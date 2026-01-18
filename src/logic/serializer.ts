@@ -4,6 +4,9 @@ import { ObjectId } from "../types";
 import { EMPTY_ELEMENT_MAP, GameElementId, GameElementPositions, GameSetup } from "./data/game-elements";
 import { calculatePar } from "./par";
 import { CatId } from "./data/catId";
+import { getLevelIndexFromHash, readableLevel } from "./levels";
+import { configItemsWithout, hasMoveLimit, showMoon } from "./config/config";
+import { levels } from "./level-definition";
 
 const serializeStrings = {
   [CatId.MOTHER]: "🟣",
@@ -16,13 +19,21 @@ const serializeStrings = {
 };
 
 export function serializeGame(gameSetup: GameSetup): string {
+  if (gameSetup.levelIndex > -1) {
+    return readableLevel(gameSetup.levelIndex).toString();
+  }
+
   return Object.entries(gameSetup.elementPositions)
     .map(([id, pos]) => (pos ? `${serializeStrings[id]}${pos.row}${pos.column}` : ""))
     .join("");
 }
 
-export function deserializeGame(serializedGame: string, options?: { skipParCalculation?: boolean; removeMoon?: boolean }): GameSetup {
-  console.info("Deserializing game:", serializedGame);
+export function deserializeGame(serializedGameString: string, options?: { skipParCalculation?: boolean }): GameSetup {
+  const levelIndex = getLevelIndexFromHash(serializedGameString);
+  const level = levels[levelIndex];
+  const serializedGame = level?.configString ?? serializedGameString;
+
+  !options?.skipParCalculation && console.info("Deserializing game:", serializedGameString, serializedGame);
 
   const elementPositions: GameElementPositions = EMPTY_ELEMENT_MAP();
   elementPositions[ObjectId.MOON] = { ...DEFAULT_MOON_POSITION };
@@ -36,17 +47,20 @@ export function deserializeGame(serializedGame: string, options?: { skipParCalcu
     };
   }
 
-  if (options?.removeMoon) {
+  const availableConfigItems = configItemsWithout(level?.excludedConfigItems);
+
+  if (!showMoon(availableConfigItems)) {
     elementPositions[ObjectId.MOON] = null;
   }
 
   const gameSetup: GameSetup = {
-    fieldSize: DEFAULT_FIELD_SIZE,
+    fieldSize: level?.fieldSize ?? DEFAULT_FIELD_SIZE,
     elementPositions,
     possibleSolutions: [],
+    levelIndex,
   };
 
-  if (options?.skipParCalculation) {
+  if (options?.skipParCalculation || !hasMoveLimit(availableConfigItems)) {
     return gameSetup;
   }
 

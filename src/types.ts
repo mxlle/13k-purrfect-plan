@@ -38,12 +38,6 @@ export function isTool(move: unknown): move is Tool {
 
 export const ALL_TURN_MOVES = [...ALL_DIRECTIONS, ...ALL_TOOLS] as const;
 
-export type OnboardingStep = defineEnum<typeof OnboardingStep>;
-export const OnboardingStep = defineEnum({
-  INTRO: 0,
-  INTERMEDIATE_OBJECTS: 1,
-  LAST_SETUP: 2,
-});
 export type ObjectId = defineEnum<typeof ObjectId>;
 export const ObjectId = defineEnum({
   MOON: 4,

@@ -5,7 +5,6 @@ const LOCAL_STORAGE_PREFIX = "mxlle";
 export type LocalStorageKey = defineEnum<typeof LocalStorageKey>;
 export const LocalStorageKey = defineEnum({
   MUTED: "m",
-  ONBOARDING_STEP: "o",
   SOUND: "s",
   KNOWN_CONFIG_ELEMENTS: "k",
   XP: "x",
