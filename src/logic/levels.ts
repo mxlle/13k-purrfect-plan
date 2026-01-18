@@ -3,7 +3,7 @@ import { globals } from "../globals";
 import { levels, onboardingLevels } from "./level-definition";
 
 export function getCurrentHighestLevelIndex(): number {
-  const currentHighestLevelString = getLocalStorageItem(LocalStorageKey.LEVEL) || "-1";
+  const currentHighestLevelString = getLocalStorageItem(LocalStorageKey.LEVEL) || "0";
   return parseInt(currentHighestLevelString);
 }
 

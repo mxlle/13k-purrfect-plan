@@ -9,7 +9,7 @@ import { FALLBACK_PAR } from "../par";
 import { deserializeGame } from "../serializer";
 import { globals } from "../../globals";
 import { HAS_LOCATION_SERIALIZATION } from "../../env-utils";
-import { getCurrentHighestLevelIndex } from "../levels";
+import { getCurrentHighestLevelIndex, readableLevel } from "../levels";
 import { getDefaultPlacedObjects } from "../initialize";
 import { levels } from "../level-definition";
 
@@ -74,7 +74,7 @@ export function determineGameSetup(options: { isDoOver?: boolean } = {}): GameSe
     const nextLevel = levels[currentHighestLevelIndex];
 
     if (nextLevel) {
-      gameSetup = deserializeGame(nextLevel.configString);
+      gameSetup = deserializeGame(readableLevel(currentHighestLevelIndex).toString());
     }
   }
 

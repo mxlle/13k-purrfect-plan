@@ -26,7 +26,7 @@ export type StartNewGameOptions = { isDoOver?: boolean; isFirstGame?: boolean; g
 type BetweenGamesCheckResult = { newConfigItem?: ConfigItemId | boolean; shouldReplaceGameField?: boolean };
 
 export async function GameAreaComponent(): Promise<ComponentDefinition<StartNewGameOptions>> {
-  const autoStartGame = hasMoreLevels() || location.hash.length > 1;
+  const autoStartGame = hasMoreLevels() || (HAS_LOCATION_SERIALIZATION && location.hash.length > 1);
   let gameSetup = autoStartGame ? determineGameSetup() : getInitialGameSetup();
   let gameFieldComponent = GameFieldComponent(gameSetup.fieldSize);
 

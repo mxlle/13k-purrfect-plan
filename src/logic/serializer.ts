@@ -29,11 +29,11 @@ export function serializeGame(gameSetup: GameSetup): string {
 }
 
 export function deserializeGame(serializedGameString: string, options?: { skipParCalculation?: boolean }): GameSetup {
-  !options?.skipParCalculation && console.info("Deserializing game:", serializedGameString);
-
   const levelIndex = getLevelIndexFromHash(serializedGameString);
   const level = levels[levelIndex];
   const serializedGame = level?.configString ?? serializedGameString;
+
+  !options?.skipParCalculation && console.info("Deserializing game:", serializedGameString, serializedGame);
 
   const elementPositions: GameElementPositions = EMPTY_ELEMENT_MAP();
   elementPositions[ObjectId.MOON] = { ...DEFAULT_MOON_POSITION };
