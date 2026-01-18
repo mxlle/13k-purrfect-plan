@@ -8,6 +8,7 @@ import { deserializeGame } from "../../logic/serializer";
 import { getTranslation } from "../../translations/i18n";
 import { TranslationKey } from "../../translations/translationKey";
 import { levels } from "../../logic/level-definition";
+import { readableLevel } from "../../logic/levels";
 
 let dialog: Dialog | undefined;
 
@@ -19,18 +20,18 @@ export function openLevelSelection(onClose: (isSubmit: boolean) => void = () => 
   const levelGrid = createElement({ cssClass: styles.levelGrid });
   for (let i = 0; i < levels.length; i++) {
     const level = levels[i];
-    const levelNumber = i + 1;
+    const levelLabel = readableLevel(i).toString();
     const levelButton = createButton({
       cssClass: [CssClass.SECONDARY, styles.levelButton],
-      text: levelNumber.toString(),
+      text: levelLabel,
       onClick: () => {
         dialog?.close(true);
 
-        console.debug("level selected", level);
+        console.debug("level selected", levelLabel, level);
 
         pubSubService.publish(PubSubEvent.START_NEW_GAME, {
           isDoOver: false,
-          gameSetup: deserializeGame(level.configString),
+          gameSetup: deserializeGame(levelLabel),
         });
       },
     });

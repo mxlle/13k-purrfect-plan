@@ -1,6 +1,6 @@
 import { getLocalStorageItem, LocalStorageKey, setLocalStorageItem } from "../utils/local-storage";
 import { globals } from "../globals";
-import { LevelDefinition, levels, onboardingLevels } from "./level-definition";
+import { levels, onboardingLevels } from "./level-definition";
 
 export function getCurrentHighestLevelIndex(): number {
   const currentHighestLevelString = getLocalStorageItem(LocalStorageKey.LEVEL) || "-1";
@@ -35,30 +35,18 @@ export function updateAvailableLevels(): void {
   setLocalStorageItem(LocalStorageKey.LEVEL, newHighestLevel.toString());
 }
 
-export function getCurrentLevelIndexFromConfigString(configString: string): number {
-  return levels.findIndex((level) => {
-    return level.configString === configString;
-  });
-}
-
-export function getCurrentLevelFromConfigString(configString: string): LevelDefinition | undefined {
-  return levels[getCurrentLevelIndexFromConfigString(configString)];
-}
-
 export function readableLevel(levelIndex: number): number {
   return levelIndex + 1;
 }
 
 export function getLevelIndexFromHash(hash: string): number {
-  let levelIndex = getCurrentLevelIndexFromConfigString(hash);
+  const parsedLevelIndex = parseInt(hash);
 
-  if (levelIndex === -1) {
-    const parsedLevelIndex = parseInt(hash);
-
-    if (!isNaN(parsedLevelIndex) && parsedLevelIndex <= levels.length) {
-      levelIndex = parsedLevelIndex - 1; // minus one for zero-based index
-    }
+  if (isNaN(parsedLevelIndex) || parsedLevelIndex > levels.length) {
+    return -1;
   }
+
+  const levelIndex = parsedLevelIndex - 1; // minus one for zero-based index
 
   return Math.min(levelIndex, getCurrentHighestLevelIndex());
 }

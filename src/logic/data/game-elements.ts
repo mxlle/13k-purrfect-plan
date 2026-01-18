@@ -9,7 +9,7 @@ import { FALLBACK_PAR } from "../par";
 import { deserializeGame } from "../serializer";
 import { globals } from "../../globals";
 import { HAS_LOCATION_SERIALIZATION } from "../../env-utils";
-import { getCurrentHighestLevelIndex, getLevelIndexFromHash } from "../levels";
+import { getCurrentHighestLevelIndex } from "../levels";
 import { getDefaultPlacedObjects } from "../initialize";
 import { levels } from "../level-definition";
 
@@ -48,9 +48,7 @@ export function determineGameSetup(options: { isDoOver?: boolean } = {}): GameSe
     let gameSetupFromUrl: GameSetup | undefined;
     if (isInitialStart && gameSetupFromHash) {
       try {
-        const decodedHash = decodeURI(gameSetupFromHash);
-        const level = levels[getLevelIndexFromHash(decodedHash)];
-        gameSetupFromUrl = deserializeGame(level?.configString ?? decodedHash);
+        gameSetupFromUrl = deserializeGame(decodeURI(gameSetupFromHash));
         console.debug("Loaded game setup from hash:", gameSetupFromUrl);
 
         if (!isValidGameSetup(gameSetupFromUrl)) {

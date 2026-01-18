@@ -15,7 +15,7 @@ import { serializeGame } from "../../logic/serializer";
 import { PubSubEvent, pubSubService } from "../../utils/pub-sub-service";
 import { requestAnimationFrameWithTimeout } from "../../utils/promise-utils";
 import { activateOnboardingHighlight } from "./controls-and-info/controls/controls-component";
-import { hasMoreLevels, readableLevel } from "../../logic/levels";
+import { hasMoreLevels } from "../../logic/levels";
 import { DEFAULT_FIELD_SIZE } from "../../logic/data/field-size";
 import { LevelDefinition, levels } from "../../logic/level-definition";
 import { configItemsWithout, setKnownConfigItems } from "../../logic/config/config";
@@ -51,7 +51,7 @@ export async function GameAreaComponent(): Promise<ComponentDefinition<StartNewG
   async function startNewGame(options: StartNewGameOptions) {
     let newGameSetup: GameSetup | undefined = options.gameSetup ?? determineGameSetup(options);
 
-    setKnownConfigItems(configItemsWithout(levels[newGameSetup?.levelIndex ?? -1].excludedConfigItems));
+    setKnownConfigItems(configItemsWithout(levels[newGameSetup?.levelIndex ?? -1]?.excludedConfigItems));
 
     const isBetweenGames = !options.isFirstGame && !options.isDoOver;
     let betweenGamesCheckResult: BetweenGamesCheckResult = {};
@@ -70,8 +70,7 @@ export async function GameAreaComponent(): Promise<ComponentDefinition<StartNewG
     globals.nextPositionsIfWait = calculateNewPositions(globals.gameState, Tool.WAIT);
 
     if (HAS_LOCATION_SERIALIZATION) {
-      const serializedGameSetup = serializeGame(gameSetup);
-      location.hash = gameSetup.levelIndex > -1 ? `#${readableLevel(gameSetup.levelIndex)}` : `#${serializedGameSetup}`;
+      location.hash = `#${serializeGame(gameSetup)}`;
     }
 
     document.body.style.setProperty("--s-cnt", gameSetup.fieldSize.toString());
