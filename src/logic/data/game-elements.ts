@@ -69,7 +69,7 @@ export function determineGameSetup(options: { isDoOver?: boolean } = {}): GameSe
 
   if (options.isDoOver && globals.gameState) {
     gameSetup = globals.gameState.setup;
-  } else {
+  } else if (isInitialStart) {
     const currentHighestLevelIndex = getCurrentHighestLevelIndex();
     const nextLevel = levels[currentHighestLevelIndex];
 
